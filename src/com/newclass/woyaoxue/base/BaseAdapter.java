@@ -3,22 +3,19 @@ package com.newclass.woyaoxue.base;
 import java.util.List;
 
 import com.lidroid.xutils.ViewUtils;
-
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
-public class BaseAdapter<T> extends ArrayAdapter
+public class BaseAdapter<T> extends android.widget.BaseAdapter
 {
-
-	private int mResource;
 	private List<T> data;
+	private Context mContext;
+	private int mResource;
 
-	public BaseAdapter(Context context, int resource, List<T> objects)
+	public BaseAdapter(Context context, List<T> objects)
 	{
-		super(context, resource, objects);
-		this.mResource = resource;
+		this.mContext = context;
 		this.data = objects;
 	}
 
@@ -26,10 +23,32 @@ public class BaseAdapter<T> extends ArrayAdapter
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
 		T t = this.data.get(position);
-		View view = View.inflate(getContext(), this.mResource, null);
-		ViewUtils.inject(view);
+		if (convertView == null)
+		{
+			convertView = View.inflate(this.mContext, this.mResource, null);
+		}
+		else
+		{}
 
-		return view;
+		return convertView;
+	}
+
+	@Override
+	public int getCount()
+	{
+		return this.data.size();
+	}
+
+	@Override
+	public T getItem(int position)
+	{
+		return this.data.get(position);
+	}
+
+	@Override
+	public long getItemId(int position)
+	{
+		return position;
 	}
 
 }

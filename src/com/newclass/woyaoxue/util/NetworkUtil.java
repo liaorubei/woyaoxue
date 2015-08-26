@@ -2,7 +2,8 @@ package com.newclass.woyaoxue.util;
 
 public class NetworkUtil
 {
-	public static String domain = "http://192.168.3.121:801";
+	// public static String domain = "http://192.168.3.121:801";
+	public static String domain = "http://voc2015.cloudapp.net";
 
 	public static String getDocs()
 	{

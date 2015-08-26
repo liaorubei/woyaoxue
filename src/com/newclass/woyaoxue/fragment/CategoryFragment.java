@@ -78,6 +78,7 @@ public class CategoryFragment extends Fragment
 		}
 		if (adapter == null)
 		{
+			Log.i("logi", getActivity() + "");
 			adapter = new MyAdapter(getActivity(), R.layout.listitem_category, objs);
 		}
 		adapter.notifyDataSetChanged();

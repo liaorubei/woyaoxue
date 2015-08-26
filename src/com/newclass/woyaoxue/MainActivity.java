@@ -23,6 +23,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.fragment.CategoryFragment;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitlePageIndicator;
 
 import android.support.v4.app.Fragment;
@@ -35,7 +36,7 @@ import android.support.v4.view.ViewPager;
 public class MainActivity extends FragmentActivity
 {
 	@ViewInject(R.id.indicator)
-	private TitlePageIndicator indicator;
+	private TabPageIndicator indicator;
 	@ViewInject(R.id.viewPager)
 	private ViewPager viewPager;
 
@@ -57,6 +58,7 @@ public class MainActivity extends FragmentActivity
 		mPagerAdapter = new MyPagerAdatper(getSupportFragmentManager());
 	
 		viewPager.setAdapter(mPagerAdapter);	
+		
 		indicator.setViewPager(viewPager);
 	
 		initData();
