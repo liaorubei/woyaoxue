@@ -318,6 +318,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		tv_bSide.setText("" + mp.getDuration());
 
 		// 定时更新歌词及SeekBar
+
+		
 		new Timer().schedule(new TimerTask()
 		{
 
@@ -325,7 +327,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			public void run()
 			{
 				// TODO Auto-generated method stub
-				if (mediaPlayer.isPlaying())
+				if (mediaPlayer!=null&&mediaPlayer.isPlaying())
 				{
 					handler.sendEmptyMessage(REFRESH_SEEKBAR);
 				}
