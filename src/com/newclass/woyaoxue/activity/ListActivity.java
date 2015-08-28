@@ -59,7 +59,7 @@ public class ListActivity extends Activity implements OnItemClickListener
 
 		listView.setOnItemClickListener(this);
 
-		String url = NetworkUtil.getDocsById(levelId);
+		String url = NetworkUtil.getDocsByLevelId(levelId);
 		Log.i("logi", "url=" + url);
 		new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
 		{

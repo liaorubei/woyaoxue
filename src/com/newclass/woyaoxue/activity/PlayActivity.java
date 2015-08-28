@@ -10,11 +10,18 @@ import java.util.TimerTask;
 
 import org.w3c.dom.Text;
 
+import com.google.gson.Gson;
+import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.R;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.Lyric;
+import com.newclass.woyaoxue.util.NetworkUtil;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -48,8 +55,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PlayActivity extends Activity implements OnClickListener, OnBufferingUpdateListener, OnPreparedListener, OnErrorListener
-{
+public class PlayActivity extends Activity
+		implements OnClickListener, OnBufferingUpdateListener, OnPreparedListener, OnErrorListener {
 	protected static final int REFRESH_SEEKBAR = 0;
 	@ViewInject(R.id.tv_title)
 	private TextView tv_title;
@@ -74,12 +81,9 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	List<Lyric> lyrics = new ArrayList<Lyric>();
 
-	private Handler handler = new Handler()
-	{
-		public void handleMessage(android.os.Message msg)
-		{
-			switch (msg.what)
-			{
+	private Handler handler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
 			case REFRESH_SEEKBAR:
 				refresh_seekbar();
 				break;
@@ -97,29 +101,37 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	private List<TextView> translateTextViews;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{// http://voc2015.cloudapp.net/Home/Detail/431
+	protected void onCreate(Bundle savedInstanceState) {// http://voc2015.cloudapp.net/NewClass/DocById/431
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_play);
 		ViewUtils.inject(this);
 
 		Intent intent = getIntent();
 		int id = intent.getIntExtra("Id", 431);
-		String title = intent.getStringExtra("Title");
-		String soundPath = intent.getStringExtra("SoundPath");
-		Document document = new Document(id, title, soundPath);
-
-		tv_title.setText("我就是那无比重要的标题");
 
 		bt_play.setOnClickListener(this);
 		bt_pause.setOnClickListener(this);
 
-		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
-		{
+		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocById(id), new RequestCallBack<String>() {
 
 			@Override
-			public void onStopTrackingTouch(SeekBar sb)
-			{
+			public void onSuccess(ResponseInfo<String> responseInfo) {
+				Document fromJson = new Gson().fromJson(responseInfo.result, Document.class);
+				tv_title.setText(fromJson.Title);
+
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
+		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+
+			@Override
+			public void onStopTrackingTouch(SeekBar sb) {
 				// TODO Auto-generated method stub
 
 				mediaPlayer.seekTo(sb.getProgress());
@@ -127,18 +139,15 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			}
 
 			@Override
-			public void onStartTrackingTouch(SeekBar seekBar)
-			{
+			public void onStartTrackingTouch(SeekBar seekBar) {
 				// TODO Auto-generated method stub
 
 			}
 
 			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
-			{
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				// 如果由用户手动拖动则更改左右两边的时间标签内容
-				if (fromUser)
-				{
+				if (fromUser) {
 					tv_aSide.setText(millisecondsFormat(mediaPlayer.getCurrentPosition()));
 				}
 
@@ -148,8 +157,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		lines = new ArrayList<LinearLayout>();
 		originalTextViews = new ArrayList<TextView>();
 		translateTextViews = new ArrayList<TextView>();
-		for (int i = 0; i < 25; i++)
-		{
+		for (int i = 0; i < 25; i++) {
 			Lyric lyric = new Lyric();
 			lyric.Original = "为什么老周和老罗都对跑分有这样的反应？我认为，前者是在质疑其必要性，后者是在质疑其客观性。";
 			lyric.Translate = "Why did Lao zhou and Mr. Luo to run points have this reaction?I think that the former is in question its necessity, the latter is in doubt its objectivity.";
@@ -166,13 +174,13 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		initMediaPlayer();
 	}
 
-	private LinearLayout generateLine(Lyric lyric)
-	{
+	private LinearLayout generateLine(Lyric lyric) {
 
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 		params.setMargins(0, 5, 0, 5);
 		layout.setLayoutParams(params);
 
@@ -190,8 +198,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		return layout;
 	}
 
-	private void initView()
-	{
+	private void initView() {
 		Log.i("logi", "---------------");
 		RelativeLayout message_popup = (RelativeLayout) View.inflate(this, R.layout.message_popup, null);
 		Button confirmBtn = (Button) message_popup.findViewById(R.id.confirm_message_btn);
@@ -201,11 +208,9 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		readingMessageNum.setText("1");
 		totalMessageNum.setText("顶戴sdf");
 		confirmBtn.setEnabled(true);
-		confirmBtn.setOnClickListener(new View.OnClickListener()
-		{
+		confirmBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				Toast.makeText(PlayActivity.this, "show it", Toast.LENGTH_LONG).show();
 			}
 		});
@@ -215,8 +220,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	}
 
-	protected String millisecondsFormat(int milliseconds)
-	{
+	protected String millisecondsFormat(int milliseconds) {
 
 		long days = milliseconds / (1000 * 60 * 60 * 24);
 		long hours = (milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
@@ -228,8 +232,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		return minutes + ":" + seconds;
 	}
 
-	protected void refresh_seekbar()
-	{
+	protected void refresh_seekbar() {
 		// TODO Auto-generated method stub
 
 		seekBar.setProgress(mediaPlayer.getCurrentPosition());
@@ -239,17 +242,12 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	}
 
 	@Override
-	public void onClick(View v)
-	{
-		switch (v.getId())
-		{
+	public void onClick(View v) {
+		switch (v.getId()) {
 		case R.id.bt_paly:
-			if (mediaPlayer.isPlaying())
-			{
+			if (mediaPlayer.isPlaying()) {
 				mediaPlayer.pause();
-			}
-			else
-			{
+			} else {
 				mediaPlayer.start();
 			}
 
@@ -260,10 +258,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		}
 	}
 
-	private void initMediaPlayer()
-	{
-		try
-		{
+	private void initMediaPlayer() {
+		try {
 			url = "http://voc2015.cloudapp.net/File/20150822/5e00f7a6-ed99-4ae0-9065-8796d28f4145.mp3";
 			mediaPlayer = new MediaPlayer();
 			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -273,9 +269,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			mediaPlayer.setDataSource(url);
 			// mediaPlayer.prepare(); // might take long! (for buffering, etc)
 			mediaPlayer.prepareAsync();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 
@@ -283,33 +277,30 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	}
 
 	@Override
-	public void onBufferingUpdate(MediaPlayer mp, int percent)
-	{
-		// Log.i("logi", "onBufferingUpdate Position:" + mp.getCurrentPosition() + " Duration:" + mp.getDuration() + " percent:" + percent + "%");
+	public void onBufferingUpdate(MediaPlayer mp, int percent) {
+		// Log.i("logi", "onBufferingUpdate Position:" + mp.getCurrentPosition()
+		// + " Duration:" + mp.getDuration() + " percent:" + percent + "%");
 
 		// seekBar.setProgress(mp.getCurrentPosition());
-		// seekBar.setSecondaryProgress((int) (mp.getDuration() * percent * 0.01));
+		// seekBar.setSecondaryProgress((int) (mp.getDuration() * percent *
+		// 0.01));
 		// tv_aSide.setText("" + mp.getCurrentPosition());
 	}
 
 	@Override
-	public void onPrepared(MediaPlayer mp)
-	{
+	public void onPrepared(MediaPlayer mp) {
 		// TODO Auto-generated method stub
 		mediaPlayer.start();
 		seekBar.setMax(mp.getDuration());
 		tv_bSide.setText("" + mp.getDuration());
 
 		// 定时更新歌词及SeekBar
-		new Timer().schedule(new TimerTask()
-		{
+		new Timer().schedule(new TimerTask() {
 
 			@Override
-			public void run()
-			{
+			public void run() {
 				// TODO Auto-generated method stub
-				if (mediaPlayer.isPlaying())
-				{
+				if (mediaPlayer.isPlaying()) {
 					handler.sendEmptyMessage(REFRESH_SEEKBAR);
 				}
 
@@ -318,15 +309,13 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	}
 
 	@Override
-	public boolean onError(MediaPlayer mp, int what, int extra)
-	{
+	public boolean onError(MediaPlayer mp, int what, int extra) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	protected void onDestroy()
-	{
+	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 
