@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:theme="@style/StyledIndicators" >
         <activity
-            android:name=".MainActivity"
+            android:name="com.newclass.woyaoxue.activity.PlayActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
         <activity android:name="com.newclass.woyaoxue.activity.ListActivity" />
 
         <!-- 播放界面 -->
-        <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" />
+        <!-- <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" /> -->
     </application>
 
 </manifest>
