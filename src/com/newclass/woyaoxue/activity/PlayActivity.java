@@ -28,6 +28,7 @@ import com.newclass.woyaoxue.bean.Lyric;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.SpecialLyricView;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -43,6 +44,8 @@ import android.os.Handler;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -117,6 +120,13 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		bt_play.setOnClickListener(this);
 		bt_pause.setOnClickListener(this);
 
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayShowHomeEnabled(true);
+		//actionBar.setDisplayHomeAsUpEnabled(true);
+		
+		
+		Log.i("logi", "actionBar=" + actionBar);
+
 		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocById(id), new RequestCallBack<String>()
 		{
 
@@ -186,31 +196,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	}
 
-	private void initView()
-	{
-		Log.i("logi", "---------------");
-		RelativeLayout message_popup = (RelativeLayout) View.inflate(this, R.layout.message_popup, null);
-		Button confirmBtn = (Button) message_popup.findViewById(R.id.confirm_message_btn);
-		EditText mSourceText = (EditText) message_popup.findViewById(R.id.source_text);
-		TextView readingMessageNum = (TextView) message_popup.findViewById(R.id.reading_message);
-		TextView totalMessageNum = (TextView) message_popup.findViewById(R.id.total_messages);
-		readingMessageNum.setText("1");
-		totalMessageNum.setText("顶戴sdf");
-		confirmBtn.setEnabled(true);
-		confirmBtn.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				Toast.makeText(PlayActivity.this, "show it", Toast.LENGTH_LONG).show();
-			}
-		});
-
-		PopupWindow popupWindow = new PopupWindow(message_popup);
-		popupWindow.showAsDropDown(sv_lyrics, 5, 5);
-
-	}
-
 	protected String millisecondsFormat(int milliseconds)
 	{
 
@@ -245,6 +230,17 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			if (currentLineTime < currentPosition && currentPosition < nextLineTime)
 			{
 				view.highlight();
+
+				Log.i("logi", "view.getTop()=" + view.getTop() + " ScrollY()=" + sv_lyrics.getScrollY());
+
+				if (sv_lyrics.getScrollY() < view.getTop() && view.getTop() < sv_lyrics.getScrollY() + 800)
+				{
+					Log.i("logi", "不用跳");
+				}else{
+				sv_lyrics.scrollTo(0, view.getTop());
+					
+				}
+
 			}
 			else
 			{
@@ -272,6 +268,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			break;
 
 		case R.id.bt_pause:
+
 			break;
 		}
 	}
@@ -305,8 +302,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	@Override
 	public void onBufferingUpdate(MediaPlayer mp, int percent)
 	{
-		Log.i("logi", "onBufferingUpdate Position:" + mp.getCurrentPosition() + " Duration:" + mp.getDuration() + " percent:" + percent + "%");
-		seekBar.setSecondaryProgress((int) (mp.getDuration() * percent * 0.01));
+		// Log.i("logi", "onBufferingUpdate Position:" + mp.getCurrentPosition() + " Duration:" + mp.getDuration() + " percent:" + percent + "%");
+		// seekBar.setSecondaryProgress((int) (mp.getDuration() * percent * 0.01));
 	}
 
 	@Override
@@ -315,11 +312,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		// TODO Auto-generated method stub
 		mediaPlayer.start();
 		seekBar.setMax(mp.getDuration());
-		tv_bSide.setText("" + mp.getDuration());
+		tv_bSide.setText(millisecondsFormat(mp.getDuration()));
 
 		// 定时更新歌词及SeekBar
 
-		
 		new Timer().schedule(new TimerTask()
 		{
 
@@ -327,7 +323,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			public void run()
 			{
 				// TODO Auto-generated method stub
-				if (mediaPlayer!=null&&mediaPlayer.isPlaying())
+				if (mediaPlayer != null)// && mediaPlayer.isPlaying())
 				{
 					handler.sendEmptyMessage(REFRESH_SEEKBAR);
 				}
@@ -353,6 +349,14 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 		mediaPlayer.release();
 		mediaPlayer = null;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.play_activity, menu);
+		return true;
 	}
 
 }

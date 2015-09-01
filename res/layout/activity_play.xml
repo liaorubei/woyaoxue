@@ -1,7 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    tools:context=".activity.PlayActivity" >
 
     <RelativeLayout
         android:id="@+id/rl_seekbar"
@@ -27,18 +29,13 @@
 
         <SeekBar
             android:id="@+id/seekBar"
+            style="@style/Widget.SeekBar.Normal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_toEndOf="@id/tv_aSide"
             android:layout_toLeftOf="@id/tv_bSide"
             android:layout_toRightOf="@id/tv_aSide"
-            android:layout_toStartOf="@id/tv_bSide"
-            android:max="100"
-            android:maxHeight="1dp"
-            android:minHeight="1dp"
-            android:progress="50"
-            android:secondaryProgress="75" />
+            android:layout_toStartOf="@id/tv_bSide" />
     </RelativeLayout>
 
     <LinearLayout
@@ -117,21 +114,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
 
-<!--                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
+                <!-- 这里面不要写东西 -->
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="这个是原文,这个是原文,这个是原文,这个是原文,这个是原文,这个是原文,这个是原文,这个是原文" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="this is translate,this is translate,this is translate,this is translate" />
-                </LinearLayout> -->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

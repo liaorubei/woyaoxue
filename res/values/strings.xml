@@ -5,4 +5,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <!-- MainActivity更新对话框 -->
+    <string name="upgrade_tips">"更新提示"</string>
+    <string name="negative_text">"取消"</string>
+    <string name="positive_text">"确定"</string>
+
 </resources>
