@@ -4,7 +4,7 @@ public class NetworkUtil
 {
 	// public static String domain = "http://192.168.3.121:801";
 
-	public static String domain = "http://voc2015.cloudapp.net";
+	public static String domain = "http://voc2015.azurewebsites.net";
 
 	public static String getDocs()
 	{
@@ -35,8 +35,18 @@ public class NetworkUtil
 	 */
 	public static String getFullPath(String path)
 	{
-		// TODO Auto-generated method stub
+		
 		return domain + path;
+	}
+
+	/**
+	 * /NewClass/GetLatestPackage
+	 * @return
+	 */
+	public static String getLatest()
+	{
+		
+		return domain+"/NewClass/GetLatestPackage";
 	}
 
 }

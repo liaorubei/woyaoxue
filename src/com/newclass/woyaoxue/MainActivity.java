@@ -14,6 +14,7 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -34,6 +35,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.CategoryFragment;
+import com.newclass.woyaoxue.service.DownLoadService;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitlePageIndicator;
@@ -44,6 +46,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+
+import com.voc.woyaoxue.R;
 
 public class MainActivity extends FragmentActivity
 {
@@ -76,7 +80,7 @@ public class MainActivity extends FragmentActivity
 
 		initData();
 
-		new HttpUtils().send(HttpMethod.GET, "http://www.baidu.com", new RequestCallBack<String>()
+		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLatest(), new RequestCallBack<String>()
 		{
 
 			@Override
@@ -87,7 +91,7 @@ public class MainActivity extends FragmentActivity
 				{
 
 					// 解析
-					UpgradePatch upgradePatch = new UpgradePatch();// new Gson().fromJson(responseInfo.result, UpgradePatch.class);
+					final UpgradePatch upgradePatch = new Gson().fromJson(responseInfo.result, UpgradePatch.class);
 					packageManager = getPackageManager();
 					PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), PackageManager.GET_CONFIGURATIONS);
 					Log.i("logi", " versionCode=" + packageInfo.versionCode + " versionName=" + packageInfo.versionName + " packageName=" + packageInfo.packageName);
@@ -97,7 +101,7 @@ public class MainActivity extends FragmentActivity
 						Builder builder = new AlertDialog.Builder(MainActivity.this);
 						builder.setTitle(R.string.upgrade_tips);
 
-						builder.setMessage("发现了新的版本\r\n文件大小:4.5MB\r\n你需要更新吗?\r\n更新日志");
+						builder.setMessage(upgradePatch.UpgradeInfo);
 						builder.setNegativeButton(R.string.negative_text, new OnClickListener()
 						{
 
@@ -113,7 +117,11 @@ public class MainActivity extends FragmentActivity
 							@Override
 							public void onClick(DialogInterface dialog, int which)
 							{
-								// 开始下载
+								
+								Intent service=new Intent(MainActivity.this, DownLoadService.class);
+								service.putExtra("path", upgradePatch.PackagePath);
+								startService(service);
+								
 
 							}
 						});

@@ -2,10 +2,9 @@ package com.newclass.woyaoxue.fragment;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.voc.woyaoxue.R;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
-import com.newclass.woyaoxue.R;
 import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.bean.Level;

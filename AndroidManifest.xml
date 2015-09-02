@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.newclass.woyaoxue"
+    package="com.voc.woyaoxue"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,6 +9,7 @@
         android:targetSdkVersion="22" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -31,6 +32,10 @@
 
         <!-- 播放界面 -->
         <!-- <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" /> -->
+
+
+        <!-- 更新下载服务 -->
+        <service android:name="com.newclass.woyaoxue.service.DownLoadService" />
     </application>
 
 </manifest>
