@@ -166,6 +166,7 @@ public class MainActivity extends FragmentActivity
 							{
 
 								Intent service = new Intent(MainActivity.this, DownLoadService.class);
+								service.putExtra("versionName", upgradePatch.VersionName);
 								service.putExtra("path", upgradePatch.PackagePath);
 								startService(service);
 
