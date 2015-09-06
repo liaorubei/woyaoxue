@@ -16,6 +16,11 @@ public class NetworkUtil
 		return domain + "/NewClass/levels";
 	}
 
+	/**
+	 * /NewClass/DocsByLevel?levelid={levelId}
+	 * @param levelId
+	 * @return
+	 */
 	public static String getDocsByLevelId(int levelId)
 	{
 		return domain + "/NewClass/DocsByLevel?levelid=" + levelId;

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.voc.woyaoxue"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.2" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -31,8 +31,7 @@
         <activity android:name="com.newclass.woyaoxue.activity.ListActivity" />
 
         <!-- 播放界面 -->
-        <!-- <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" /> -->
-
+        <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" />
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.DownLoadService" />

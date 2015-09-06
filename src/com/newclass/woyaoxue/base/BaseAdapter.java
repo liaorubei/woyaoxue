@@ -13,9 +13,10 @@ public class BaseAdapter<T> extends android.widget.BaseAdapter
 	private Context mContext;
 	private int mResource;
 
-	public BaseAdapter(Context context, List<T> objects)
+	public BaseAdapter(Context context, int resource, List<T> objects)
 	{
 		this.mContext = context;
+		this.mResource = resource;
 		this.data = objects;
 	}
 

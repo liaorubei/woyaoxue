@@ -15,4 +15,6 @@ public class Document
 	public String Title;
 	public List<Lyric> Lyrics;
 	public String SoundPath;
+	public String Duration;
+	public String Size;
 }

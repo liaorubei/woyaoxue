@@ -99,16 +99,6 @@ public class ListActivity extends Activity implements OnItemClickListener
 		startActivity(intent);
 	}
 
-	private class MyListViewAdapter extends BaseAdapter<Document>
-	{
-
-		public MyListViewAdapter(Context context, List<Document> objects)
-		{
-			super(context, objects);
-		}
-
-	}
-
 	private class MyAdapter extends ArrayAdapter<Document>
 	{
 
