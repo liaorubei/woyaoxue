@@ -9,18 +9,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/file_download" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <LinearLayout android:layout_toLeftOf="@id/ib_download"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical" android:paddingTop="5dp">
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="这里是标题" />
+            android:text="这里是标题这里是标题这里是标题这里是标题这里是标题这里是标题这里是标题" android:singleLine="true" android:ellipsize="end"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
