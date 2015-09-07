@@ -4,17 +4,36 @@
     android:layout_height="match_parent"
     android:descendantFocusability="blocksDescendants" >
 
-    <ImageButton
-        android:id="@+id/ib_download"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/file_download" />
+    <FrameLayout
+        android:id="@+id/fl_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true" >
+
+        <ImageButton
+            android:id="@+id/ib_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/file_download" />
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/ib_download"
+            android:max="100"
+            android:maxHeight="5dp"
+            android:minHeight="5dp"
+            android:progress="50" />
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/ib_download"
+        android:layout_toLeftOf="@id/fl_icon"
         android:orientation="vertical"
         android:paddingTop="5dp" >
 
@@ -45,17 +64,5 @@
                 android:text="大小 2.3M" />
         </RelativeLayout>
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/ib_download"
-        android:max="100"
-        android:maxHeight="5dp"
-        android:minHeight="5dp"
-        android:progress="50" />
 
 </RelativeLayout>
