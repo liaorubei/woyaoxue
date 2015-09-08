@@ -10,24 +10,23 @@
         android:layout_height="50dp"
         android:layout_alignParentRight="true" >
 
-        <ImageButton
+        <Button
             android:id="@+id/ib_download"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/file_download" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/file_downloada" />
 
         <ProgressBar
-            android:id="@+id/progressBar1"
+            android:id="@+id/pb_download"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="50dp"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/ib_download"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="36dp"
             android:max="100"
-            android:maxHeight="5dp"
-            android:minHeight="5dp"
-            android:progress="50" />
+            android:maxHeight="8dp"
+            android:minHeight="8dp"
+            android:progress="10" />
     </FrameLayout>
 
     <LinearLayout

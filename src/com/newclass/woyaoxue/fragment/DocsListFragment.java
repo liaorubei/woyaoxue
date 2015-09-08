@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -146,17 +147,21 @@ public class DocsListFragment extends Fragment
 
 			ViewHolder tag = (ViewHolder) convertView.getTag();
 			tag.tv_title.setText(document.Title);
-			tag.tv_duration.setText(document.Duration);
-			tag.tv_size.setText(document.Size);
+			tag.tv_duration.setText(document.Duration+"");
+			tag.tv_size.setText(document.Size+"");
 			tag.ib_download.setOnClickListener(new OnClickListener()
 			{
-
 				@Override
 				public void onClick(View v)
 				{
-					Toast.makeText(getActivity(), "下载" + NetworkUtil.getDocById(document.Id), Toast.LENGTH_LONG).show();
+document.NeedDownLoad=true;
+
 				}
 			});
+			
+			tag.pb_download.setMax(100);
+			tag.pb_download.setProgress(0);
+			
 			return convertView;
 		}
 	}
@@ -165,6 +170,7 @@ public class DocsListFragment extends Fragment
 	{
 
 		public View ib_download;
+		public ProgressBar pb_download;
 		public TextView tv_size;
 		public TextView tv_duration;
 		public TextView tv_title;
