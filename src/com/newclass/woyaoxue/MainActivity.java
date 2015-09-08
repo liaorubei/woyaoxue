@@ -81,6 +81,11 @@ public class MainActivity extends FragmentActivity
 		setContentView(R.layout.activity_main);
 		ViewUtils.inject(this);
 
+		Log.i("logi", "FilesDir=" + getFilesDir());
+		
+		
+		
+
 		// 常规数据请求
 		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
 		{
@@ -141,7 +146,7 @@ public class MainActivity extends FragmentActivity
 					final UpgradePatch upgradePatch = new Gson().fromJson(responseInfo.result, UpgradePatch.class);
 					packageManager = getPackageManager();
 					PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), PackageManager.GET_CONFIGURATIONS);
-					//Log.i("logi", "versionCode=" + packageInfo.versionCode + " versionName=" + packageInfo.versionName + " packageName=" + packageInfo.packageName);
+					// Log.i("logi", "versionCode=" + packageInfo.versionCode + " versionName=" + packageInfo.versionName + " packageName=" + packageInfo.packageName);
 
 					if (!packageInfo.versionName.equals(upgradePatch.VersionName))
 					{

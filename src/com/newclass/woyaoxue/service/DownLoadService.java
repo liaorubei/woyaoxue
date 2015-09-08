@@ -20,6 +20,11 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.newclass.woyaoxue.util.NetworkUtil;
 
+/**
+ * 自动更新服务
+ * @author liaorubei
+ *
+ */
 public class DownLoadService extends Service
 {
 	private AlertDialog alertDialog;

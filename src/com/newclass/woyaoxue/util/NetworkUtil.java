@@ -17,7 +17,7 @@ public class NetworkUtil
 	}
 
 	/**
-	 * /NewClass/DocsByLevel?levelid={levelId}
+	 * /NewClass/DocsByLevelId/{levelId}
 	 * @param id
 	 * @return
 	 */

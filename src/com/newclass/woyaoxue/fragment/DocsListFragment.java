@@ -1,12 +1,18 @@
 package com.newclass.woyaoxue.fragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +37,8 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
+import com.newclass.woyaoxue.service.BatchDownloadService;
+import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
@@ -64,6 +72,13 @@ public class DocsListFragment extends Fragment
 		{
 			adapter = new MyAdatper(getActivity(), R.layout.listitem_docslist, documents);
 		}
+
+		int flags;
+		ServiceConnection conn;
+		Intent service;
+		// 开启批量下载服务
+		// getActivity().bindService(service, conn, flags);
+
 	}
 
 	@Override
@@ -142,26 +157,44 @@ public class DocsListFragment extends Fragment
 				holder.tv_duration = (TextView) convertView.findViewById(R.id.tv_duration);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.ib_download = convertView.findViewById(R.id.ib_download);
+				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
 				convertView.setTag(holder);
 			}
 
 			ViewHolder tag = (ViewHolder) convertView.getTag();
 			tag.tv_title.setText(document.Title);
-			tag.tv_duration.setText(document.Duration+"");
-			tag.tv_size.setText(document.Size+"");
+			tag.tv_duration.setText("时间 " + document.Duration);
+			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
+
+			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色,
 			tag.ib_download.setOnClickListener(new OnClickListener()
 			{
 				@Override
 				public void onClick(View v)
 				{
-document.NeedDownLoad=true;
+					// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让点击跳过代码
+					if (document.SoundFileExists || batchDownloadBinder.isInDownloadQueue(document))
+					{
 
+					}
+					else
+					{
+						document.NeedDownLoad = true;
+						v.setClickable(false);
+						Log.i("logi", "下载按钮被点击了");
+
+						addToDownloadLists(document);
+
+					}
+
+					//
 				}
+
 			});
-			
+
 			tag.pb_download.setMax(100);
 			tag.pb_download.setProgress(0);
-			
+
 			return convertView;
 		}
 	}
@@ -174,6 +207,31 @@ document.NeedDownLoad=true;
 		public TextView tv_size;
 		public TextView tv_duration;
 		public TextView tv_title;
+	}
+
+	private void addToDownloadLists(Document document)
+	{
+		batchDownloadBinder.addToDownloadLists(document);
+
+	}
+
+	private BatchDownloadBinder batchDownloadBinder;
+
+	private class MyServiceConnection implements ServiceConnection
+	{
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service)
+		{
+			batchDownloadBinder = (BatchDownloadBinder) service;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name)
+		{
+			// TODO Auto-generated method stub
+
+		}
 	}
 
 }
