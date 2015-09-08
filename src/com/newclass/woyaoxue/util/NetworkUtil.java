@@ -18,12 +18,12 @@ public class NetworkUtil
 
 	/**
 	 * /NewClass/DocsByLevel?levelid={levelId}
-	 * @param levelId
+	 * @param id
 	 * @return
 	 */
-	public static String getDocsByLevelId(int levelId)
+	public static String getDocsByLevelId(int id)
 	{
-		return domain + "/NewClass/DocsByLevel?levelid=" + levelId;
+		return domain + "/NewClass/DocsByLevelId/" + id;
 	}
 
 	public static String getDocById(int id)
