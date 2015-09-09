@@ -4,13 +4,20 @@ import com.newclass.woyaoxue.bean.Lyric;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class SpecialLyricView extends LinearLayout implements Comparable<SpecialLyricView>
 {
+	public static final int SHOW_CN = 1;
+	public static final int SHOW_EN = 2;
+	public static final int SHOW_ENCN = 3;
+	public static final int SHOW_NONE = 0;
+
 	private Lyric mLyric;
 	private TextView originalTextView;
+	private TextView translateTextView;
 
 	public SpecialLyricView(Context context, Lyric lyric)
 	{
@@ -24,14 +31,12 @@ public class SpecialLyricView extends LinearLayout implements Comparable<Special
 		this.setOrientation(LinearLayout.VERTICAL);
 
 		originalTextView = new TextView(context);
-
 		originalTextView.setText(lyric.Original);
-
 		this.addView(originalTextView);
 
-		TextView textView2 = new TextView(context);
-		textView2.setText(lyric.Translate);
-		this.addView(textView2);
+		translateTextView = new TextView(context);
+		translateTextView.setText(lyric.Translate);
+		this.addView(translateTextView);
 	}
 
 	@Override
@@ -53,6 +58,33 @@ public class SpecialLyricView extends LinearLayout implements Comparable<Special
 	public void resetColor()
 	{
 		this.originalTextView.setTextColor(Color.BLACK);
+	}
+
+	/**
+	 * 
+	 * @param target SHOW_CN,SHOW_EN,SHOW_CN_EN,SHOW_NONE四个中的一个
+	 */
+	public void showEnCn(int target)
+	{
+		switch (target)
+		{
+		case SHOW_CN:
+			this.setVisibility(View.VISIBLE);
+			translateTextView.setVisibility(View.GONE);
+			break;
+		case SHOW_EN:
+			this.setVisibility(View.VISIBLE);
+			originalTextView.setVisibility(View.GONE);
+			break;
+		case SHOW_ENCN:
+			this.setVisibility(View.VISIBLE);
+			originalTextView.setVisibility(View.VISIBLE);
+			translateTextView.setVisibility(View.VISIBLE);
+			break;
+		case SHOW_NONE:
+			this.setVisibility(View.GONE);
+			break;
+		}
 	}
 
 }

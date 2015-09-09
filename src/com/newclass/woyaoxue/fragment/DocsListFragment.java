@@ -154,7 +154,7 @@ public class DocsListFragment extends Fragment
 				convertView = View.inflate(getActivity(), R.layout.listitem_docslist, null);
 				ViewHolder holder = new ViewHolder();
 				holder.tv_title = (TextView) convertView.findViewById(R.id.tv_title);
-				holder.tv_duration = (TextView) convertView.findViewById(R.id.tv_duration);
+				//holder.tv_duration = (TextView) convertView.findViewById(R.id.tv_duration);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.ib_download = convertView.findViewById(R.id.ib_download);
 				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
@@ -163,7 +163,7 @@ public class DocsListFragment extends Fragment
 
 			ViewHolder tag = (ViewHolder) convertView.getTag();
 			tag.tv_title.setText(document.Title);
-			tag.tv_duration.setText("时间 " + document.Duration);
+			//tag.tv_duration.setText("时间 " + document.Duration);
 			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
 
 			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色,
@@ -205,7 +205,7 @@ public class DocsListFragment extends Fragment
 		public View ib_download;
 		public ProgressBar pb_download;
 		public TextView tv_size;
-		public TextView tv_duration;
+		//public TextView tv_duration;
 		public TextView tv_title;
 	}
 

@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -28,6 +29,7 @@ import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
@@ -87,12 +89,20 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		};
 	};
 
+	private List<Integer> subTitleIcons;
+	private Integer subTitleState = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{// http://voc2015.cloudapp.net/NewClass/DocById/431
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_play);
 		ViewUtils.inject(this);
+
+		subTitleIcons = new ArrayList<Integer>();
+		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_none);
+		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_cn);
+		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_encn);
 
 		Intent intent = getIntent();
 		int id = intent.getIntExtra("Id", 429);
@@ -101,10 +111,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		bt_pause.setOnClickListener(this);
 
 		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayShowHomeEnabled(true);
-		//actionBar.setDisplayHomeAsUpEnabled(true);
-		
-		
+
+		// 返回按钮
+		actionBar.setDisplayHomeAsUpEnabled(true);
+
 		Log.i("logi", "actionBar=" + actionBar);
 
 		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocById(id), new RequestCallBack<String>()
@@ -128,6 +138,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 				for (SpecialLyricView specialLyricView : specialLyricViews)
 				{
+					//在刚开始的时候,是不显示字幕的
+					specialLyricView.showEnCn(SpecialLyricView.SHOW_NONE);					
 					ll_lyrics.addView(specialLyricView);
 				}
 
@@ -138,7 +150,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -149,7 +160,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			@Override
 			public void onStopTrackingTouch(SeekBar sb)
 			{
-				// TODO Auto-generated method stub
 
 				mediaPlayer.seekTo(sb.getProgress());
 
@@ -158,7 +168,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar)
 			{
-				// TODO Auto-generated method stub
 
 			}
 
@@ -195,7 +204,12 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		long nextLineTime = 0;
 
 		// Color.parseColor("#ffffff")
-		// TODO Auto-generated method stub
+
+		if (mediaPlayer == null)
+		{
+			return;
+		}
+
 		int currentPosition = mediaPlayer.getCurrentPosition();
 		seekBar.setProgress(mediaPlayer.getCurrentPosition());
 		tv_aSide.setText(millisecondsFormat(mediaPlayer.getCurrentPosition()));
@@ -211,14 +225,16 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			{
 				view.highlight();
 
-				Log.i("logi", "view.getTop()=" + view.getTop() + " ScrollY()=" + sv_lyrics.getScrollY());
+				// Log.i("logi", "view.getTop()=" + view.getTop() + " ScrollY()=" + sv_lyrics.getScrollY());
 
 				if (sv_lyrics.getScrollY() < view.getTop() && view.getTop() < sv_lyrics.getScrollY() + 800)
 				{
-					Log.i("logi", "不用跳");
-				}else{
-				sv_lyrics.scrollTo(0, view.getTop());
-					
+					// Log.i("logi", "不用跳");
+				}
+				else
+				{
+					sv_lyrics.scrollTo(0, view.getTop());
+
 				}
 
 			}
@@ -289,7 +305,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	@Override
 	public void onPrepared(MediaPlayer mp)
 	{
-		// TODO Auto-generated method stub
+
 		mediaPlayer.start();
 		seekBar.setMax(mp.getDuration());
 		tv_bSide.setText(millisecondsFormat(mp.getDuration()));
@@ -302,7 +318,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			@Override
 			public void run()
 			{
-				// TODO Auto-generated method stub
+
 				if (mediaPlayer != null)// && mediaPlayer.isPlaying())
 				{
 					handler.sendEmptyMessage(REFRESH_SEEKBAR);
@@ -315,20 +331,17 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	@Override
 	public boolean onError(MediaPlayer mp, int what, int extra)
 	{
-		// TODO Auto-generated method stub
+
 		return false;
 	}
 
 	@Override
 	protected void onDestroy()
 	{
-		// TODO Auto-generated method stub
-		super.onDestroy();
-
 		handler.removeCallbacksAndMessages(null);
-
 		mediaPlayer.release();
 		mediaPlayer = null;
+		super.onDestroy();
 	}
 
 	@Override
@@ -337,6 +350,55 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.play_activity, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		case android.R.id.home:
+			this.finish();
+			return true;
+		case R.id.menu_switch:
+			subTitleState++;
+			int state = subTitleState % subTitleIcons.size();
+			showOrHideSubtitle(state);
+			item.setIcon(subTitleIcons.get(state));
+			Toast.makeText(this, "点击了语言切换", Toast.LENGTH_LONG).show();
+
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
+	}
+
+	private void showOrHideSubtitle(int state)
+	{
+		Integer integer = subTitleIcons.get(state);
+		switch (integer)
+		{
+		case R.drawable.ico_actionbar_subtitle_none:
+			for (SpecialLyricView view : specialLyricViews)
+			{
+				view.showEnCn(SpecialLyricView.SHOW_NONE);
+			}
+			break;
+		case R.drawable.ico_actionbar_subtitle_cn:
+			for (SpecialLyricView view : specialLyricViews)
+			{
+				view.showEnCn(SpecialLyricView.SHOW_CN);
+			}
+			break;
+		case R.drawable.ico_actionbar_subtitle_encn:
+			for (SpecialLyricView view : specialLyricViews)
+			{
+				view.showEnCn(SpecialLyricView.SHOW_ENCN);
+			}
+			break;
+		}
+
 	}
 
 }
