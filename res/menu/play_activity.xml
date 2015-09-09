@@ -9,7 +9,7 @@
     <item
         android:id="@+id/menu_play"
         android:icon="@drawable/ic_launcher"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="never"
         android:title="这个是菜单"/>
 
 </menu>

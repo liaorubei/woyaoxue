@@ -42,10 +42,10 @@ public class SpecialLyricView extends LinearLayout implements Comparable<Special
 	@Override
 	public int compareTo(SpecialLyricView another)
 	{
-		return Long.valueOf(this.mLyric.TimeLabel).compareTo(another.mLyric.TimeLabel);
+		return Integer.valueOf(this.mLyric.TimeLabel).compareTo(another.mLyric.TimeLabel);
 	}
 
-	public Long getTimeLabel()
+	public Integer getTimeLabel()
 	{
 		return this.mLyric.TimeLabel;
 	}
