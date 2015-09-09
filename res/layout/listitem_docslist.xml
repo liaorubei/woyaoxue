@@ -50,19 +50,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
 
-            <TextView
+   <!--          <TextView
                 android:id="@+id/tv_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="时长 00:23"
                 android:textColor="#88000000"
-                android:textSize="12sp" />
+                android:textSize="12sp" /> -->
 
             <TextView
                 android:id="@+id/tv_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="65dp"
+            
                 android:text="2.3M"
                 android:textColor="#88000000"
                 android:textSize="12sp" />
