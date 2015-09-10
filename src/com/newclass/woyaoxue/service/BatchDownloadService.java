@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * 批量音频下载服务
@@ -24,6 +25,7 @@ public class BatchDownloadService extends Service
 	@Override
 	public void onCreate()
 	{
+		Log.i("logi", "BatchDownloadService--" + "onCreate");
 		downloadLists = new ArrayList<Document>();
 		super.onCreate();
 	}
@@ -47,10 +49,9 @@ public class BatchDownloadService extends Service
 	public class BatchDownloadBinder extends Binder
 	{
 
-		public void addToDownloadLists(Document document)
+		public void addToDownloadQueue(Document document)
 		{
 			downloadLists.add(document);
-
 		}
 
 		public boolean isInDownloadQueue(Document document)

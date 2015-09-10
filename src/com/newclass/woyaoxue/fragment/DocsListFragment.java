@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Service;
+import android.app.ActionBar.Tab;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -20,6 +22,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -73,12 +76,10 @@ public class DocsListFragment extends Fragment
 			adapter = new MyAdatper(getActivity(), R.layout.listitem_docslist, documents);
 		}
 
-		int flags;
-		ServiceConnection conn;
-		Intent service;
+		Intent service = new Intent(getActivity(), BatchDownloadService.class);
+		ServiceConnection conn = new MyServiceConnection();
 		// 开启批量下载服务
-		// getActivity().bindService(service, conn, flags);
-
+		getActivity().bindService(service, conn, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -153,21 +154,24 @@ public class DocsListFragment extends Fragment
 			{
 				convertView = View.inflate(getActivity(), R.layout.listitem_docslist, null);
 				ViewHolder holder = new ViewHolder();
-				holder.tv_title = (TextView) convertView.findViewById(R.id.tv_title);
-				//holder.tv_duration = (TextView) convertView.findViewById(R.id.tv_duration);
-				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
+				holder.tv_title_one = (TextView) convertView.findViewById(R.id.tv_title_one);
+				// holder.tv_duration = (TextView) convertView.findViewById(R.id.tv_duration);
+				//holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
+				/*holder.fl_icon=convertView.findViewById(R.id.fl_icon);
 				holder.ib_download = convertView.findViewById(R.id.ib_download);
-				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
+				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);*/
 				convertView.setTag(holder);
 			}
 
 			ViewHolder tag = (ViewHolder) convertView.getTag();
-			tag.tv_title.setText(document.Title);
-			//tag.tv_duration.setText("时间 " + document.Duration);
-			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
+			tag.tv_title_one.setText(document.Title);
+		/*	// tag.tv_duration.setText("时间 " + document.Duration);
+			//tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
 
-			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色,
-			tag.ib_download.setOnClickListener(new OnClickListener()
+			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色
+			tag.ib_download.setBackgroundResource((document.SoundFileExists || batchDownloadBinder.isInDownloadQueue(document)) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
+			//tag.pb_download
+			tag.fl_icon.setOnClickListener(new OnClickListener()
 			{
 				@Override
 				public void onClick(View v)
@@ -175,26 +179,17 @@ public class DocsListFragment extends Fragment
 					// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让点击跳过代码
 					if (document.SoundFileExists || batchDownloadBinder.isInDownloadQueue(document))
 					{
-
+						Toast.makeText(getActivity(), "文件已下载", Toast.LENGTH_SHORT).show();
 					}
 					else
 					{
-						document.NeedDownLoad = true;
-						v.setClickable(false);
-						Log.i("logi", "下载按钮被点击了");
-
-						addToDownloadLists(document);
-
+						v.setBackgroundResource(R.drawable.file_download_disable);
+						batchDownloadBinder.addToDownloadQueue(document);
 					}
-
-					//
 				}
 
-			});
-
-			tag.pb_download.setMax(100);
-			tag.pb_download.setProgress(0);
-
+			});*/
+			
 			return convertView;
 		}
 	}
@@ -202,17 +197,14 @@ public class DocsListFragment extends Fragment
 	private class ViewHolder
 	{
 
+		//public TextView tv_size;
+		// public TextView tv_duration;
+		public TextView tv_title_one;
+		public TextView tv_title_two;
+		
+		public View fl_icon;
 		public View ib_download;
-		public ProgressBar pb_download;
-		public TextView tv_size;
-		//public TextView tv_duration;
-		public TextView tv_title;
-	}
-
-	private void addToDownloadLists(Document document)
-	{
-		batchDownloadBinder.addToDownloadLists(document);
-
+		public View pb_download;
 	}
 
 	private BatchDownloadBinder batchDownloadBinder;

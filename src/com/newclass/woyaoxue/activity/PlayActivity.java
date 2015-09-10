@@ -218,8 +218,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 				for (SpecialLyricView specialLyricView : specialLyricViews)
 				{
-					// 在刚开始的时候,是不显示字幕的
-					specialLyricView.showEnCn(SpecialLyricView.SHOW_NONE);
+					// 在刚开始的时候,显示中文字幕的
+					specialLyricView.showEnCn(SpecialLyricView.SHOW_CN);
 					ll_lyrics.addView(specialLyricView);
 				}
 
@@ -311,8 +311,24 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		mp.start();
 		seekBar.setMax(mp.getDuration());
 		tv_bSide.setText(millisecondsFormat(mp.getDuration()));
-
 		sideB = mp.getDuration();
+
+		//点出播放单句
+		if (specialLyricViews != null)
+		{
+			for (SpecialLyricView i : specialLyricViews)
+			{
+				i.setOnClickListener(new OnClickListener()
+				{
+
+					@Override
+					public void onClick(View v)
+					{
+						mediaPlayer.seekTo(((SpecialLyricView) v).getTimeLabel());
+					}
+				});
+			}
+		}
 
 		// 定时更新歌词及SeekBar,找出当前播放的那一句
 		new Timer().schedule(new TimerTask()
@@ -329,7 +345,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 				}
 
 			}
-		}, 0, 1000);
+		}, 0, 100);
 	}
 
 	protected void refresh_seekbar()
@@ -411,7 +427,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 				}
 			}
 		}
-
 	}
 
 	private void showOrHideSubtitle(int state)
