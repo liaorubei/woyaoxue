@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants" >
 
     <FrameLayout
         android:id="@+id/fl_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:background="@drawable/file_download_enbale" >
@@ -36,8 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/fl_icon"
         android:layout_toStartOf="@id/fl_icon"
-        android:orientation="vertical"
-        android:paddingTop="5dp" >
+        android:orientation="vertical" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,7 +59,7 @@
                 android:layout_weight="1"
                 android:text="2012-12-12"
                 android:textColor="#a0a0a0"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,7 +67,7 @@
                 android:layout_weight="1"
                 android:text="100:59"
                 android:textColor="#a0a0a0"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -76,13 +75,13 @@
                 android:layout_weight="1"
                 android:text="56.00MB"
                 android:textColor="#a0a0a0"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/tv_title_two"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="3"
             android:ellipsize="end"
             android:singleLine="true"
