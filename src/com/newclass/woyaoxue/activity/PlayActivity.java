@@ -108,6 +108,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		try
 		{
 			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setLooping(true);//默认开启循环播放
 			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			mediaPlayer.setOnBufferingUpdateListener(this);
 			mediaPlayer.setOnPreparedListener(this);
@@ -219,7 +220,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 				for (SpecialLyricView specialLyricView : specialLyricViews)
 				{
 					// 在刚开始的时候,显示中文字幕的
-					specialLyricView.showEnCn(SpecialLyricView.SHOW_CN);
+					specialLyricView.showEnCn(SpecialLyricView.SHOW_NONE);
 					ll_lyrics.addView(specialLyricView);
 				}
 

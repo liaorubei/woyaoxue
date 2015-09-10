@@ -155,24 +155,30 @@ public class DocsListFragment extends Fragment
 				convertView = View.inflate(getActivity(), R.layout.listitem_docslist, null);
 				ViewHolder holder = new ViewHolder();
 				holder.tv_title_one = (TextView) convertView.findViewById(R.id.tv_title_one);
-				// holder.tv_duration = (TextView) convertView.findViewById(R.id.tv_duration);
-				//holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
-				/*holder.fl_icon=convertView.findViewById(R.id.fl_icon);
-				holder.ib_download = convertView.findViewById(R.id.ib_download);
-				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);*/
+				holder.tv_title_two = (TextView) convertView.findViewById(R.id.tv_title_two);
+				holder.tv_date = (TextView) convertView.findViewById(R.id.tv_date);
+				holder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
+				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
+				holder.fl_icon = convertView.findViewById(R.id.fl_icon);
+				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
+
 				convertView.setTag(holder);
 			}
 
 			ViewHolder tag = (ViewHolder) convertView.getTag();
 			tag.tv_title_one.setText(document.Title);
-		/*	// tag.tv_duration.setText("时间 " + document.Duration);
-			//tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
+			tag.tv_title_two.setText("Life is the art of drawing without an eraser");
+			tag.tv_date.setText("2012-12-12");
+			tag.tv_time.setText("00:56");
+			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
+			tag.pb_download.setMax((int) document.Length);
 
 			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色
-			tag.ib_download.setBackgroundResource((document.SoundFileExists || batchDownloadBinder.isInDownloadQueue(document)) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
-			//tag.pb_download
+			tag.fl_icon.setBackgroundResource((document.SoundFileExists || batchDownloadBinder.isInDownloadQueue(document)) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
+
 			tag.fl_icon.setOnClickListener(new OnClickListener()
 			{
+
 				@Override
 				public void onClick(View v)
 				{
@@ -184,12 +190,11 @@ public class DocsListFragment extends Fragment
 					else
 					{
 						v.setBackgroundResource(R.drawable.file_download_disable);
-						batchDownloadBinder.addToDownloadQueue(document);
+						batchDownloadBinder.addToDownloadQueue(document, v);
 					}
 				}
+			});
 
-			});*/
-			
 			return convertView;
 		}
 	}
@@ -197,14 +202,16 @@ public class DocsListFragment extends Fragment
 	private class ViewHolder
 	{
 
-		//public TextView tv_size;
+		// public TextView tv_size;
 		// public TextView tv_duration;
 		public TextView tv_title_one;
 		public TextView tv_title_two;
-		
+		public TextView tv_date;
+		public TextView tv_time;
+		public TextView tv_size;
+
 		public View fl_icon;
-		public View ib_download;
-		public View pb_download;
+		public ProgressBar pb_download;
 	}
 
 	private BatchDownloadBinder batchDownloadBinder;
