@@ -4,20 +4,21 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.newclass.woyaoxue.bean.Document;
-import com.newclass.woyaoxue.util.NetworkUtil;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.newclass.woyaoxue.bean.Document;
+import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.NetworkUtil;
 
 /**
  * 批量音频下载服务
@@ -42,35 +43,12 @@ public class BatchDownloadService extends Service
 			{
 				while (true)
 				{
+
 					if (downloadLists.size() > 0 && !isRunning)
 					{
 						Document document = downloadLists.remove(0);
-						new HttpUtils().download(NetworkUtil.getFullPath(document.SoundPath), document.SoundPath, new RequestCallBack<File>()
-						{
-							public void onStart()
-							{
-								isRunning = true;
-							};
-
-							public void onLoading(long total, long current, boolean isUploading)
-							{
-								Log.i("logi", "total=" + total + " current=" + current + " isUploading=" + isUploading);
-							};
-
-							@Override
-							public void onSuccess(ResponseInfo<File> responseInfo)
-							{
-								isRunning = false;
-
-							}
-
-							@Override
-							public void onFailure(HttpException error, String msg)
-							{
-								isRunning = false;
-
-							}
-						});
+						BatchDownloadCallBacke batchDownloadCallBacke = new BatchDownloadCallBacke(document);
+						new HttpUtils().download(NetworkUtil.getFullPath(document.SoundPath), new File(getFilesDir(), document.SoundPath).getAbsolutePath(), batchDownloadCallBacke);
 					}
 
 					SystemClock.sleep(1000);// 休眠一秒
@@ -103,6 +81,7 @@ public class BatchDownloadService extends Service
 		public void addToDownloadQueue(Document document, View v)
 		{
 			downloadLists.add(document);
+
 		}
 
 		public boolean isInDownloadQueue(Document document)
@@ -110,6 +89,52 @@ public class BatchDownloadService extends Service
 			return downloadLists.contains(document);
 		}
 
+	}
+
+	public class BatchDownloadCallBacke extends RequestCallBack<File>
+	{
+		private ProgressBar progressBar;
+		private Document document;
+
+		public BatchDownloadCallBacke(Document document2)
+		{
+			this.document = document2;
+			// this.progressBar=doc
+		}
+
+		@Override
+		public void onStart()
+		{
+			Log.i("logi", "文件:" + document.SoundPath + "开始下载");
+			isRunning = true;
+		}
+
+		@Override
+		public void onLoading(long total, long current, boolean isUploading)
+		{
+			if (progressBar.getTag().equals(document.SoundPath))
+			{
+				progressBar.setMax((int) total);
+				progressBar.setProgress((int) current);
+			}
+		}
+
+		@Override
+		public void onSuccess(ResponseInfo<File> responseInfo)
+		{
+			Log.i("logi", "文件下载成功,保存在:" + responseInfo.result.getAbsolutePath());
+			document.SoundFileExists = true;
+			isRunning = false;
+
+		}
+
+		@Override
+		public void onFailure(HttpException error, String msg)
+		{
+			Log.i("logi", "文件下载失败,出错信息为:" + msg);
+			document.SoundFileExists = false;
+			isRunning = false;
+		}
 	}
 
 }

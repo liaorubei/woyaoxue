@@ -2,6 +2,8 @@ package com.newclass.woyaoxue.bean;
 
 import java.util.List;
 
+import android.widget.ProgressBar;
+
 public class Document
 {
 	public int Id;
@@ -15,4 +17,6 @@ public class Document
 	public boolean NeedDownLoad;
 	// 声音文件是否已经下载,并已经存在
 	public boolean SoundFileExists;
+
+	public ProgressBar progressBar;
 }

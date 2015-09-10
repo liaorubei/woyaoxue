@@ -1,16 +1,12 @@
 package com.newclass.woyaoxue.fragment;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Service;
-import android.app.ActionBar.Tab;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -22,7 +18,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,7 +37,6 @@ import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
-import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 public class DocsListFragment extends Fragment
@@ -94,7 +88,6 @@ public class DocsListFragment extends Fragment
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				Log.i("logi", "onItemClick");
 				Intent intent = new Intent(getActivity(), PlayActivity.class);
 				intent.putExtra("Id", documents.get(position).Id);
 				startActivity(intent);
@@ -105,14 +98,12 @@ public class DocsListFragment extends Fragment
 
 	public void fillData()
 	{
-		Log.i("logi", "fillData" + this.mFullPath);
+		Log.i("logi", "开始填充数据:" + this.mFullPath);
 		new HttpUtils().send(HttpMethod.GET, this.mFullPath, new RequestCallBack<String>()
 		{
 			@Override
 			public void onFailure(HttpException error, String msg)
-			{
-				Log.i("logi", "msg=" + msg);
-			}
+			{}
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
@@ -189,6 +180,8 @@ public class DocsListFragment extends Fragment
 					}
 					else
 					{
+						// 设置TAG,防止数据在界面乱窜
+						v.setTag(document.SoundPath);
 						v.setBackgroundResource(R.drawable.file_download_disable);
 						batchDownloadBinder.addToDownloadQueue(document, v);
 					}
@@ -228,7 +221,6 @@ public class DocsListFragment extends Fragment
 		@Override
 		public void onServiceDisconnected(ComponentName name)
 		{
-			// TODO Auto-generated method stub
 
 		}
 	}
