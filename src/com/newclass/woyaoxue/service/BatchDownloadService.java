@@ -2,11 +2,15 @@ package com.newclass.woyaoxue.service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.view.View;
@@ -17,8 +21,11 @@ import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.newclass.woyaoxue.bean.Document;
+import com.newclass.woyaoxue.fragment.DocsListFragment.DownloadHelper;
+import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.newclass.woyaoxue.util.UpdateListenerUtil;
 
 /**
  * 批量音频下载服务
@@ -28,15 +35,21 @@ import com.newclass.woyaoxue.util.NetworkUtil;
  */
 public class BatchDownloadService extends Service
 {
-	private List<Document> downloadLists;// 待下载的
+	public static boolean isDownloading = false;
+	public static int downloadCount = 5;
+	private LinkedList<DownloadHelper> downloadQueue;
 	private BatchDownloadBinder batchDownloadBinder;
 	protected boolean isRunning = false;
+
+	protected File root;
 
 	@Override
 	public void onCreate()
 	{
+		root = FolderUtil.rootDir(getApplication());
+
 		Log.i("logi", "BatchDownloadService--" + "onCreate");
-		downloadLists = new ArrayList<Document>();
+		downloadQueue = new LinkedList<DownloadHelper>();
 		new Thread(new Runnable()
 		{
 			public void run()
@@ -44,11 +57,11 @@ public class BatchDownloadService extends Service
 				while (true)
 				{
 
-					if (downloadLists.size() > 0 && !isRunning)
+					if (downloadQueue.size() > 0 && !isDownloading && downloadCount > 0)
 					{
-						Document document = downloadLists.remove(0);
-						BatchDownloadCallBacke batchDownloadCallBacke = new BatchDownloadCallBacke(document);
-						new HttpUtils().download(NetworkUtil.getFullPath(document.SoundPath), new File(getFilesDir(), document.SoundPath).getAbsolutePath(), batchDownloadCallBacke);
+						DownloadHelper first = downloadQueue.pollFirst();
+						new HttpUtils().download(NetworkUtil.getFullPath(first.getDoc().SoundPath), new File(root, first.getDoc().SoundPath).getAbsolutePath(), first);
+						downloadCount--;
 					}
 
 					SystemClock.sleep(1000);// 休眠一秒
@@ -78,63 +91,15 @@ public class BatchDownloadService extends Service
 	public class BatchDownloadBinder extends Binder
 	{
 
-		public void addToDownloadQueue(Document document, View v)
+		public boolean isInDownloadQueue(DownloadHelper callBack)
 		{
-			downloadLists.add(document);
-
+			return downloadQueue.contains(callBack);
 		}
 
-		public boolean isInDownloadQueue(Document document)
+		public void addToDownloadQueue(DownloadHelper callBack)
 		{
-			return downloadLists.contains(document);
+			downloadQueue.add(callBack);
 		}
 
 	}
-
-	public class BatchDownloadCallBacke extends RequestCallBack<File>
-	{
-		private ProgressBar progressBar;
-		private Document document;
-
-		public BatchDownloadCallBacke(Document document2)
-		{
-			this.document = document2;
-			// this.progressBar=doc
-		}
-
-		@Override
-		public void onStart()
-		{
-			Log.i("logi", "文件:" + document.SoundPath + "开始下载");
-			isRunning = true;
-		}
-
-		@Override
-		public void onLoading(long total, long current, boolean isUploading)
-		{
-			if (progressBar.getTag().equals(document.SoundPath))
-			{
-				progressBar.setMax((int) total);
-				progressBar.setProgress((int) current);
-			}
-		}
-
-		@Override
-		public void onSuccess(ResponseInfo<File> responseInfo)
-		{
-			Log.i("logi", "文件下载成功,保存在:" + responseInfo.result.getAbsolutePath());
-			document.SoundFileExists = true;
-			isRunning = false;
-
-		}
-
-		@Override
-		public void onFailure(HttpException error, String msg)
-		{
-			Log.i("logi", "文件下载失败,出错信息为:" + msg);
-			document.SoundFileExists = false;
-			isRunning = false;
-		}
-	}
-
 }

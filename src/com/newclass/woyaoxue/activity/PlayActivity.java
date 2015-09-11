@@ -1,5 +1,6 @@
 package com.newclass.woyaoxue.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,7 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.Lyric;
+import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.SpecialLyricView;
 import com.voc.woyaoxue.R;
@@ -71,6 +73,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	@ViewInject(R.id.iv_line)
 	private ImageView iv_line;
+
+	@ViewInject(R.id.iv_loop)
+	private ImageView iv_loop;
+
 	@ViewInject(R.id.ll_lyrics)
 	private LinearLayout ll_lyrics;
 
@@ -101,19 +107,28 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	/**
 	 * 使用指定的音频路径初始化MediaPlayer
 	 * 
-	 * @param url 音频的全路径
+	 * @param url 音频的相对路径
 	 */
 	private void initMediaPlayer(String url)
 	{
 		try
 		{
 			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setLooping(true);//默认开启循环播放
+			mediaPlayer.setLooping(true);// 默认开启循环播放
 			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			mediaPlayer.setOnBufferingUpdateListener(this);
 			mediaPlayer.setOnPreparedListener(this);
 			mediaPlayer.setOnErrorListener(this);
-			mediaPlayer.setDataSource(url);
+			File file = new File(FolderUtil.rootDir(this), url);
+
+			if (file.exists())
+			{
+				mediaPlayer.setDataSource(file.getAbsolutePath());
+			}
+			else
+			{
+				mediaPlayer.setDataSource(NetworkUtil.getFullPath(url));
+			}
 			// mediaPlayer.prepare(); // might take long! (for buffering, etc)
 			mediaPlayer.prepareAsync();
 		}
@@ -164,6 +179,13 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 				setSideASideB();
 			}
 			break;
+		case R.id.iv_loop:
+			if (mediaPlayer != null)
+			{
+				mediaPlayer.setLooping(!mediaPlayer.isLooping());
+				iv_loop.setImageResource(mediaPlayer.isLooping() ? R.drawable.loop_enable : R.drawable.loop_disable);
+			}
+			break;
 		}
 	}
 
@@ -184,6 +206,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 		bt_play.setOnClickListener(this);
 		iv_line.setOnClickListener(this);
+		iv_loop.setOnClickListener(this);
 
 		ActionBar actionBar = getActionBar();
 
@@ -225,7 +248,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 				}
 
 				// 因为使用的是相对路径,但是在实际请求时要加上域名
-				initMediaPlayer(NetworkUtil.getFullPath(document.SoundPath));
+				initMediaPlayer(document.SoundPath);
 			}
 		});
 
@@ -314,20 +337,25 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		tv_bSide.setText(millisecondsFormat(mp.getDuration()));
 		sideB = mp.getDuration();
 
-		//点出播放单句
-		if (specialLyricViews != null)
+		// 点出播放单句,同时重置A-B两端
+		if (specialLyricViews != null && mediaPlayer != null && mediaPlayer.getDuration() > 0)
 		{
-			for (SpecialLyricView i : specialLyricViews)
+			for (int i = 0; i < specialLyricViews.size(); i++)
 			{
-				i.setOnClickListener(new OnClickListener()
+				final Integer timeA = specialLyricViews.get(i).getTimeLabel();
+				final Integer timeB = i == (specialLyricViews.size() - 1) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
+				specialLyricViews.get(i).setOnClickListener(new OnClickListener()
 				{
 
 					@Override
 					public void onClick(View v)
 					{
-						mediaPlayer.seekTo(((SpecialLyricView) v).getTimeLabel());
+						sideA = timeA;
+						sideB = timeB;
+						mediaPlayer.seekTo(sideA);
 					}
 				});
+
 			}
 		}
 

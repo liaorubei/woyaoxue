@@ -1,5 +1,6 @@
 package com.newclass.woyaoxue.fragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
+import com.newclass.woyaoxue.util.FolderUtil;
 import com.voc.woyaoxue.R;
 
 public class DocsListFragment extends Fragment
@@ -44,6 +46,7 @@ public class DocsListFragment extends Fragment
 	private BaseAdapter<Document> adapter;
 
 	private List<Document> documents;
+	private List<DownloadHelper> callbacks;
 
 	@ViewInject(R.id.listView)
 	private ListView listView;
@@ -61,6 +64,11 @@ public class DocsListFragment extends Fragment
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		if (callbacks == null)
+		{
+			callbacks = new ArrayList<DocsListFragment.DownloadHelper>();
+		}
+
 		if (documents == null)
 		{
 			documents = new ArrayList<Document>();
@@ -114,6 +122,13 @@ public class DocsListFragment extends Fragment
 				{
 					documents.clear();
 					documents.addAll(fromJson);
+
+					callbacks.clear();
+					for (Document document : fromJson)
+					{
+						callbacks.add(new DownloadHelper(document));
+					}
+
 					adapter.notifyDataSetChanged();
 					tv_none_data.setVisibility(View.GONE);
 				}
@@ -140,7 +155,8 @@ public class DocsListFragment extends Fragment
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			final Document document = getItem(position);
+			final DownloadHelper helper = callbacks.get(position);
+			Document document = helper.getDoc();
 			if (convertView == null)
 			{
 				convertView = View.inflate(getActivity(), R.layout.listitem_docslist, null);
@@ -162,10 +178,11 @@ public class DocsListFragment extends Fragment
 			tag.tv_date.setText("2012-12-12");
 			tag.tv_time.setText("00:56");
 			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
-			tag.pb_download.setMax((int) document.Length);
+
+			helper.setProgressBar(tag.pb_download);// 把进度条添加到回调管理中
 
 			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色
-			tag.fl_icon.setBackgroundResource((document.SoundFileExists || batchDownloadBinder.isInDownloadQueue(document)) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
+			tag.fl_icon.setBackgroundResource((helper.exists() || batchDownloadBinder.isInDownloadQueue(helper)) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
 
 			tag.fl_icon.setOnClickListener(new OnClickListener()
 			{
@@ -174,16 +191,19 @@ public class DocsListFragment extends Fragment
 				public void onClick(View v)
 				{
 					// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让点击跳过代码
-					if (document.SoundFileExists || batchDownloadBinder.isInDownloadQueue(document))
+					if (helper.exists())
 					{
-						Toast.makeText(getActivity(), "文件已下载", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), "已经下载", Toast.LENGTH_SHORT).show();
 					}
+					else if (batchDownloadBinder.isInDownloadQueue(helper))
+					{
+						Toast.makeText(getActivity(), "正在下载", Toast.LENGTH_SHORT).show();
+					}
+
 					else
 					{
-						// 设置TAG,防止数据在界面乱窜
-						v.setTag(document.SoundPath);
 						v.setBackgroundResource(R.drawable.file_download_disable);
-						batchDownloadBinder.addToDownloadQueue(document, v);
+						batchDownloadBinder.addToDownloadQueue(helper);
 					}
 				}
 			});
@@ -194,9 +214,6 @@ public class DocsListFragment extends Fragment
 
 	private class ViewHolder
 	{
-
-		// public TextView tv_size;
-		// public TextView tv_duration;
 		public TextView tv_title_one;
 		public TextView tv_title_two;
 		public TextView tv_date;
@@ -222,6 +239,76 @@ public class DocsListFragment extends Fragment
 		public void onServiceDisconnected(ComponentName name)
 		{
 
+		}
+	}
+
+	/**
+	 * 扩展自RequestCallBack的下载辅助类,可以进行基本的回调,文件是否存在判断等功能
+	 * 
+	 * @author liaorubei
+	 *
+	 */
+	public class DownloadHelper extends RequestCallBack<File>
+	{
+		public ProgressBar bar;
+		private Document doc;
+		private long mTotal;
+		private long mCurrent;
+
+		public void setProgressBar(ProgressBar progressBar)
+		{
+			this.bar = progressBar;
+			this.bar.setMax((int) mTotal);
+			this.bar.setProgress((int) mCurrent);
+			this.bar.setTag(doc.SoundPath);
+		}
+
+		public boolean exists()
+		{
+			File file = new File(FolderUtil.rootDir(getActivity()), this.doc.SoundPath);
+			return file.exists();
+		}
+
+		public DownloadHelper(Document document)
+		{
+			this.doc = document;
+		}
+
+		@Override
+		public void onStart()
+		{
+			BatchDownloadService.isDownloading = true;
+		}
+
+		@Override
+		public void onLoading(long total, long current, boolean isUploading)
+		{
+			if (bar != null && bar.getTag().equals(doc.SoundPath))
+			{
+				this.bar.setMax((int) total);
+				this.bar.setProgress((int) current);
+			}
+			this.mTotal = total;
+			this.mCurrent = current;
+		}
+
+		@Override
+		public void onSuccess(ResponseInfo<File> responseInfo)
+		{
+			BatchDownloadService.isDownloading = false;
+			BatchDownloadService.downloadCount++;
+		}
+
+		@Override
+		public void onFailure(HttpException error, String msg)
+		{
+			BatchDownloadService.isDownloading = false;
+			BatchDownloadService.downloadCount++;
+		}
+
+		public Document getDoc()
+		{
+			return doc;
 		}
 	}
 
