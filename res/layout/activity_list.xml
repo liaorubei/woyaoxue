@@ -2,11 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
-
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="上10秒" android:id="@+id/bt_prev"/>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="播放" android:id="@+id/bt_play"/>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="下10秒" android:id="@+id/bt_next"/>
 </LinearLayout>

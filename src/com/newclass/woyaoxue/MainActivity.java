@@ -1,10 +1,8 @@
 package com.newclass.woyaoxue;
 
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -15,15 +13,18 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -36,7 +37,6 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
-import com.newclass.woyaoxue.fragment.CategoryFragment;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
 import com.newclass.woyaoxue.service.DownLoadService;
 import com.newclass.woyaoxue.util.NetworkUtil;
@@ -48,6 +48,8 @@ public class MainActivity extends FragmentActivity
 
 	@ViewInject(R.id.fl_content)
 	private FrameLayout fl_content;
+	@ViewInject(R.id.rg_levels)
+	private RadioGroup rg_levels;
 
 	List<DocsListFragment> fragments;
 	private PackageManager packageManager;
@@ -81,11 +83,6 @@ public class MainActivity extends FragmentActivity
 		setContentView(R.layout.activity_main);
 		ViewUtils.inject(this);
 
-		Log.i("logi", "FilesDir=" + getFilesDir());
-		
-		
-		
-
 		// 常规数据请求
 		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
 		{
@@ -99,9 +96,19 @@ public class MainActivity extends FragmentActivity
 				if (levels.size() > 4)
 				{
 					fragments = new ArrayList<DocsListFragment>();
+					RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, RadioGroup.LayoutParams.MATCH_PARENT);
+					params.gravity = Gravity.CENTER;
+					params.weight = 1;
+					params.setMargins(10, 10, 10, 10);
+					rg_levels.removeAllViews();
 					for (int i = 0; i < 3; i++)
 					{
-						Button button = (Button) ll_ctrl.getChildAt(i);
+						RadioButton button = new RadioButton(MainActivity.this);
+						button.setLayoutParams(params);
+						button.setBackgroundResource(R.drawable.selector_levels);
+						button.setButtonDrawable(android.R.color.transparent);
+						button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+
 						Level level = levels.get(i);
 						button.setText(level.LevelName);
 						button.setTag(i);
@@ -117,8 +124,9 @@ public class MainActivity extends FragmentActivity
 
 						DocsListFragment fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(level.Id));
 						fragments.add(fragment);
+						rg_levels.addView(button);
 					}
-					ll_ctrl.getChildAt(0).performClick();
+					rg_levels.getChildAt(0).performClick();
 				}
 
 			}

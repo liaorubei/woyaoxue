@@ -1,5 +1,8 @@
 package com.newclass.woyaoxue.activity;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,103 +28,109 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class ListActivity extends Activity implements OnItemClickListener
+public class ListActivity extends Activity implements OnClickListener
 {
-	@ViewInject(R.id.listView)
-	private ListView listView;
-
-	private List<Document> objects;
-	private MyAdapter adapter;
+	@ViewInject(R.id.bt_prev)
+	private Button bt_prev;
+	@ViewInject(R.id.bt_play)
+	private Button bt_play;
+	@ViewInject(R.id.bt_next)
+	private Button bt_next;
+	private MediaPlayer mediaPlayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list);
-		int levelId = getIntent().getIntExtra("levelId", 0);
-
 		ViewUtils.inject(this);
 
-		objects = new ArrayList<Document>();
-		adapter = new MyAdapter(ListActivity.this, R.layout.listitem_listactivity, objects);
+		bt_prev.setOnClickListener(this);
+		bt_play.setOnClickListener(this);
+		bt_next.setOnClickListener(this);
+		File file = new File(Environment.getExternalStorageDirectory(), "Download/冬天的秘密-周传雄.mp3");
+		Log.i("logi", "file.exists=" + file.exists());
 
-		listView.setAdapter(adapter);
+		try
+		{
+			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setDataSource(file.getAbsolutePath());
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			mediaPlayer.prepare();
+			mediaPlayer.setLooping(true);
+			mediaPlayer.setOnPreparedListener(new OnPreparedListener()
+			{
 
-		listView.setOnItemClickListener(this);
+				@Override
+				public void onPrepared(MediaPlayer mp)
+				{
+					mp.start();
+				}
+			});
+			mediaPlayer.setOnCompletionListener(new OnCompletionListener()
+			{
 
-		String url = NetworkUtil.getDocsByLevelId(levelId);
-		Log.i("logi", "url=" + url);
-		new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
+				@Override
+				public void onCompletion(MediaPlayer mp)
+				{
+					Log.i("logi", "MediaPlayer播放结束");
+				//	mp.start();
+				}
+			});
+		}
+		catch (Exception e)
 		{
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				List<Document> list = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
-				{}.getType());
-
-				for (Document document : list)
-				{
-					objects.add(document);
-				}
-				adapter.notifyDataSetChanged();
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				// TODO Auto-generated method stub
-
-			}
-		});
+			e.printStackTrace();
+		}
 
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+	public void onClick(View v)
 	{
-		Document document = objects.get(position);
-
-		Intent intent = new Intent(ListActivity.this, PlayActivity.class);
-		intent.putExtra("Id", document.Id);
-		intent.putExtra("Title", document.Title);
-		intent.putExtra("SoundPath", document.SoundPath);
-		startActivity(intent);
-	}
-
-	private class MyAdapter extends ArrayAdapter<Document>
-	{
-
-		private int mResource;
-
-		public MyAdapter(Context context, int resource, List<Document> objects)
+		switch (v.getId())
 		{
-			super(context, resource, objects);
-			this.mResource = resource;
-		}
+		case R.id.bt_prev:
+		//	mediaPlayer.start();
+			mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() - 10000);
+			break;
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
-			Document item = getItem(position);
-			if (convertView == null)
+		case R.id.bt_play:
+			if (mediaPlayer.isPlaying())
 			{
-				convertView = View.inflate(getApplicationContext(), mResource, null);
+				mediaPlayer.pause();
+				bt_play.setText("播放");
 			}
-			((TextView) convertView).setText(item.Title);
-			return convertView;
-		}
+			else
+			{
+				mediaPlayer.start();
+				bt_play.setText("暂停");
+			}
+			break;
+		case R.id.bt_next:
+		//	mediaPlayer.start();
+			mediaPlayer.seekTo(mediaPlayer.getCurrentPosition() + 10000);
+			break;
 
+		}
 	}
 
 }

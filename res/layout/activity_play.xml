@@ -50,48 +50,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ico_line_loop_off"
-            android:text="单句" />
-
-        <ImageView
-            android:id="@+id/iv_loop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:src="@drawable/loop_enable"
-            android:text="单曲循环" />
+            android:contentDescription="单句循环"
+            android:src="@drawable/selector_line_loop_disable" />
 
         <ImageView
             android:id="@+id/iv_prev"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_weight="1"
-            android:src="@android:drawable/ic_media_previous" />
+            android:contentDescription="前一句"
+            android:src="@drawable/selector_prev" />
 
         <ImageView
-            android:id="@+id/bt_paly"
+            android:id="@+id/iv_paly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_weight="1"
-            android:src="@android:drawable/ic_media_play" />
+            android:contentDescription="播放暂停"
+            android:src="@drawable/selector_play_enable" />
 
         <ImageView
             android:id="@+id/iv_next"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_weight="1"
-            android:src="@android:drawable/ic_media_next" />
+            android:contentDescription="后一句"
+            android:src="@drawable/selector_next" />
 
         <ImageView
+            android:id="@+id/iv_microphone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_weight="1"
-            android:src="@drawable/ic_voice_search" />
+            android:contentDescription="待定"
+            android:src="@drawable/microphone_disable" />
     </LinearLayout>
 
     <ScrollView

@@ -9,38 +9,27 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal" >
 
-        <Button
-            android:layout_width="0dp"
+        <RadioGroup
+            android:id="@+id/rg_levels"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:button="@null"
-            android:gravity="center"
-            android:text="Level_01"
-            android:textSize="12sp" />
+            android:layout_weight="3"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_levels"
+                android:button="@null"
+                android:gravity="center"
+                android:text="55555" />
+        </RadioGroup>
 
         <Button
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:button="@null"
-            android:gravity="center"
-            android:text="Level_01"
-            android:textSize="12sp" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:button="@null"
-            android:gravity="center"
-            android:text="Level_01"
-            android:textSize="12sp" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:button="@null"
+            android:background="@drawable/selector_levels"
             android:gravity="center"
             android:text="..."
             android:textSize="12sp" />

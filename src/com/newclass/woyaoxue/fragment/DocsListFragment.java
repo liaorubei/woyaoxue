@@ -116,6 +116,7 @@ public class DocsListFragment extends Fragment
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
+				
 				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
 				{}.getType());
 				if (fromJson != null)
@@ -132,6 +133,7 @@ public class DocsListFragment extends Fragment
 					adapter.notifyDataSetChanged();
 					tv_none_data.setVisibility(View.GONE);
 				}
+				Log.i("logi","onSuccess:"+documents.size());
 			}
 		});
 
@@ -174,9 +176,9 @@ public class DocsListFragment extends Fragment
 
 			ViewHolder tag = (ViewHolder) convertView.getTag();
 			tag.tv_title_one.setText(document.Title);
-			tag.tv_title_two.setText("Life is the art of drawing without an eraser");
-			tag.tv_date.setText("2012-12-12");
-			tag.tv_time.setText("00:56");
+			tag.tv_title_two.setText(document.TitleTwo);
+			tag.tv_date.setText(document.DateString);
+			tag.tv_time.setText(document.LengthString);
 			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
 
 			helper.setProgressBar(tag.pb_download);// 把进度条添加到回调管理中

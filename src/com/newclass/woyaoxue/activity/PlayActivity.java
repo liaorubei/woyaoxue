@@ -3,10 +3,13 @@ package com.newclass.woyaoxue.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.R.integer;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +17,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,11 +50,9 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.SpecialLyricView;
 import com.voc.woyaoxue.R;
 
-public class PlayActivity extends Activity implements OnClickListener, OnBufferingUpdateListener, OnPreparedListener, OnErrorListener
+public class PlayActivity extends Activity implements OnClickListener, OnBufferingUpdateListener, OnPreparedListener, OnErrorListener, OnInfoListener
 {
 	protected static final int REFRESH_SEEKBAR = 0;
-	@ViewInject(R.id.bt_paly)
-	private ImageView bt_play;
 	private Handler handler = new Handler()
 	{
 		public void handleMessage(android.os.Message msg)
@@ -70,12 +72,19 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	// 是否单句循环
 	private boolean isOneLineLoop = false;
-
 	@ViewInject(R.id.iv_line)
 	private ImageView iv_line;
+	@ViewInject(R.id.iv_microphone)
+	private ImageView iv_microphone;
 
-	@ViewInject(R.id.iv_loop)
-	private ImageView iv_loop;
+	@ViewInject(R.id.iv_next)
+	private ImageView iv_next;
+
+	@ViewInject(R.id.iv_paly)
+	private ImageView iv_play;
+
+	@ViewInject(R.id.iv_prev)
+	private ImageView iv_prev;
 
 	@ViewInject(R.id.ll_lyrics)
 	private LinearLayout ll_lyrics;
@@ -85,24 +94,24 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	@ViewInject(R.id.seekBar)
 	private SeekBar seekBar;
 
+	private int sideA = 0;
+
+	private int sideB = 0;
 	private List<SpecialLyricView> specialLyricViews;
 
 	private List<Integer> subTitleIcons;
-	private Integer subTitleState = 0;
 
+	private Integer subTitleState = 0;
 	@ViewInject(R.id.sv_lyrics)
 	private ScrollView sv_lyrics;
 
 	@ViewInject(R.id.tv_aSide)
 	private TextView tv_aSide;
+
 	@ViewInject(R.id.tv_bSide)
 	private TextView tv_bSide;
-
 	@ViewInject(R.id.tv_title)
 	private TextView tv_title;
-
-	private int sideA = 0;
-	private int sideB = 0;
 
 	/**
 	 * 使用指定的音频路径初始化MediaPlayer
@@ -119,18 +128,19 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			mediaPlayer.setOnBufferingUpdateListener(this);
 			mediaPlayer.setOnPreparedListener(this);
 			mediaPlayer.setOnErrorListener(this);
+			mediaPlayer.setOnInfoListener(this);
 			File file = new File(FolderUtil.rootDir(this), url);
 
 			if (file.exists())
 			{
 				mediaPlayer.setDataSource(file.getAbsolutePath());
+				mediaPlayer.prepare();
 			}
 			else
 			{
 				mediaPlayer.setDataSource(NetworkUtil.getFullPath(url));
+				mediaPlayer.prepareAsync();
 			}
-			// mediaPlayer.prepare(); // might take long! (for buffering, etc)
-			mediaPlayer.prepareAsync();
 		}
 		catch (Exception e)
 		{
@@ -159,7 +169,19 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	{
 		switch (v.getId())
 		{
-		case R.id.bt_paly:
+
+		case R.id.iv_line:
+			isOneLineLoop = !isOneLineLoop;
+			iv_line.setImageResource(isOneLineLoop ? R.drawable.selector_line_loop_enable : R.drawable.selector_line_loop_disable);
+			if (isOneLineLoop)
+			{
+				setSideASideB();
+			}
+			break;
+		case R.id.iv_prev:
+			getPrevLine();
+			break;
+		case R.id.iv_paly:
 			if (mediaPlayer.isPlaying())
 			{
 				mediaPlayer.pause();
@@ -169,24 +191,69 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 				mediaPlayer.start();
 			}
 
+			Log.i("logi", "isPlaying=" + mediaPlayer.isPlaying());
+			iv_play.setImageResource(mediaPlayer.isPlaying() ? R.drawable.selector_play_enable : R.drawable.selector_play_disable);
 			break;
 
-		case R.id.iv_line:
-			isOneLineLoop = !isOneLineLoop;
-			iv_line.setImageResource(isOneLineLoop ? R.drawable.ico_line_loop_on : R.drawable.ico_line_loop_off);
-			if (isOneLineLoop)
-			{
-				setSideASideB();
-			}
+		case R.id.iv_next:
+			getNextLine();
 			break;
-		case R.id.iv_loop:
-			if (mediaPlayer != null)
-			{
-				mediaPlayer.setLooping(!mediaPlayer.isLooping());
-				iv_loop.setImageResource(mediaPlayer.isLooping() ? R.drawable.loop_enable : R.drawable.loop_disable);
-			}
+
+		case R.id.iv_microphone:
+			Toast.makeText(this, "功能待定", Toast.LENGTH_LONG).show();
 			break;
+
 		}
+	}
+
+	private void getNextLine()
+	{
+		int index = getCurrentIndex();
+
+		if (index + 2 < specialLyricViews.size())
+		{
+			SpecialLyricView next = specialLyricViews.get(index + 1);
+			SpecialLyricView nextNext = specialLyricViews.get(index + 2);
+			sideA = next.getTimeLabel();
+			sideB = nextNext.getTimeLabel();
+			mediaPlayer.seekTo(sideA);
+		}
+		Log.i("logi", "isPlay=" + mediaPlayer.isPlaying());
+
+	}
+
+	private void getPrevLine()
+	{
+		int index = getCurrentIndex();
+		if (index > 0)
+		{
+			SpecialLyricView prev = specialLyricViews.get(index - 1);
+			SpecialLyricView curr = specialLyricViews.get(index);
+			sideA = prev.getTimeLabel();
+			sideB = curr.getTimeLabel();
+			mediaPlayer.seekTo(sideA);
+		}
+
+	}
+
+	private int getCurrentIndex()
+	{
+
+		if (specialLyricViews != null && mediaPlayer != null && mediaPlayer.getDuration() > 0)
+		{
+			int current = mediaPlayer.getCurrentPosition();
+			for (int i = 0; i < specialLyricViews.size(); i++)
+			{
+				Integer timeA = specialLyricViews.get(i).getTimeLabel();
+				Integer timeB = i == (specialLyricViews.size() - 1) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
+				//含头不含尾,因为当暂停之后再seekto时,current会等于sideA,所以要含头不含尾
+				if (timeA <= current && current < timeB)
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
 	}
 
 	@Override
@@ -204,16 +271,15 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		Intent intent = getIntent();
 		int id = intent.getIntExtra("Id", 429);
 
-		bt_play.setOnClickListener(this);
 		iv_line.setOnClickListener(this);
-		iv_loop.setOnClickListener(this);
+		iv_prev.setOnClickListener(this);
+		iv_play.setOnClickListener(this);
+		iv_next.setOnClickListener(this);
+		iv_microphone.setOnClickListener(this);
 
 		ActionBar actionBar = getActionBar();
-
 		// 返回按钮
 		actionBar.setDisplayHomeAsUpEnabled(true);
-
-		Log.i("logi", "actionBar=" + actionBar);
 
 		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocById(id), new RequestCallBack<String>()
 		{
@@ -303,7 +369,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	@Override
 	public boolean onError(MediaPlayer mp, int what, int extra)
 	{
-
+		Log.i("logi", "onError:" + " what=" + what + " extra=" + extra);
 		return false;
 	}
 
@@ -379,10 +445,9 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	protected void refresh_seekbar()
 	{
+
 		long currentLineTime = 0;
 		long nextLineTime = 0;
-
-		// Color.parseColor("#ffffff")
 
 		if (mediaPlayer == null)
 		{
@@ -405,7 +470,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 			nextLineTime = (i + 1 == specialLyricViews.size()) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
 
-			if (currentLineTime < currentPosition && currentPosition < nextLineTime)
+			if (currentLineTime <= currentPosition && currentPosition < nextLineTime)
 			{
 				// 高亮显示字幕
 				view.highlight();
@@ -442,7 +507,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		if (specialLyricViews != null && mediaPlayer != null && mediaPlayer.getDuration() > 0)
 		{
 			int currentPosition = mediaPlayer.getCurrentPosition();
-
 			for (int i = 0; i < specialLyricViews.size(); i++)
 			{
 				Integer timeA = specialLyricViews.get(i).getTimeLabel();
@@ -451,8 +515,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 				{
 					sideA = timeA;
 					sideB = timeB;
-
-					Log.i("logi", "isOneLineLoop=" + isOneLineLoop + " sideA=" + sideA + " sideB=" + sideB);
 				}
 			}
 		}
@@ -485,4 +547,53 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	}
 
+	@Override
+	public boolean onInfo(MediaPlayer mp, int what, int extra)
+	{
+		// MEDIA_INFO_UNKNOWN
+		// MEDIA_INFO_VIDEO_TRACK_LAGGING
+		// MEDIA_INFO_VIDEO_RENDERING_START
+		// MEDIA_INFO_BUFFERING_START
+		// MEDIA_INFO_BUFFERING_END
+		// MEDIA_INFO_BAD_INTERLEAVING
+		// MEDIA_INFO_NOT_SEEKABLE
+		// MEDIA_INFO_METADATA_UPDATE
+		// MEDIA_INFO_UNSUPPORTED_SUBTITLE
+		// MEDIA_INFO_SUBTITLE_TIMED_OUT
+
+		switch (what)
+		{
+		case MediaPlayer.MEDIA_INFO_UNKNOWN:
+			Log.i("logi", "INFO=MEDIA_INFO_UNKNOWN" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
+			Log.i("logi", "INFO=MEDIA_INFO_VIDEO_TRACK_LAGGING" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+			Log.i("logi", "INFO=MEDIA_INFO_VIDEO_RENDERING_START" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+			Log.i("logi", "INFO=MEDIA_INFO_BUFFERING_START" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+			Log.i("logi", "INFO=MEDIA_INFO_BUFFERING_END" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
+			Log.i("logi", "INFO=MEDIA_INFO_BAD_INTERLEAVING" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
+			Log.i("logi", "INFO=MEDIA_INFO_METADATA_UPDATE" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
+			Log.i("logi", "INFO=MEDIA_INFO_NOT_SEEKABLE" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
+			Log.i("logi", "INFO=MEDIA_INFO_UNSUPPORTED_SUBTITLE" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
+			Log.i("logi", "INFO=MEDIA_INFO_SUBTITLE_TIMED_OUT" + what);
+			break;
+		}
+		return true;
+	}
 }

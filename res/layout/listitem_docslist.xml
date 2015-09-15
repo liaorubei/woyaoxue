@@ -27,31 +27,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:layout_toLeftOf="@id/fl_icon"
         android:layout_toStartOf="@id/fl_icon"
         android:orientation="vertical" >
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:layout_height="wrap_content" >
 
             <TextView
-                android:id="@+id/tv_title_one"
+                android:id="@+id/tv_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:text="美国头虱"
-                android:textColor="#000000" />
-
-            <TextView
-                android:id="@+id/tv_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="2012-12-12"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="10dp"
+                android:text="59:59"
                 android:textColor="#a0a0a0"
                 android:textSize="12sp" />
 
@@ -59,20 +50,33 @@
                 android:id="@+id/tv_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@id/tv_time"
                 android:text="56.00MB"
                 android:textColor="#a0a0a0"
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tv_time"
+                android:id="@+id/tv_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="59:59"
+                android:layout_marginLeft="10dp"
+                android:layout_toLeftOf="@id/tv_size"
+                android:text="2012-12-12"
                 android:textColor="#a0a0a0"
                 android:textSize="12sp" />
-        </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_title_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/tv_date"
+                android:layout_toStartOf="@id/tv_date"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题"
+                android:textColor="#000000" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/tv_title_two"
