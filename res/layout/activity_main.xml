@@ -12,27 +12,46 @@
         <RadioGroup
             android:id="@+id/rg_levels"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="3"
             android:orientation="horizontal" >
 
             <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/selector_levels"
+                android:button="@null"
+                android:gravity="center"
+                android:text="55555" />
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/selector_levels"
+                android:button="@null"
+                android:gravity="center"
+                android:text="55555" />
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:background="@drawable/selector_levels"
                 android:button="@null"
                 android:gravity="center"
                 android:text="55555" />
         </RadioGroup>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <Button android:id="@+id/bt_menu"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:background="@drawable/selector_levels"
+            android:background="@drawable/selector_pressed"
+            android:button="@null"
             android:gravity="center"
-            android:text="..."
-            android:textSize="12sp" />
+            android:text="..." />
     </LinearLayout>
 
     <FrameLayout
