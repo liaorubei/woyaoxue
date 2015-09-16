@@ -2,36 +2,13 @@ package com.newclass.woyaoxue.base;
 
 import java.util.List;
 
-import com.lidroid.xutils.ViewUtils;
-import android.content.Context;
-import android.view.View;
-import android.view.ViewGroup;
-
-public class BaseAdapter<T> extends android.widget.BaseAdapter
+public abstract class BaseAdapter<T> extends android.widget.BaseAdapter
 {
 	private List<T> data;
-	private Context mContext;
-	private int mResource;
 
-	public BaseAdapter(Context context, int resource, List<T> objects)
+	public BaseAdapter(List<T> list)
 	{
-		this.mContext = context;
-		this.mResource = resource;
-		this.data = objects;
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent)
-	{
-		T t = this.data.get(position);
-		if (convertView == null)
-		{
-			convertView = View.inflate(this.mContext, this.mResource, null);
-		}
-		else
-		{}
-
-		return convertView;
+		this.data = list;
 	}
 
 	@Override
@@ -51,5 +28,4 @@ public class BaseAdapter<T> extends android.widget.BaseAdapter
 	{
 		return position;
 	}
-
 }

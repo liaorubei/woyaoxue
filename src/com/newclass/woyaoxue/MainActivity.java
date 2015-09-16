@@ -16,6 +16,9 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -82,6 +85,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		ViewUtils.inject(this);
@@ -219,6 +223,30 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	{
 		super.onDestroy();
 		handler.removeCallbacksAndMessages(null);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_activity, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		case R.id.menu_mydownload:
+			Intent intent = new Intent(this, MyDownloadActivity.class);
+			startActivity(intent);
+			return true;
+
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

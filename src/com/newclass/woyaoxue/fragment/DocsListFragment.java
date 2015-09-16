@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +34,6 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
-import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
@@ -45,12 +45,10 @@ import com.voc.woyaoxue.R;
 
 public class DocsListFragment extends Fragment
 {
-	private BaseAdapter<Document> adapter;
+	private BaseAdapter<DownloadHelper> adapter;
 
 	private BatchDownloadBinder batchDownloadBinder;
-	private List<DownloadHelper> callbacks;
-
-	private List<Document> documents;
+	private List<DownloadHelper> helpers;
 	@ViewInject(R.id.listView)
 	private ListView listView;
 
@@ -62,11 +60,14 @@ public class DocsListFragment extends Fragment
 	public DocsListFragment(String fullPath)
 	{
 		this.mFullPath = fullPath;
+		initData();
 	}
+	
+	
 
 	public void fillData()
 	{
-		Log.i("logi", "开始填充数据:" + this.mFullPath);
+		initData();
 		new HttpUtils().send(HttpMethod.GET, this.mFullPath, new RequestCallBack<String>()
 		{
 			@Override
@@ -76,24 +77,18 @@ public class DocsListFragment extends Fragment
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
-
 				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
 				{}.getType());
 				if (fromJson != null)
 				{
-					documents.clear();
-					documents.addAll(fromJson);
-
-					callbacks.clear();
+					helpers.clear();
 					for (Document document : fromJson)
 					{
-						callbacks.add(new DownloadHelper(document));
+						helpers.add(new DownloadHelper(document));
 					}
-
 					adapter.notifyDataSetChanged();
 					tv_none_data.setVisibility(View.GONE);
 				}
-				Log.i("logi", "onSuccess:" + documents.size());
 			}
 		});
 
@@ -105,22 +100,26 @@ public class DocsListFragment extends Fragment
 		fillData();
 	}
 
+
+
+	private void initData()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		if (callbacks == null)
+		if (helpers == null)
 		{
-			callbacks = new ArrayList<DocsListFragment.DownloadHelper>();
+			helpers = new ArrayList<DownloadHelper>();
 		}
 
-		if (documents == null)
-		{
-			documents = new ArrayList<Document>();
-		}
 		if (adapter == null)
 		{
-			adapter = new MyAdatper(getActivity(), R.layout.listitem_docslist, documents);
+			adapter = new MyAdatper(helpers);
 		}
 
 		Intent service = new Intent(getActivity(), BatchDownloadService.class);
@@ -142,10 +141,11 @@ public class DocsListFragment extends Fragment
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
 				Intent intent = new Intent(getActivity(), PlayActivity.class);
-				intent.putExtra("Id", documents.get(position).Id);
+				intent.putExtra("Id", helpers.get(position).getDoc().Id);
 				startActivity(intent);
 			}
 		});
+		Log.i("logi", "onCreateView");
 		return inflate;
 	}
 
@@ -224,19 +224,18 @@ public class DocsListFragment extends Fragment
 		}
 	}
 
-	private class MyAdatper extends BaseAdapter<Document>
+	private class MyAdatper extends BaseAdapter<DownloadHelper>
 	{
 
-		public MyAdatper(Context context, int resource, List<Document> objects)
+		public MyAdatper(List<DownloadHelper> objects)
 		{
-			super(context, resource, objects);
-			// TODO Auto-generated constructor stub
+			super(objects);
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			final DownloadHelper helper = callbacks.get(position);
+			final DownloadHelper helper = getItem(position);
 			Document document = helper.getDoc();
 			if (convertView == null)
 			{
@@ -249,7 +248,6 @@ public class DocsListFragment extends Fragment
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.fl_icon = convertView.findViewById(R.id.fl_icon);
 				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
-
 				convertView.setTag(holder);
 			}
 
@@ -280,7 +278,6 @@ public class DocsListFragment extends Fragment
 					{
 						Toast.makeText(getActivity(), "正在下载", Toast.LENGTH_SHORT).show();
 					}
-
 					else
 					{
 						v.setBackgroundResource(R.drawable.file_download_disable);
@@ -288,7 +285,6 @@ public class DocsListFragment extends Fragment
 					}
 				}
 			});
-
 			return convertView;
 		}
 	}
