@@ -33,11 +33,13 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
+import com.newclass.woyaoxue.util.DocDbUtil;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.voc.woyaoxue.R;
 
@@ -45,19 +47,62 @@ public class DocsListFragment extends Fragment
 {
 	private BaseAdapter<Document> adapter;
 
-	private List<Document> documents;
+	private BatchDownloadBinder batchDownloadBinder;
 	private List<DownloadHelper> callbacks;
 
+	private List<Document> documents;
 	@ViewInject(R.id.listView)
 	private ListView listView;
-	@ViewInject(R.id.tv_none_data)
-	private TextView tv_none_data;
 
 	private String mFullPath;
+
+	@ViewInject(R.id.tv_none_data)
+	private TextView tv_none_data;
 
 	public DocsListFragment(String fullPath)
 	{
 		this.mFullPath = fullPath;
+	}
+
+	public void fillData()
+	{
+		Log.i("logi", "开始填充数据:" + this.mFullPath);
+		new HttpUtils().send(HttpMethod.GET, this.mFullPath, new RequestCallBack<String>()
+		{
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{}
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+
+				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
+				{}.getType());
+				if (fromJson != null)
+				{
+					documents.clear();
+					documents.addAll(fromJson);
+
+					callbacks.clear();
+					for (Document document : fromJson)
+					{
+						callbacks.add(new DownloadHelper(document));
+					}
+
+					adapter.notifyDataSetChanged();
+					tv_none_data.setVisibility(View.GONE);
+				}
+				Log.i("logi", "onSuccess:" + documents.size());
+			}
+		});
+
+	}
+
+	public void fillData(String fullPath)
+	{
+		this.mFullPath = fullPath;
+		fillData();
 	}
 
 	@Override
@@ -104,45 +149,79 @@ public class DocsListFragment extends Fragment
 		return inflate;
 	}
 
-	public void fillData()
+	/**
+	 * 扩展自RequestCallBack的下载辅助类,可以进行基本的回调,文件是否存在判断等功能
+	 * 
+	 * @author liaorubei
+	 *
+	 */
+	public class DownloadHelper extends RequestCallBack<File>
 	{
-		Log.i("logi", "开始填充数据:" + this.mFullPath);
-		new HttpUtils().send(HttpMethod.GET, this.mFullPath, new RequestCallBack<String>()
+		public ProgressBar bar;
+		private Document doc;
+		private long mCurrent;
+		private long mTotal;
+
+		public DownloadHelper(Document document)
 		{
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{}
+			this.doc = document;
+		}
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
+		public boolean exists()
+		{
+			File file = new File(FolderUtil.rootDir(getActivity()), this.doc.SoundPath);
+			return file.exists();
+		}
+
+		public Document getDoc()
+		{
+			return doc;
+		}
+
+		@Override
+		public void onFailure(HttpException error, String msg)
+		{
+			BatchDownloadService.isDownloading = false;
+			BatchDownloadService.downloadCount++;
+		}
+
+		@Override
+		public void onLoading(long total, long current, boolean isUploading)
+		{
+			if (bar != null && bar.getTag().equals(doc.SoundPath))
 			{
-				
-				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
-				{}.getType());
-				if (fromJson != null)
-				{
-					documents.clear();
-					documents.addAll(fromJson);
-
-					callbacks.clear();
-					for (Document document : fromJson)
-					{
-						callbacks.add(new DownloadHelper(document));
-					}
-
-					adapter.notifyDataSetChanged();
-					tv_none_data.setVisibility(View.GONE);
-				}
-				Log.i("logi","onSuccess:"+documents.size());
+				this.bar.setMax((int) total);
+				this.bar.setProgress((int) current);
 			}
-		});
+			this.mTotal = total;
+			this.mCurrent = current;
+		}
 
-	}
+		@Override
+		public void onStart()
+		{
+			BatchDownloadService.isDownloading = true;
+		}
 
-	public void fillData(String fullPath)
-	{
-		this.mFullPath = fullPath;
-		fillData();
+		@Override
+		public void onSuccess(ResponseInfo<File> responseInfo)
+		{
+			BatchDownloadService.isDownloading = false;
+			BatchDownloadService.downloadCount++;
+
+			// 每次下载成功一个,就添加一条记录到数据库
+
+			DocDbUtil.insert(this.doc, getActivity());
+
+		}
+
+		public void setProgressBar(ProgressBar progressBar)
+		{
+			this.bar = progressBar;
+			this.bar.setMax((int) mTotal);
+			this.bar.setProgress((int) mCurrent);
+			this.bar.setTag(doc.SoundPath);
+		}
 	}
 
 	private class MyAdatper extends BaseAdapter<Document>
@@ -214,20 +293,6 @@ public class DocsListFragment extends Fragment
 		}
 	}
 
-	private class ViewHolder
-	{
-		public TextView tv_title_one;
-		public TextView tv_title_two;
-		public TextView tv_date;
-		public TextView tv_time;
-		public TextView tv_size;
-
-		public View fl_icon;
-		public ProgressBar pb_download;
-	}
-
-	private BatchDownloadBinder batchDownloadBinder;
-
 	private class MyServiceConnection implements ServiceConnection
 	{
 
@@ -244,74 +309,15 @@ public class DocsListFragment extends Fragment
 		}
 	}
 
-	/**
-	 * 扩展自RequestCallBack的下载辅助类,可以进行基本的回调,文件是否存在判断等功能
-	 * 
-	 * @author liaorubei
-	 *
-	 */
-	public class DownloadHelper extends RequestCallBack<File>
+	private class ViewHolder
 	{
-		public ProgressBar bar;
-		private Document doc;
-		private long mTotal;
-		private long mCurrent;
-
-		public void setProgressBar(ProgressBar progressBar)
-		{
-			this.bar = progressBar;
-			this.bar.setMax((int) mTotal);
-			this.bar.setProgress((int) mCurrent);
-			this.bar.setTag(doc.SoundPath);
-		}
-
-		public boolean exists()
-		{
-			File file = new File(FolderUtil.rootDir(getActivity()), this.doc.SoundPath);
-			return file.exists();
-		}
-
-		public DownloadHelper(Document document)
-		{
-			this.doc = document;
-		}
-
-		@Override
-		public void onStart()
-		{
-			BatchDownloadService.isDownloading = true;
-		}
-
-		@Override
-		public void onLoading(long total, long current, boolean isUploading)
-		{
-			if (bar != null && bar.getTag().equals(doc.SoundPath))
-			{
-				this.bar.setMax((int) total);
-				this.bar.setProgress((int) current);
-			}
-			this.mTotal = total;
-			this.mCurrent = current;
-		}
-
-		@Override
-		public void onSuccess(ResponseInfo<File> responseInfo)
-		{
-			BatchDownloadService.isDownloading = false;
-			BatchDownloadService.downloadCount++;
-		}
-
-		@Override
-		public void onFailure(HttpException error, String msg)
-		{
-			BatchDownloadService.isDownloading = false;
-			BatchDownloadService.downloadCount++;
-		}
-
-		public Document getDoc()
-		{
-			return doc;
-		}
+		public View fl_icon;
+		public ProgressBar pb_download;
+		public TextView tv_date;
+		public TextView tv_size;
+		public TextView tv_time;
+		public TextView tv_title_one;
+		public TextView tv_title_two;
 	}
 
 }

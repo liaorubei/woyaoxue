@@ -35,6 +35,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.newclass.woyaoxue.activity.MyDownloadActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
@@ -232,16 +233,16 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 				// window.dismiss();
 				window.setFocusable(true);// 要求可以取得焦点,当失去焦点时可以自动dismiss
 				TextView textView = new TextView(this);
-				textView.setText("弹出窗口");
-				textView.setPadding(50, 50, 50, 50);
+				textView.setText("我的下载");
 				textView.setOnClickListener(new View.OnClickListener()
 				{
 
 					@Override
 					public void onClick(View v)
 					{
-						Toast.makeText(MainActivity.this, "弹出吐司", Toast.LENGTH_LONG).show();
 						window.dismiss();
+						Intent intent = new Intent(MainActivity.this, MyDownloadActivity.class);
+						startActivity(intent);
 					}
 
 				});
