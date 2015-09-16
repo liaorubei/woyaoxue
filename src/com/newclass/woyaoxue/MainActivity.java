@@ -1,5 +1,6 @@
 package com.newclass.woyaoxue;
 
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +18,13 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -42,7 +42,7 @@ import com.newclass.woyaoxue.service.DownLoadService;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
-public class MainActivity extends FragmentActivity implements android.view.View.OnClickListener
+public class MainActivity extends FragmentActivity
 {
 	protected static final int INIT_LEVEL = 0;
 
@@ -50,11 +50,11 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	private FrameLayout fl_content;
 	@ViewInject(R.id.rg_levels)
 	private RadioGroup rg_levels;
-	@ViewInject(R.id.bt_menu)
-	private View bt_menu;
 
 	List<DocsListFragment> fragments;
 	private PackageManager packageManager;
+	private AlertDialog alertDialog;
+
 	@ViewInject(R.id.ll_ctrl)
 	private LinearLayout ll_ctrl;
 
@@ -76,8 +76,6 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	};
 	private List<Level> levels;
 
-	private PopupWindow window;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -98,12 +96,14 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 				if (levels.size() > 4)
 				{
 					fragments = new ArrayList<DocsListFragment>();
-					RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, RadioGroup.LayoutParams.MATCH_PARENT, 1);
+					RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, RadioGroup.LayoutParams.MATCH_PARENT);
+					params.gravity = Gravity.CENTER;
+					params.weight = 1;
+					params.setMargins(10, 10, 10, 10);
 					rg_levels.removeAllViews();
 					for (int i = 0; i < 3; i++)
 					{
 						RadioButton button = new RadioButton(MainActivity.this);
-						button.setGravity(Gravity.CENTER);
 						button.setLayoutParams(params);
 						button.setBackgroundResource(R.drawable.selector_levels);
 						button.setButtonDrawable(android.R.color.transparent);
@@ -186,7 +186,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 							}
 						});
 
-						builder.show();
+						alertDialog = builder.show();
 
 					}
 				}
@@ -204,8 +204,6 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 				Log.i("logi", "连网失败");
 			}
 		});
-
-		bt_menu.setOnClickListener(this);
 	}
 
 	protected static void init_level()
@@ -218,44 +216,5 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	{
 		super.onDestroy();
 		handler.removeCallbacksAndMessages(null);
-	}
-
-	@Override
-	public void onClick(View v)
-	{
-		switch (v.getId())
-		{
-		case R.id.bt_menu:
-			if (window == null)
-			{
-				window = new PopupWindow(this);
-				// window.dismiss();
-				window.setFocusable(true);// 要求可以取得焦点,当失去焦点时可以自动dismiss
-				TextView textView = new TextView(this);
-				textView.setText("弹出窗口");
-				textView.setPadding(50, 50, 50, 50);
-				textView.setOnClickListener(new View.OnClickListener()
-				{
-
-					@Override
-					public void onClick(View v)
-					{
-						Toast.makeText(MainActivity.this, "弹出吐司", Toast.LENGTH_LONG).show();
-						window.dismiss();
-					}
-
-				});
-				window.setContentView(textView);
-				window.setWindowLayoutMode(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-			}
-
-			window.showAtLocation(bt_menu, Gravity.BOTTOM | Gravity.END, 0, 0);
-
-			break;
-
-		default:
-			break;
-		}
-
 	}
 }
