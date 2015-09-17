@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.google.gson.Gson;
@@ -52,6 +51,8 @@ public class ListActivity extends FragmentActivity
 		indicator.setViewPager(viewpager);
 
 		getActionBar().setDisplayShowHomeEnabled(true);
+		
+		//如果没有长度,平分
 	}
 
 	private void initData()
