@@ -48,6 +48,9 @@ import com.voc.woyaoxue.R;
 
 public class MainActivity extends FragmentActivity implements android.view.View.OnClickListener
 {
+	//#3498db #95a5a6
+	
+	
 	protected static final int INIT_LEVEL = 0;
 
 	@ViewInject(R.id.fl_content)

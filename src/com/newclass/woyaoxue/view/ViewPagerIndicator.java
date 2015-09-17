@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.voc.woyaoxue.R;
 
+import android.R.color;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -23,11 +24,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-/**
- * http://blog.csdn.net/lmj623565791/article/details/42160391
- * @author zhy
- *
- */
+
 public class ViewPagerIndicator extends LinearLayout
 {
 	/**
@@ -60,6 +57,7 @@ public class ViewPagerIndicator extends LinearLayout
 	 * 初始时，三角形指示器的偏移量
 	 */
 	private int mInitTranslationX;
+
 	/**
 	 * 手指滑动时的偏移量
 	 */
@@ -86,11 +84,11 @@ public class ViewPagerIndicator extends LinearLayout
 	/**
 	 * 标题正常时的颜色
 	 */
-	private static final int COLOR_TEXT_NORMAL = 0x77FFFFFF;
+	private static final int COLOR_TEXT_NORMAL = Color.parseColor("#95a5a6");
 	/**
 	 * 标题选中时的颜色
 	 */
-	private static final int COLOR_TEXT_HIGHLIGHTCOLOR = 0xFFFFFFFF;
+	private static final int COLOR_TEXT_HIGHLIGHTCOLOR = Color.parseColor("#3498db");
 
 	public ViewPagerIndicator(Context context)
 	{
@@ -102,10 +100,8 @@ public class ViewPagerIndicator extends LinearLayout
 		super(context, attrs);
 
 		// 获得自定义属性，tab的数量
-		TypedArray a = context.obtainStyledAttributes(attrs,
-				R.styleable.ViewPagerIndicator);
-		mTabVisibleCount = a.getInt(R.styleable.ViewPagerIndicator_item_count,
-				COUNT_DEFAULT_TAB);
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ViewPagerIndicator);
+		mTabVisibleCount = a.getInt(R.styleable.ViewPagerIndicator_item_count, COUNT_DEFAULT_TAB);
 		if (mTabVisibleCount < 0)
 			mTabVisibleCount = COUNT_DEFAULT_TAB;
 		a.recycle();
@@ -149,8 +145,7 @@ public class ViewPagerIndicator extends LinearLayout
 		initTriangle();
 
 		// 初始时的偏移量
-		mInitTranslationX = getWidth() / mTabVisibleCount / 2 - mTriangleWidth
-				/ 2;
+		mInitTranslationX = getWidth() / mTabVisibleCount / 2 - mTriangleWidth / 2;
 	}
 
 	/**
@@ -195,8 +190,7 @@ public class ViewPagerIndicator extends LinearLayout
 	 */
 	public interface PageChangeListener
 	{
-		public void onPageScrolled(int position, float positionOffset,
-				int positionOffsetPixels);
+		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels);
 
 		public void onPageSelected(int position);
 
@@ -216,7 +210,6 @@ public class ViewPagerIndicator extends LinearLayout
 	public void setViewPager(ViewPager mViewPager, int pos)
 	{
 		this.mViewPager = mViewPager;
-
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener()
 		{
 			@Override
@@ -225,7 +218,6 @@ public class ViewPagerIndicator extends LinearLayout
 				// 设置字体颜色高亮
 				resetTextViewColor();
 				highLightTextView(position);
-
 				// 回调
 				if (onPageChangeListener != null)
 				{
@@ -234,17 +226,14 @@ public class ViewPagerIndicator extends LinearLayout
 			}
 
 			@Override
-			public void onPageScrolled(int position, float positionOffset,
-					int positionOffsetPixels)
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
 			{
 				// 滚动
 				scroll(position, positionOffset);
-
 				// 回调
 				if (onPageChangeListener != null)
 				{
-					onPageChangeListener.onPageScrolled(position,
-							positionOffset, positionOffsetPixels);
+					onPageChangeListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
 				}
 
 			}
@@ -326,13 +315,13 @@ public class ViewPagerIndicator extends LinearLayout
 	private TextView generateTextView(String text)
 	{
 		TextView tv = new TextView(getContext());
-		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		lp.width = getScreenWidth() / mTabVisibleCount;
 		tv.setGravity(Gravity.CENTER);
 		tv.setTextColor(COLOR_TEXT_NORMAL);
 		tv.setText(text);
 		tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+		tv.setBackgroundResource(R.drawable.selector_levels);
 		tv.setLayoutParams(lp);
 		return tv;
 	}
@@ -359,33 +348,24 @@ public class ViewPagerIndicator extends LinearLayout
 	 */
 	public void scroll(int position, float offset)
 	{
-		/**
-		 * <pre>
-		 *  0-1:position=0 ;1-0:postion=0;
-		 * </pre>
-		 */
-		// 不断改变偏移量，invalidate
 		mTranslationX = getWidth() / mTabVisibleCount * (position + offset);
 
 		int tabWidth = getScreenWidth() / mTabVisibleCount;
 
 		// 容器滚动，当移动到倒数最后一个的时候，开始滚动
-		if (offset > 0 && position >= (mTabVisibleCount - 2)
-				&& getChildCount() > mTabVisibleCount)
+		if (offset > 0 && position >= (mTabVisibleCount - 2) && getChildCount() > mTabVisibleCount)
 		{
 			if (mTabVisibleCount != 1)
 			{
-				this.scrollTo((position - (mTabVisibleCount - 2)) * tabWidth
-						+ (int) (tabWidth * offset), 0);
-			} else
+				// this.scrollTo((position - (mTabVisibleCount - 2)) * tabWidth + (int) (tabWidth * offset), 0);
+				this.scrollTo((position-1) * tabWidth, 0);
+			}
+			else
 			// 为count为1时 的特殊处理
 			{
-				this.scrollTo(
-						position * tabWidth + (int) (tabWidth * offset), 0);
+				this.scrollTo(position * tabWidth + (int) (tabWidth * offset), 0);
 			}
 		}
-
-		invalidate();
 	}
 
 	/**
@@ -405,8 +385,7 @@ public class ViewPagerIndicator extends LinearLayout
 		for (int i = 0; i < cCount; i++)
 		{
 			View view = getChildAt(i);
-			LinearLayout.LayoutParams lp = (LayoutParams) view
-					.getLayoutParams();
+			LinearLayout.LayoutParams lp = (LayoutParams) view.getLayoutParams();
 			lp.weight = 0;
 			lp.width = getScreenWidth() / mTabVisibleCount;
 			view.setLayoutParams(lp);
@@ -423,8 +402,7 @@ public class ViewPagerIndicator extends LinearLayout
 	 */
 	public int getScreenWidth()
 	{
-		WindowManager wm = (WindowManager) getContext().getSystemService(
-				Context.WINDOW_SERVICE);
+		WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		wm.getDefaultDisplay().getMetrics(outMetrics);
 		return outMetrics.widthPixels;
