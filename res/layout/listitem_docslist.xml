@@ -41,7 +41,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
                 android:text="59:59"
                 android:textColor="#a0a0a0"
                 android:textSize="12sp" />
@@ -50,8 +49,8 @@
                 android:id="@+id/tv_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toLeftOf="@id/tv_time"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="35dp"
                 android:text="56.00MB"
                 android:textColor="#a0a0a0"
                 android:textSize="12sp" />
@@ -60,15 +59,15 @@
                 android:id="@+id/tv_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_toLeftOf="@id/tv_size"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="90dp"
                 android:text="2012-12-12"
                 android:textColor="#a0a0a0"
                 android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/tv_title_one"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/tv_date"
                 android:layout_toStartOf="@id/tv_date"

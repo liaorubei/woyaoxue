@@ -9,8 +9,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -29,7 +30,6 @@ import com.voc.woyaoxue.R;
 
 public class ListActivity extends FragmentActivity
 {
-	private static final String[] TITLE = new String[] { "分类1", "分类2", "分类3", "分类4" };
 	@ViewInject(R.id.viewpager)
 	private ViewPager viewpager;
 	@ViewInject(R.id.indicator)
@@ -50,6 +50,8 @@ public class ListActivity extends FragmentActivity
 
 		viewpager.setAdapter(pagerAdapter);
 		indicator.setViewPager(viewpager);
+
+		getActionBar().setDisplayShowHomeEnabled(true);
 	}
 
 	private void initData()
@@ -109,6 +111,20 @@ public class ListActivity extends FragmentActivity
 
 			return levels.size();
 		}
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.list_activity, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		// TODO Auto-generated method stub
+		return super.onOptionsItemSelected(item);
 	}
 
 }
