@@ -71,6 +71,8 @@ public class MainActivity extends FragmentActivity
 			case INIT_LEVEL:
 				init_level();
 				break;
+				
+				
 
 			default:
 				break;
