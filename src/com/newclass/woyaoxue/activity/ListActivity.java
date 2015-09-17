@@ -50,30 +50,6 @@ public class ListActivity extends FragmentActivity
 
 		viewpager.setAdapter(pagerAdapter);
 		indicator.setViewPager(viewpager);
-		indicator.setOnPageChangeListener(new OnPageChangeListener()
-		{
-			
-			@Override
-			public void onPageSelected(int arg0)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onPageScrollStateChanged(int arg0)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-		});
 	}
 
 	private void initData()
@@ -93,6 +69,7 @@ public class ListActivity extends FragmentActivity
 					levels.clear();
 					levels.addAll(fromJson);
 					pagerAdapter.notifyDataSetChanged();
+					indicator.notifyDataSetChanged();
 				}
 			}
 
