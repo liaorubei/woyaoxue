@@ -45,9 +45,8 @@ public class TestActivity extends FragmentActivity
 
 		initView();
 		initData();
-		initDatas();
+
 		// 设置Tab上的标题
-		mIndicator.setTabItemTitles(mDatas);
 		mViewPager.setAdapter(mAdapter);
 		// 设置关联的ViewPager
 		mIndicator.setViewPager(mViewPager, 0);
@@ -57,41 +56,6 @@ public class TestActivity extends FragmentActivity
 	private void initData()
 	{
 		levels = new ArrayList<Level>();
-
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
-		{
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-				{}.getType());
-				if (fromJson != null)
-				{
-					levels.clear();
-					levels.addAll(fromJson);
-					mAdapter.notifyDataSetChanged();
-					List<String> datas = new ArrayList<String>();
-					for (Level level : fromJson)
-					{
-						datas.add(level.LevelName);
-					}
-					mIndicator.setTabItemTitles(datas);
-				}
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-	}
-
-	private void initDatas()
-	{
 
 		mAdapter = new FragmentPagerAdapter(getSupportFragmentManager())
 		{
@@ -106,7 +70,39 @@ public class TestActivity extends FragmentActivity
 			{
 				return new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
 			}
+
+			@Override
+			public CharSequence getPageTitle(int position)
+			{
+				return levels.get(position).LevelName;
+			}
 		};
+
+		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
+		{
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
+				{}.getType());
+				if (fromJson != null)
+				{
+					levels.clear();
+					levels.addAll(fromJson);
+					mAdapter.notifyDataSetChanged();
+					mIndicator.refreshTitle();
+				}
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				// TODO Auto-generated method stub
+
+			}
+		});
+
 	}
 
 	private void initView()

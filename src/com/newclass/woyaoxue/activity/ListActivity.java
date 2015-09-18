@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -25,13 +26,14 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.newclass.woyaoxue.view.ViewPagerIndicator;
 import com.viewpagerindicator.TabPageIndicator;
 import com.voc.woyaoxue.R;
 
 public class ListActivity extends FragmentActivity
 {
 	@ViewInject(R.id.indicator)
-	private TabPageIndicator indicator;
+	private ViewPagerIndicator indicator;
 	private List<Level> levels;
 	private FragmentPagerAdapter pagerAdapter;
 	@ViewInject(R.id.viewpager)
@@ -49,7 +51,7 @@ public class ListActivity extends FragmentActivity
 		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 
 		viewpager.setAdapter(pagerAdapter);
-		indicator.setViewPager(viewpager);
+		indicator.setViewPager(viewpager, 0);
 
 		getActionBar().setDisplayShowHomeEnabled(true);
 
@@ -72,7 +74,9 @@ public class ListActivity extends FragmentActivity
 			Intent intent = new Intent(this, DownActivity.class);
 			startActivity(intent);
 			break;
-
+		case R.id.menu_setting:
+			Toast.makeText(this, "你点击了一个菜单", Toast.LENGTH_LONG).show();
+			break;
 		default:
 			break;
 		}
@@ -102,7 +106,7 @@ public class ListActivity extends FragmentActivity
 				{
 					levels.addAll(fromJson);
 					pagerAdapter.notifyDataSetChanged();
-					indicator.notifyDataSetChanged();
+					indicator.refreshTitle();
 				}
 			}
 		});
