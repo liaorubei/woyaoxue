@@ -13,6 +13,9 @@ public class Document
 	public String SoundPath;
 	public double Duration;
 	public long Length;
-	public String LengthString;//播放时长
+	/**
+	 * 播放时长
+	 */
+	public String LengthString;
 	public String DateString;
 }

@@ -22,10 +22,15 @@ public class DocDbUtil
 		try
 		{
 			DbUtils db = DbUtils.create(context);
-			Doc user = new Doc(); // 这里需要注意该对象必须有id属性，或者有通过@ID注解的属性
-			user.docId = doc.Id;
-			user.title = doc.Title;
-			db.save(user);// 使用saveBindingId保存实体时会为实体的id赋值
+			com.newclass.woyaoxue.bean.database.Document document = new com.newclass.woyaoxue.bean.database.Document();
+			document.Id = doc.Id;
+			document.TitleOne = doc.Title;
+			document.TitleTwo = doc.TitleTwo;
+			document.Date = doc.DateString;
+			document.Length = doc.Length;
+			document.Time = doc.LengthString;
+			document.Path = doc.SoundPath;
+			db.save(document);// 使用saveBindingId保存实体时会为实体的id赋值
 		}
 		catch (DbException e)
 		{
@@ -34,12 +39,6 @@ public class DocDbUtil
 		}
 
 	}
-
-	public static class Doc
-	{
-		public String title;
-		@Id
-		private int docId;
-	}
-
+	
+	
 }

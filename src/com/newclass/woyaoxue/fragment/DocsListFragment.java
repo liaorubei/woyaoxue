@@ -39,6 +39,7 @@ import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
+import com.newclass.woyaoxue.util.DaoUtil;
 import com.newclass.woyaoxue.util.DocDbUtil;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.voc.woyaoxue.R;
@@ -62,8 +63,6 @@ public class DocsListFragment extends Fragment
 		this.mFullPath = fullPath;
 		initData();
 	}
-	
-	
 
 	public void fillData()
 	{
@@ -100,12 +99,10 @@ public class DocsListFragment extends Fragment
 		fillData();
 	}
 
-
-
 	private void initData()
 	{
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -209,9 +206,10 @@ public class DocsListFragment extends Fragment
 			BatchDownloadService.isDownloading = false;
 			BatchDownloadService.downloadCount++;
 
-			// 每次下载成功一个,就添加一条记录到数据库
+			Log.i("logi", "onSuccess=" + this.doc.Id);
 
-			DocDbUtil.insert(this.doc, getActivity());
+			// 每次下载成功一个,就添加一条记录到数据库
+			DaoUtil.addDocument(this.doc, getActivity());
 
 		}
 

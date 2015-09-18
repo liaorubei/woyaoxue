@@ -246,7 +246,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			{
 				Integer timeA = specialLyricViews.get(i).getTimeLabel();
 				Integer timeB = i == (specialLyricViews.size() - 1) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
-				//含头不含尾,因为当暂停之后再seekto时,current会等于sideA,所以要含头不含尾
+				// 含头不含尾,因为当暂停之后再seekto时,current会等于sideA,所以要含头不含尾
 				if (timeA <= current && current < timeB)
 				{
 					return i;
@@ -361,8 +361,11 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	protected void onDestroy()
 	{
 		handler.removeCallbacksAndMessages(null);
-		mediaPlayer.release();
-		mediaPlayer = null;
+		if (mediaPlayer != null)
+		{
+			mediaPlayer.release();
+			mediaPlayer = null;
+		}
 		super.onDestroy();
 	}
 

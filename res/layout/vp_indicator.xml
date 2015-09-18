@@ -19,7 +19,7 @@
         android:layout_height="45dp"
         android:background="@android:color/transparent"
         android:orientation="horizontal"
-        zhy:item_count="3" >
+        zhy:item_count="4" > 
 
         <TextView
             android:layout_width="0dp"

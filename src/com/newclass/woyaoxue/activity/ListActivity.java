@@ -3,6 +3,7 @@ package com.newclass.woyaoxue.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -43,7 +44,7 @@ public class ListActivity extends FragmentActivity
 		setContentView(R.layout.activity_list);
 		ViewUtils.inject(this);
 
-		initData();
+		pInitData();
 
 		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 
@@ -51,11 +52,11 @@ public class ListActivity extends FragmentActivity
 		indicator.setViewPager(viewpager);
 
 		getActionBar().setDisplayShowHomeEnabled(true);
-		
-		//如果没有长度,平分
+
+		// 如果没有长度,平分
 	}
 
-	private void initData()
+	private void pInitData()
 	{
 		levels = new ArrayList<Level>();
 
@@ -69,7 +70,6 @@ public class ListActivity extends FragmentActivity
 				{}.getType());
 				if (fromJson != null)
 				{
-					levels.clear();
 					levels.addAll(fromJson);
 					pagerAdapter.notifyDataSetChanged();
 					indicator.notifyDataSetChanged();
@@ -124,7 +124,16 @@ public class ListActivity extends FragmentActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		// TODO Auto-generated method stub
+		switch (item.getItemId())
+		{
+		case R.id.menu_download:
+			Intent intent = new Intent(this, DownActivity.class);
+			startActivity(intent);
+			break;
+
+		default:
+			break;
+		}
 		return super.onOptionsItemSelected(item);
 	}
 

@@ -38,7 +38,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
-import com.newclass.woyaoxue.activity.MyDownloadActivity;
+import com.newclass.woyaoxue.activity.DownActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
@@ -243,7 +243,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 		switch (item.getItemId())
 		{
 		case R.id.menu_mydownload:
-			Intent intent = new Intent(this, MyDownloadActivity.class);
+			Intent intent = new Intent(this, DownActivity.class);
 			startActivity(intent);
 			return true;
 
@@ -273,7 +273,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 					public void onClick(View v)
 					{
 						window.dismiss();
-						Intent intent = new Intent(MainActivity.this, MyDownloadActivity.class);
+						Intent intent = new Intent(MainActivity.this, DownActivity.class);
 						startActivity(intent);
 					}
 
