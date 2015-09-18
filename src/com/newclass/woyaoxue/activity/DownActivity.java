@@ -74,7 +74,7 @@ public class DownActivity extends Activity
 
 	private void sInitData()
 	{
-		List<Document> allDocs = DaoUtil.getAllDocs(this);
+		List<Document> allDocs = DaoUtil.getAllDocs(this, true);
 		documents = allDocs == null ? new ArrayList<Document>() : new ArrayList<Document>(allDocs);
 	}
 

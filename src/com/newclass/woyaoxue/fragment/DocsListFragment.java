@@ -167,6 +167,11 @@ public class DocsListFragment extends Fragment
 		public boolean exists()
 		{
 			File file = new File(FolderUtil.rootDir(getActivity()), this.doc.SoundPath);
+			if (file.exists())
+			{
+				this.doc.Length = file.length();
+				DaoUtil.documentSaveorUpdate(this.doc, getActivity());
+			}
 			return file.exists();
 		}
 

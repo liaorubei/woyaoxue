@@ -30,12 +30,12 @@ import com.voc.woyaoxue.R;
 
 public class ListActivity extends FragmentActivity
 {
-	@ViewInject(R.id.viewpager)
-	private ViewPager viewpager;
 	@ViewInject(R.id.indicator)
 	private TabPageIndicator indicator;
 	private List<Level> levels;
 	private FragmentPagerAdapter pagerAdapter;
+	@ViewInject(R.id.viewpager)
+	private ViewPager viewpager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -44,7 +44,7 @@ public class ListActivity extends FragmentActivity
 		setContentView(R.layout.activity_list);
 		ViewUtils.inject(this);
 
-		pInitData();
+		sInitData();
 
 		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 
@@ -54,64 +54,6 @@ public class ListActivity extends FragmentActivity
 		getActionBar().setDisplayShowHomeEnabled(true);
 
 		// 如果没有长度,平分
-	}
-
-	private void pInitData()
-	{
-		levels = new ArrayList<Level>();
-
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
-		{
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-				{}.getType());
-				if (fromJson != null)
-				{
-					levels.addAll(fromJson);
-					pagerAdapter.notifyDataSetChanged();
-					indicator.notifyDataSetChanged();
-				}
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-	}
-
-	private class MyPagerAdapter extends FragmentPagerAdapter
-	{
-		public MyPagerAdapter(FragmentManager fm)
-		{
-			super(fm);
-		}
-
-		@Override
-		public Fragment getItem(int position)
-		{
-			Fragment fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
-			return fragment;
-		}
-
-		@Override
-		public CharSequence getPageTitle(int position)
-		{
-			return levels.get(position).LevelName;
-		}
-
-		@Override
-		public int getCount()
-		{
-
-			return levels.size();
-		}
 	}
 
 	@Override
@@ -135,6 +77,64 @@ public class ListActivity extends FragmentActivity
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void sInitData()
+	{
+		levels = new ArrayList<Level>();
+
+		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
+		{
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
+				{}.getType());
+				if (fromJson != null)
+				{
+					levels.addAll(fromJson);
+					pagerAdapter.notifyDataSetChanged();
+					indicator.notifyDataSetChanged();
+				}
+			}
+		});
+
+	}
+
+	private class MyPagerAdapter extends FragmentPagerAdapter
+	{
+		public MyPagerAdapter(FragmentManager fm)
+		{
+			super(fm);
+		}
+
+		@Override
+		public int getCount()
+		{
+
+			return levels.size();
+		}
+
+		@Override
+		public Fragment getItem(int position)
+		{
+			Fragment fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
+			return fragment;
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position)
+		{
+			return levels.get(position).LevelName;
+		}
 	}
 
 }
