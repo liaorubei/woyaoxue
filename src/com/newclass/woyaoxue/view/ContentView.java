@@ -1,13 +1,10 @@
 package com.newclass.woyaoxue.view;
 
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.voc.woyaoxue.R;
-
 import android.content.Context;
 import android.view.View;
 import android.widget.FrameLayout;
+
+import com.voc.woyaoxue.R;
 
 public abstract class ContentView extends FrameLayout
 {
@@ -78,7 +75,6 @@ public abstract class ContentView extends FrameLayout
 		{
 			successView.setVisibility(this.CURRENTSTATE == ViewState.SUCCESS ? View.VISIBLE : View.INVISIBLE);
 		}
-
 	}
 
 	private View onCreateEmptyView()

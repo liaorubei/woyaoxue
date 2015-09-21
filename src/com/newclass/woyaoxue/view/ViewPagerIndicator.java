@@ -254,7 +254,6 @@ public class ViewPagerIndicator extends LinearLayout
 		mTranslationX = getWidth() / mTabVisibleCount * (position + offset);
 		int tabWidth = getScreenWidth() / mTabVisibleCount;
 		this.scrollTo((int) (((mViewPager.getScrollX() + 0.0) / getScreenWidth()) * ((tabWidth + 0.0) / mTabVisibleCount)), 0);
-
 	}
 
 	// 对外的ViewPager的回调接口的设置
