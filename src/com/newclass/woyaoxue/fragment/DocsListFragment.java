@@ -36,6 +36,7 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
@@ -44,7 +45,7 @@ import com.newclass.woyaoxue.util.DocDbUtil;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.voc.woyaoxue.R;
 
-public class DocsListFragment extends Fragment
+public class DocsListFragment extends BaseFragment
 {
 	private BaseAdapter<DownloadHelper> adapter;
 
@@ -317,6 +318,13 @@ public class DocsListFragment extends Fragment
 		public TextView tv_time;
 		public TextView tv_title_one;
 		public TextView tv_title_two;
+	}
+
+	@Override
+	protected View onCreateSuccessView()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

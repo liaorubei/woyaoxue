@@ -128,6 +128,7 @@ public class ViewPagerIndicator extends LinearLayout
 		// 画笔平移到正确的位置
 		canvas.translate(mInitTranslationX + mTranslationX, getHeight() + 1);
 		canvas.drawPath(mPath, mPaint);
+		canvas.drawRect(0, 25, getScreenWidth() / 4, 25, mPaint);
 		canvas.restore();
 
 		super.dispatchDraw(canvas);
@@ -246,52 +247,13 @@ public class ViewPagerIndicator extends LinearLayout
 	 * 
 	 * @param position
 	 * @param offset
-	 * @param positionOffsetPixels 
+	 * @param positionOffsetPixels
 	 */
 	public void scroll(int position, float offset, int positionOffsetPixels)
 	{
-	
 		mTranslationX = getWidth() / mTabVisibleCount * (position + offset);
-
 		int tabWidth = getScreenWidth() / mTabVisibleCount;
-	/*
-		// 容器滚动，当移动到倒数最后一个的时候，开始滚动
-		if (offset > 0 && position >= (mTabVisibleCount - 2) && getChildCount() > mTabVisibleCount)
-		{
-			if (mTabVisibleCount != 1)
-			{
-				// this.scrollTo((position - (mTabVisibleCount - 2)) * tabWidth + (int) (tabWidth * offset), 0);
-				this.scrollTo((position - 1) * tabWidth, 0);
-			}
-			else
-			// 为count为1时 的特殊处理
-			{
-				this.scrollTo(position * tabWidth + (int) (tabWidth * offset), 0);
-			}
-		}
-
-		if (position == 0)
-		{
-			this.scrollTo(0, 0);
-		}
-		else if (position == mViewPager.getAdapter().getCount() - 1)
-		{
-			this.scrollTo((mViewPager.getAdapter().getCount() - mTabVisibleCount) * tabWidth, 0);
-		}
-
-		if (position * mTabVisibleCount > getScreenWidth())
-		{
-			this.scrollTo((position - mTabVisibleCount) * tabWidth, 0);
-		}*/
-		
-		
-		
-		Log.i("position="+position+" offset="+offset+" pix="+positionOffsetPixels+" width="+getScreenWidth()+" tabWidth="+tabWidth);	
-		double i=((tabWidth+0.0)/getScreenWidth())*tabWidth;
-		double x=position*67.5;
-	
-		this.scrollTo((int) (((mViewPager.getScrollX()+0.0)/getScreenWidth())*((tabWidth+0.0)/mTabVisibleCount)), 0);
-		Log.i("ScrollX"+((mViewPager.getScrollX()+0.0)/getScreenWidth())*((tabWidth+0.0)/mTabVisibleCount));
+		this.scrollTo((int) (((mViewPager.getScrollX() + 0.0) / getScreenWidth()) * ((tabWidth + 0.0) / mTabVisibleCount)), 0);
 
 	}
 
@@ -312,7 +274,7 @@ public class ViewPagerIndicator extends LinearLayout
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
 			{
 				// 滚动
-				scroll(position, positionOffset,positionOffsetPixels);
+				scroll(position, positionOffset, positionOffsetPixels);
 				// 回调
 				if (onPageChangeListener != null)
 				{

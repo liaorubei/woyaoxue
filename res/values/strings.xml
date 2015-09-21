@@ -9,5 +9,7 @@
     <string name="upgrade_tips">"更新提示"</string>
     <string name="negative_text">"取消"</string>
     <string name="positive_text">"确定"</string>
+    <string name="new_versions_message">"发现了最新版本,是否下载?"</string>
+    <string name="has_download_message">"更新包下载完毕,是否安装?"</string>
 
 </resources>

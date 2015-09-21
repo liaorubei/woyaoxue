@@ -31,6 +31,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.MainActivity;
+import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
@@ -140,7 +141,7 @@ public class ListActivity extends FragmentActivity
 		@Override
 		public Fragment getItem(int position)
 		{
-			Fragment fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
+			BaseFragment fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
 			return fragment;
 		}
 

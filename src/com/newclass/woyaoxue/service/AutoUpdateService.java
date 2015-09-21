@@ -24,6 +24,7 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.voc.woyaoxue.R;
 
 /**
  * 自动更新服务
@@ -41,9 +42,11 @@ public class AutoUpdateService extends Service
 	private void builderDownloadDialog()
 	{
 		Builder builder = new AlertDialog.Builder(getApplicationContext(), AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
-		builder.setTitle("升级提示");
-		builder.setMessage("已经的新的版本了,现在更新?");
-		builder.setPositiveButton("确定", new OnClickListener()
+		builder.setTitle(R.string.upgrade_tips);
+		String string = getResources().getString(R.string.new_versions_message);
+		string += "\r\n" + upgradePatch.UpgradeInfo;
+		builder.setMessage(string);
+		builder.setPositiveButton(R.string.positive_text, new OnClickListener()
 		{
 
 			@Override
@@ -88,7 +91,7 @@ public class AutoUpdateService extends Service
 
 			}
 		});
-		builder.setNegativeButton("取消", new OnClickListener()
+		builder.setNegativeButton(R.string.negative_text, new OnClickListener()
 		{
 
 			@Override
@@ -104,9 +107,9 @@ public class AutoUpdateService extends Service
 	private void builderNowSetupDialog()
 	{
 		Builder builder = new AlertDialog.Builder(getApplicationContext(), AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
-		builder.setTitle("升级提示");
-		builder.setMessage("已经下载好了,现在安装?");
-		builder.setPositiveButton("确定", new OnClickListener()
+		builder.setTitle(R.string.upgrade_tips);
+		builder.setMessage(R.string.has_download_message);
+		builder.setPositiveButton(R.string.positive_text, new OnClickListener()
 		{
 
 			@Override
@@ -120,7 +123,7 @@ public class AutoUpdateService extends Service
 			}
 
 		});
-		builder.setNegativeButton("取消", new OnClickListener()
+		builder.setNegativeButton(R.string.negative_text, new OnClickListener()
 		{
 
 			@Override
@@ -189,7 +192,6 @@ public class AutoUpdateService extends Service
 				}
 				catch (Exception e)
 				{
-
 					e.printStackTrace();
 				}
 
