@@ -34,7 +34,7 @@ import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
-import com.newclass.woyaoxue.service.DownLoadService;
+import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.ViewPagerIndicator;
 import com.viewpagerindicator.TabPageIndicator;
@@ -57,14 +57,16 @@ public class ListActivity extends FragmentActivity
 		setContentView(R.layout.activity_list);
 		ViewUtils.inject(this);
 		sInitData();
-	
+
 		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		viewpager.setAdapter(pagerAdapter);
 		indicator.setViewPager(viewpager, 0);
 
 		getActionBar().setDisplayShowHomeEnabled(true);
-	}
 
+		Intent service = new Intent(this, AutoUpdateService.class);
+		startService(service);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -109,8 +111,7 @@ public class ListActivity extends FragmentActivity
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
 				List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-				{
-				}.getType());
+				{}.getType());
 				if (fromJson != null)
 				{
 					levels.addAll(fromJson);

@@ -31,6 +31,8 @@
             </intent-filter>
         </activity>
 
+        <!-- 列表界面 -->
+        <activity android:name="com.newclass.woyaoxue.activity.ListActivity" />
         <!-- 我的下载 -->
         <activity android:name="com.newclass.woyaoxue.activity.DownActivity" />
 
@@ -38,7 +40,7 @@
         <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" />
 
         <!-- 更新下载服务 -->
-        <service android:name="com.newclass.woyaoxue.service.DownLoadService" />
+        <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />
         <!-- 批量下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.BatchDownloadService" />
     </application>

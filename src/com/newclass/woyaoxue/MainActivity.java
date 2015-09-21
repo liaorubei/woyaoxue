@@ -43,7 +43,7 @@ import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
-import com.newclass.woyaoxue.service.DownLoadService;
+import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
@@ -89,133 +89,10 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		ViewUtils.inject(this);
-
-		// 常规数据请求
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
-		{
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				levels = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-				{
-				}.getType());
-
-				if (levels.size() > 4)
-				{
-					fragments = new ArrayList<DocsListFragment>();
-					RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, RadioGroup.LayoutParams.MATCH_PARENT, 1);
-					rg_levels.removeAllViews();
-					for (int i = 0; i < 3; i++)
-					{
-						RadioButton button = new RadioButton(MainActivity.this);
-						button.setGravity(Gravity.CENTER);
-						button.setLayoutParams(params);
-						button.setBackgroundResource(R.drawable.selector_levels);
-						button.setButtonDrawable(android.R.color.transparent);
-						button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
-
-						Level level = levels.get(i);
-						button.setText(level.LevelName);
-						button.setTag(i);
-						button.setOnClickListener(new View.OnClickListener()
-						{
-							@Override
-							public void onClick(View v)
-							{
-								DocsListFragment docsListFragment = fragments.get((Integer) v.getTag());
-								getSupportFragmentManager().beginTransaction().replace(R.id.fl_content, docsListFragment).commit();
-							}
-						});
-
-						DocsListFragment fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(level.Id));
-						fragments.add(fragment);
-						rg_levels.addView(button);
-					}
-					rg_levels.getChildAt(0).performClick();
-				}
-
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-		// 升级数据请求,建议放到spash界面
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLatest(), new RequestCallBack<String>()
-		{
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				try
-				{
-
-					// 解析
-					final UpgradePatch upgradePatch = new Gson().fromJson(responseInfo.result, UpgradePatch.class);
-					packageManager = getPackageManager();
-					PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), PackageManager.GET_CONFIGURATIONS);
-
-					if (!packageInfo.versionName.equals(upgradePatch.VersionName))
-					{
-						Builder builder = new AlertDialog.Builder(MainActivity.this);
-						builder.setTitle(R.string.upgrade_tips);
-
-						builder.setMessage(upgradePatch.UpgradeInfo);
-						builder.setNegativeButton(R.string.negative_text, new OnClickListener()
-						{
-
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-
-							}
-						});
-						builder.setPositiveButton(R.string.positive_text, new OnClickListener()
-						{
-
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-
-								Intent service = new Intent(MainActivity.this, DownLoadService.class);
-								service.putExtra("versionName", upgradePatch.VersionName);
-								service.putExtra("path", upgradePatch.PackagePath);
-								startService(service);
-
-							}
-						});
-
-						builder.show();
-
-					}
-				} catch (Exception e)
-				{
-
-					e.printStackTrace();
-				}
-
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				Log.i("logi", "连网失败");
-			}
-		});
-
 		Intent intent = new Intent(this, ListActivity.class);
 		startActivity(intent);
-
-		bt_menu.setOnClickListener(this);
 		this.finish();
 	}
 
