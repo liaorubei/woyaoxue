@@ -3,6 +3,7 @@ package com.newclass.woyaoxue.view;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.voc.woyaoxue.R;
 
 import android.content.Context;
 import android.view.View;
@@ -15,10 +16,12 @@ public abstract class ContentView extends FrameLayout
 	private View failureView;
 	private View emptyView;
 	private View loadingView;
+	private View contentView;
 
 	public ContentView(Context context)
 	{
 		super(context);
+		contentView = View.inflate(context, R.layout.contentview, null);
 		initView();
 	}
 
@@ -80,19 +83,17 @@ public abstract class ContentView extends FrameLayout
 
 	private View onCreateEmptyView()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return contentView.findViewById(R.id.rl_empty);
 	}
 
 	private View onCreateLoadingView()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return contentView.findViewById(R.id.rl_loading);
 	}
 
 	private View onCreateFailureView()
 	{
-		return null;
+		return contentView.findViewById(R.id.rl_failure);
 	}
 
 	public abstract View onCreateSuccessView();

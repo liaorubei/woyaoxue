@@ -39,6 +39,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.DownActivity;
+import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
@@ -48,16 +49,15 @@ import com.voc.woyaoxue.R;
 
 public class MainActivity extends FragmentActivity implements android.view.View.OnClickListener
 {
-	//#3498db #95a5a6
-	
-	
+	// #3498db #95a5a6
+
 	protected static final int INIT_LEVEL = 0;
 
 	@ViewInject(R.id.fl_content)
 	private FrameLayout fl_content;
 	@ViewInject(R.id.rg_levels)
 	private RadioGroup rg_levels;
-	
+
 	@ViewInject(R.id.bt_menu)
 	private View bt_menu;
 
@@ -89,7 +89,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		ViewUtils.inject(this);
@@ -102,7 +102,8 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
 				levels = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-				{}.getType());
+				{
+				}.getType());
 
 				if (levels.size() > 4)
 				{
@@ -155,7 +156,6 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
-				Log.i("logi", "onSuccess");
 				try
 				{
 
@@ -163,7 +163,6 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 					final UpgradePatch upgradePatch = new Gson().fromJson(responseInfo.result, UpgradePatch.class);
 					packageManager = getPackageManager();
 					PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), PackageManager.GET_CONFIGURATIONS);
-					// Log.i("logi", "versionCode=" + packageInfo.versionCode + " versionName=" + packageInfo.versionName + " packageName=" + packageInfo.packageName);
 
 					if (!packageInfo.versionName.equals(upgradePatch.VersionName))
 					{
@@ -198,8 +197,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 						builder.show();
 
 					}
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 
 					e.printStackTrace();
@@ -214,7 +212,11 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 			}
 		});
 
+		Intent intent = new Intent(this, ListActivity.class);
+		startActivity(intent);
+
 		bt_menu.setOnClickListener(this);
+		this.finish();
 	}
 
 	protected static void init_level()

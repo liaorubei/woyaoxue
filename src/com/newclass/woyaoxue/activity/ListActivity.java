@@ -3,13 +3,20 @@ package com.newclass.woyaoxue.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -23,8 +30,11 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.bean.Level;
+import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
+import com.newclass.woyaoxue.service.DownLoadService;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.ViewPagerIndicator;
 import com.viewpagerindicator.TabPageIndicator;
@@ -38,6 +48,7 @@ public class ListActivity extends FragmentActivity
 	private FragmentPagerAdapter pagerAdapter;
 	@ViewInject(R.id.viewpager)
 	private ViewPager viewpager;
+	protected PackageManager packageManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -46,16 +57,14 @@ public class ListActivity extends FragmentActivity
 		setContentView(R.layout.activity_list);
 		ViewUtils.inject(this);
 		sInitData();
-
+	
 		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
-
 		viewpager.setAdapter(pagerAdapter);
 		indicator.setViewPager(viewpager, 0);
 
 		getActionBar().setDisplayShowHomeEnabled(true);
-
-		// 如果没有长度,平分
 	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -100,7 +109,8 @@ public class ListActivity extends FragmentActivity
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
 				List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-				{}.getType());
+				{
+				}.getType());
 				if (fromJson != null)
 				{
 					levels.addAll(fromJson);
