@@ -45,7 +45,6 @@ public class ListActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list);
 		ViewUtils.inject(this);
-
 		sInitData();
 
 		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());

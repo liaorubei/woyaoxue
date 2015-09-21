@@ -2,6 +2,8 @@ package com.newclass.woyaoxue.view;
 
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -15,14 +17,16 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
+
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.TabWidget;
 import android.widget.TextView;
 
+import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 public class ViewPagerIndicator extends LinearLayout
@@ -108,7 +112,7 @@ public class ViewPagerIndicator extends LinearLayout
 		// 初始化画笔
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
-		mPaint.setColor(Color.parseColor("#ffffff"));
+		mPaint.setColor(Color.parseColor("#ff00ff"));
 		mPaint.setStyle(Style.FILL);
 		mPaint.setPathEffect(new CornerPathEffect(3));
 
@@ -183,7 +187,7 @@ public class ViewPagerIndicator extends LinearLayout
 	@Override
 	protected void onFinishInflate()
 	{
-		Log.e("TAG", "onFinishInflate");
+
 		super.onFinishInflate();
 
 		int cCount = getChildCount();
@@ -242,13 +246,15 @@ public class ViewPagerIndicator extends LinearLayout
 	 * 
 	 * @param position
 	 * @param offset
+	 * @param positionOffsetPixels 
 	 */
-	public void scroll(int position, float offset)
+	public void scroll(int position, float offset, int positionOffsetPixels)
 	{
+	
 		mTranslationX = getWidth() / mTabVisibleCount * (position + offset);
 
 		int tabWidth = getScreenWidth() / mTabVisibleCount;
-
+	/*
 		// 容器滚动，当移动到倒数最后一个的时候，开始滚动
 		if (offset > 0 && position >= (mTabVisibleCount - 2) && getChildCount() > mTabVisibleCount)
 		{
@@ -276,7 +282,16 @@ public class ViewPagerIndicator extends LinearLayout
 		if (position * mTabVisibleCount > getScreenWidth())
 		{
 			this.scrollTo((position - mTabVisibleCount) * tabWidth, 0);
-		}
+		}*/
+		
+		
+		
+		Log.i("position="+position+" offset="+offset+" pix="+positionOffsetPixels+" width="+getScreenWidth()+" tabWidth="+tabWidth);	
+		double i=((tabWidth+0.0)/getScreenWidth())*tabWidth;
+		double x=position*67.5;
+	
+		this.scrollTo((int) (((mViewPager.getScrollX()+0.0)/getScreenWidth())*((tabWidth+0.0)/mTabVisibleCount)), 0);
+		Log.i("ScrollX"+((mViewPager.getScrollX()+0.0)/getScreenWidth())*((tabWidth+0.0)/mTabVisibleCount));
 
 	}
 
@@ -287,6 +302,7 @@ public class ViewPagerIndicator extends LinearLayout
 	}
 
 	// 设置关联的ViewPager
+	@SuppressWarnings("deprecation")
 	public void setViewPager(ViewPager viewPager, int pos)
 	{
 		this.mViewPager = viewPager;
@@ -296,7 +312,7 @@ public class ViewPagerIndicator extends LinearLayout
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
 			{
 				// 滚动
-				scroll(position, positionOffset);
+				scroll(position, positionOffset,positionOffsetPixels);
 				// 回调
 				if (onPageChangeListener != null)
 				{
