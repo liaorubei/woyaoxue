@@ -27,30 +27,6 @@ public class DaoUtil
 		return null;
 	}
 
-	public static void addDocument(com.newclass.woyaoxue.bean.Document doc, Context context)
-	{
-		try
-		{
-			DbUtils db = DbUtils.create(context);
-			Document document = new Document();
-			document.DocId = doc.Id;
-			document.TitleOne = doc.Title;
-			document.TitleTwo = doc.TitleTwo;
-			document.Date = doc.DateString;
-			document.Length = doc.Length;
-			document.Time = doc.LengthString;
-			document.Path = doc.SoundPath;
-
-			db.save(document);
-
-		}
-		catch (Exception e)
-		{
-
-		}
-
-	}
-
 	public static void documentSaveorUpdate(com.newclass.woyaoxue.bean.Document doc, Context context)
 	{
 		try

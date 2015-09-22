@@ -32,11 +32,13 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.base.BaseFragment;
+import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.newclass.woyaoxue.view.ContentView.ViewState;
 import com.newclass.woyaoxue.view.ViewPagerIndicator;
 import com.viewpagerindicator.TabPageIndicator;
 import com.voc.woyaoxue.R;
@@ -141,7 +143,26 @@ public class ListActivity extends FragmentActivity
 		@Override
 		public Fragment getItem(int position)
 		{
-			BaseFragment fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
+			final BaseFragment<List<Document>> fragment = new DocsListFragment();
+			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocsByLevelId(levels.get(position).Id), new RequestCallBack<String>()
+			{
+
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
+				{
+					List<Document> json = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
+					{}.getType());
+
+					fragment.onSuccess(json);
+				}
+
+				@Override
+				public void onFailure(HttpException error, String msg)
+				{
+					fragment.onFailure();
+				}
+			});
+			Log.i("logi","getItem="+position);
 			return fragment;
 		}
 

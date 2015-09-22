@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -79,6 +80,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	@ViewInject(R.id.iv_next)
 	private ImageView iv_next;
+	@ViewInject(R.id.pb_buffering)
+	private ProgressBar pb_buffering;
 
 	@ViewInject(R.id.iv_paly)
 	private ImageView iv_play;
@@ -401,6 +404,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	@Override
 	public void onPrepared(MediaPlayer mp)
 	{
+		pb_buffering.setVisibility(View.INVISIBLE);
 		mp.start();
 		seekBar.setMax(mp.getDuration());
 		tv_bSide.setText(millisecondsFormat(mp.getDuration()));

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 public abstract class ContentView extends FrameLayout
@@ -19,43 +21,27 @@ public abstract class ContentView extends FrameLayout
 	{
 		super(context);
 		contentView = View.inflate(context, R.layout.contentview, null);
+		this.addView(contentView);
 		initView();
 	}
 
 	private void initView()
 	{
 		loadingView = onCreateLoadingView();
-		if (loadingView != null)
-		{
-			this.addView(loadingView);
-		}
-
 		failureView = onCreateFailureView();
-		if (failureView != null)
-		{
-			this.addView(failureView);
-		}
-
 		emptyView = onCreateEmptyView();
-		if (emptyView != null)
+		successView = onCreateSuccessView();
+		if (successView!=null)
 		{
-			this.addView(emptyView);
+			this.addView(successView);
 		}
-
-		showView();
-
+		showView(ViewState.LOADING);
 	}
 
-	private void showView()
+	public void showView(ViewState viewState)
 	{
-		// 要保证操作是在主线程进行
-
-		showViewOnMainThread();
-
-	}
-
-	private void showViewOnMainThread()
-	{
+		this.CURRENTSTATE = viewState;
+		Log.i("logi", "CURRENTSTATE=" + this.CURRENTSTATE);
 		if (loadingView != null)
 		{
 			loadingView.setVisibility(this.CURRENTSTATE == ViewState.LOADING ? View.VISIBLE : View.INVISIBLE);
@@ -94,7 +80,7 @@ public abstract class ContentView extends FrameLayout
 
 	public abstract View onCreateSuccessView();
 
-	enum ViewState
+	public static enum ViewState
 	{
 		LOADING, SUCCESS, FAILURE, EMPTY
 	}

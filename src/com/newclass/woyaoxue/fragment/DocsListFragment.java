@@ -4,35 +4,27 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.text.format.Formatter;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
@@ -41,110 +33,79 @@ import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
 import com.newclass.woyaoxue.util.DaoUtil;
-import com.newclass.woyaoxue.util.DocDbUtil;
 import com.newclass.woyaoxue.util.FolderUtil;
+import com.newclass.woyaoxue.view.XListView;
+import com.newclass.woyaoxue.view.XListView.IXListViewListener;
 import com.voc.woyaoxue.R;
 
-public class DocsListFragment extends BaseFragment
+public class DocsListFragment extends BaseFragment<List<Document>>
 {
-	private BaseAdapter<DownloadHelper> adapter;
-
 	private BatchDownloadBinder batchDownloadBinder;
-	private List<DownloadHelper> helpers;
-	@ViewInject(R.id.listView)
-	private ListView listView;
-
-	private String mFullPath;
-
-	@ViewInject(R.id.tv_none_data)
-	private TextView tv_none_data;
-
-	public DocsListFragment(String fullPath)
-	{
-		this.mFullPath = fullPath;
-		initData();
-	}
-
-	public void fillData()
-	{
-		initData();
-		new HttpUtils().send(HttpMethod.GET, this.mFullPath, new RequestCallBack<String>()
-		{
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{}
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
-				{}.getType());
-				if (fromJson != null)
-				{
-					helpers.clear();
-					for (Document document : fromJson)
-					{
-						helpers.add(new DownloadHelper(document));
-					}
-					adapter.notifyDataSetChanged();
-					tv_none_data.setVisibility(View.GONE);
-				}
-			}
-		});
-
-	}
-
-	public void fillData(String fullPath)
-	{
-		this.mFullPath = fullPath;
-		fillData();
-	}
-
-	private void initData()
-	{
-		// TODO Auto-generated method stub
-
-	}
+	@ViewInject(R.id.xListView)
+	private XListView xListView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
+		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		if (helpers == null)
-		{
-			helpers = new ArrayList<DownloadHelper>();
-		}
-
-		if (adapter == null)
-		{
-			adapter = new MyAdatper(helpers);
-		}
-
 		Intent service = new Intent(getActivity(), BatchDownloadService.class);
-		ServiceConnection conn = new MyServiceConnection();
-		// 开启批量下载服务
-		getActivity().bindService(service, conn, Context.BIND_AUTO_CREATE);
+		getActivity().bindService(service, new MyServiceConnection(), Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	protected View initView()
 	{
-		View inflate = inflater.inflate(R.layout.fragment_docslist, container, false);
-		ViewUtils.inject(this, inflate);
-		fillData();
-		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(new OnItemClickListener()
+		View view = View.inflate(getContext(), R.layout.fragment_docslist, null);
+		ViewUtils.inject(view, getActivity());
+		xListView = (XListView) view.findViewById(R.id.xListView);
+		return view;
+	}
+
+	@Override
+	public void showData(List<Document> data)
+	{
+		final List<DownloadHelper> objects = new ArrayList<DocsListFragment.DownloadHelper>();
+		for (Document doc : data)
 		{
+			objects.add(new DownloadHelper(doc));
+		}
+		MyAdapter adatper = new MyAdapter(objects);
+
+		xListView.setAdapter(adatper);
+		xListView.setOnItemClickListener(new OnItemClickListener()
+		{
+
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
+				DownloadHelper helper = objects.get(position);
+
 				Intent intent = new Intent(getActivity(), PlayActivity.class);
-				intent.putExtra("Id", helpers.get(position).getDoc().Id);
+				intent.putExtra("Id", helper.getDoc().Id);
 				startActivity(intent);
+
 			}
 		});
-		Log.i("logi", "onCreateView");
-		return inflate;
+
+		xListView.setPullLoadEnable(true);
+		xListView.setXListViewListener(new IXListViewListener()
+		{
+
+			@Override
+			public void onRefresh()
+			{
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onLoadMore()
+			{
+				// TODO Auto-generated method stub
+
+			}
+		});
 	}
 
 	/**
@@ -170,7 +131,6 @@ public class DocsListFragment extends BaseFragment
 			File file = new File(FolderUtil.rootDir(getActivity()), this.doc.SoundPath);
 			if (file.exists())
 			{
-				this.doc.Length = file.length();
 				DaoUtil.documentSaveorUpdate(this.doc, getActivity());
 			}
 			return file.exists();
@@ -215,8 +175,7 @@ public class DocsListFragment extends BaseFragment
 			Log.i("logi", "onSuccess=" + this.doc.Id);
 
 			// 每次下载成功一个,就添加一条记录到数据库
-			DaoUtil.addDocument(this.doc, getActivity());
-
+			DaoUtil.documentSaveorUpdate(this.doc, getActivity());
 		}
 
 		public void setProgressBar(ProgressBar progressBar)
@@ -228,10 +187,10 @@ public class DocsListFragment extends BaseFragment
 		}
 	}
 
-	private class MyAdatper extends BaseAdapter<DownloadHelper>
+	private class MyAdapter extends BaseAdapter<DownloadHelper>
 	{
 
-		public MyAdatper(List<DownloadHelper> objects)
+		public MyAdapter(List<DownloadHelper> objects)
 		{
 			super(objects);
 		}
@@ -318,13 +277,6 @@ public class DocsListFragment extends BaseFragment
 		public TextView tv_time;
 		public TextView tv_title_one;
 		public TextView tv_title_two;
-	}
-
-	@Override
-	protected View onCreateSuccessView()
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

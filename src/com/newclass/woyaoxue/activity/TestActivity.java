@@ -1,7 +1,6 @@
 package com.newclass.woyaoxue.activity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.os.Bundle;
@@ -21,6 +20,7 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.newclass.woyaoxue.view.PagerTab;
 import com.newclass.woyaoxue.view.ViewPagerIndicator;
 import com.voc.woyaoxue.R;
 
@@ -29,10 +29,7 @@ public class TestActivity extends FragmentActivity
 
 	private FragmentPagerAdapter mAdapter;
 	private ViewPager mViewPager;
-	private List<String> mDatas = Arrays.asList("短信1", "短信2", "短信3", "短信4", "短信5", "短信6", "短信7", "短信8", "短信9");
-	// private List<String> mDatas = Arrays.asList("短信", "收藏", "推荐");
-
-	private ViewPagerIndicator mIndicator;
+	private PagerTab mIndicator;
 	private ArrayList<Level> levels;
 	protected PagerAdapter pagerAdapter;
 	protected ViewPagerIndicator indicator;
@@ -49,7 +46,7 @@ public class TestActivity extends FragmentActivity
 		// 设置Tab上的标题
 		mViewPager.setAdapter(mAdapter);
 		// 设置关联的ViewPager
-		mIndicator.setViewPager(mViewPager, 0);
+		// mIndicator.setViewPager(mViewPager);
 
 	}
 
@@ -68,7 +65,7 @@ public class TestActivity extends FragmentActivity
 			@Override
 			public Fragment getItem(int position)
 			{
-				return new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
+				return new DocsListFragment();
 			}
 
 			@Override
@@ -91,7 +88,7 @@ public class TestActivity extends FragmentActivity
 					levels.clear();
 					levels.addAll(fromJson);
 					mAdapter.notifyDataSetChanged();
-					mIndicator.refreshTitle();
+					mIndicator.setViewPager(mViewPager);
 				}
 			}
 
@@ -108,6 +105,6 @@ public class TestActivity extends FragmentActivity
 	private void initView()
 	{
 		mViewPager = (ViewPager) findViewById(R.id.id_vp);
-		mIndicator = (ViewPagerIndicator) findViewById(R.id.id_indicator);
+		mIndicator = (PagerTab) findViewById(R.id.id_indicator);
 	}
 }
