@@ -41,7 +41,6 @@ public abstract class ContentView extends FrameLayout
 	public void showView(ViewState viewState)
 	{
 		this.CURRENTSTATE = viewState;
-		Log.i("logi", "CURRENTSTATE=" + this.CURRENTSTATE);
 		if (loadingView != null)
 		{
 			loadingView.setVisibility(this.CURRENTSTATE == ViewState.LOADING ? View.VISIBLE : View.INVISIBLE);

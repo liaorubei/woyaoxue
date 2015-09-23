@@ -3,12 +3,7 @@ package com.newclass.woyaoxue.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnClickListener;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,54 +14,65 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.lidroid.xutils.view.annotation.ViewInject;
-import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.Level;
-import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.newclass.woyaoxue.view.ContentView;
 import com.newclass.woyaoxue.view.ContentView.ViewState;
 import com.newclass.woyaoxue.view.ViewPagerIndicator;
-import com.viewpagerindicator.TabPageIndicator;
 import com.voc.woyaoxue.R;
 
 public class ListActivity extends FragmentActivity
 {
-	@ViewInject(R.id.indicator)
+
 	private ViewPagerIndicator indicator;
 	private List<Level> levels;
 	private FragmentPagerAdapter pagerAdapter;
-	@ViewInject(R.id.viewpager)
+
 	private ViewPager viewpager;
 	protected PackageManager packageManager;
+	private ContentView contentView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_list);
-		ViewUtils.inject(this);
+		contentView = new ContentView(this)
+		{
+
+			@Override
+			public View onCreateSuccessView()
+			{
+				View view = View.inflate(ListActivity.this, R.layout.activity_list, null);
+				indicator = (ViewPagerIndicator) view.findViewById(R.id.indicator);
+				viewpager = (ViewPager) view.findViewById(R.id.viewpager);
+				return view;
+			}
+		};
+		setContentView(contentView);
 		sInitData();
 
 		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		viewpager.setAdapter(pagerAdapter);
 		indicator.setViewPager(viewpager, 0);
 
+		// ActionBar
 		getActionBar().setDisplayShowHomeEnabled(true);
 
+		// 自动升级服务
 		Intent service = new Intent(this, AutoUpdateService.class);
 		startService(service);
 	}
@@ -106,8 +112,7 @@ public class ListActivity extends FragmentActivity
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{
-				// TODO Auto-generated method stub
-
+				contentView.showView(ViewState.FAILURE);
 			}
 
 			@Override
@@ -121,6 +126,7 @@ public class ListActivity extends FragmentActivity
 					pagerAdapter.notifyDataSetChanged();
 					indicator.refreshTitle();
 				}
+				contentView.showView(ViewState.SUCCESS);
 			}
 		});
 
@@ -162,7 +168,7 @@ public class ListActivity extends FragmentActivity
 					fragment.onFailure();
 				}
 			});
-			Log.i("logi","getItem="+position);
+			Log.i("logi", "getItem=" + position);
 			return fragment;
 		}
 

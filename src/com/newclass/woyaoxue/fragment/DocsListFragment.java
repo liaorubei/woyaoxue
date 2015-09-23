@@ -21,10 +21,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
@@ -43,14 +45,25 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 	private BatchDownloadBinder batchDownloadBinder;
 	@ViewInject(R.id.xListView)
 	private XListView xListView;
+	private MyServiceConnection myServiceConnection;
+	private MyAdapter adatper;
+	private List<DownloadHelper> objects;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		Log.i("logi", "DocsListFragment  onCreate");
 		Intent service = new Intent(getActivity(), BatchDownloadService.class);
-		getActivity().bindService(service, new MyServiceConnection(), Context.BIND_AUTO_CREATE);
+		myServiceConnection = new MyServiceConnection();
+		getActivity().bindService(service, myServiceConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		getActivity().unbindService(myServiceConnection);
 	}
 
 	@Override
@@ -65,12 +78,12 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 	@Override
 	public void showData(List<Document> data)
 	{
-		final List<DownloadHelper> objects = new ArrayList<DocsListFragment.DownloadHelper>();
+		objects = new ArrayList<DocsListFragment.DownloadHelper>();
 		for (Document doc : data)
 		{
 			objects.add(new DownloadHelper(doc));
 		}
-		MyAdapter adatper = new MyAdapter(objects);
+		adatper = new MyAdapter(objects);
 
 		xListView.setAdapter(adatper);
 		xListView.setOnItemClickListener(new OnItemClickListener()
@@ -87,6 +100,8 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 
 			}
 		});
+		
+	
 
 		xListView.setPullLoadEnable(true);
 		xListView.setXListViewListener(new IXListViewListener()
@@ -95,7 +110,23 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			@Override
 			public void onRefresh()
 			{
-				// TODO Auto-generated method stub
+				new HttpUtils().send(HttpMethod.GET, "", new RequestCallBack<String>()
+				{
+
+					@Override
+					public void onSuccess(ResponseInfo<String> responseInfo)
+					{
+				
+
+					}
+
+					@Override
+					public void onFailure(HttpException error, String msg)
+					{
+						// TODO Auto-generated method stub
+
+					}
+				});
 
 			}
 
@@ -224,7 +255,8 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			helper.setProgressBar(tag.pb_download);// 把进度条添加到回调管理中
 
 			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色
-			tag.fl_icon.setBackgroundResource((helper.exists() || batchDownloadBinder.isInDownloadQueue(helper)) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
+
+			tag.fl_icon.setBackgroundResource((helper.exists() || (batchDownloadBinder != null && batchDownloadBinder.isInDownloadQueue(helper))) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
 
 			tag.fl_icon.setOnClickListener(new OnClickListener()
 			{

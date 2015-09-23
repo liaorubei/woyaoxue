@@ -20,7 +20,6 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
 import com.newclass.woyaoxue.util.NetworkUtil;
-import com.newclass.woyaoxue.view.PagerTab;
 import com.newclass.woyaoxue.view.ViewPagerIndicator;
 import com.voc.woyaoxue.R;
 
@@ -29,7 +28,7 @@ public class TestActivity extends FragmentActivity
 
 	private FragmentPagerAdapter mAdapter;
 	private ViewPager mViewPager;
-	private PagerTab mIndicator;
+	
 	private ArrayList<Level> levels;
 	protected PagerAdapter pagerAdapter;
 	protected ViewPagerIndicator indicator;
@@ -88,7 +87,7 @@ public class TestActivity extends FragmentActivity
 					levels.clear();
 					levels.addAll(fromJson);
 					mAdapter.notifyDataSetChanged();
-					mIndicator.setViewPager(mViewPager);
+				
 				}
 			}
 
@@ -105,6 +104,5 @@ public class TestActivity extends FragmentActivity
 	private void initView()
 	{
 		mViewPager = (ViewPager) findViewById(R.id.id_vp);
-		mIndicator = (PagerTab) findViewById(R.id.id_indicator);
 	}
 }
