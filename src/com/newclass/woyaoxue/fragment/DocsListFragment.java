@@ -2,6 +2,7 @@ package com.newclass.woyaoxue.fragment;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ComponentName;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.format.DateFormat;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +23,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -46,14 +50,20 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 	@ViewInject(R.id.xListView)
 	private XListView xListView;
 	private MyServiceConnection myServiceConnection;
-	private MyAdapter adatper;
+	private MyAdapter myAdapter;
 	private List<DownloadHelper> objects;
+	private String mPath;
+	protected int pageSize = 5;
+
+	public DocsListFragment(String fullPath)
+	{
+		this.mPath = fullPath;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		Log.i("logi", "DocsListFragment  onCreate");
 		Intent service = new Intent(getActivity(), BatchDownloadService.class);
 		myServiceConnection = new MyServiceConnection();
 		getActivity().bindService(service, myServiceConnection, Context.BIND_AUTO_CREATE);
@@ -83,9 +93,9 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 		{
 			objects.add(new DownloadHelper(doc));
 		}
-		adatper = new MyAdapter(objects);
+		myAdapter = new MyAdapter(objects);
 
-		xListView.setAdapter(adatper);
+		xListView.setAdapter(myAdapter);
 		xListView.setOnItemClickListener(new OnItemClickListener()
 		{
 
@@ -100,8 +110,6 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 
 			}
 		});
-		
-	
 
 		xListView.setPullLoadEnable(true);
 		xListView.setXListViewListener(new IXListViewListener()
@@ -110,21 +118,34 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			@Override
 			public void onRefresh()
 			{
-				new HttpUtils().send(HttpMethod.GET, "", new RequestCallBack<String>()
+				new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath + "?skip=" + 0 + "&take=" + pageSize, new RequestCallBack<String>()
 				{
 
 					@Override
 					public void onSuccess(ResponseInfo<String> responseInfo)
 					{
-				
+						List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
+						{}.getType());
+						Log.i("logi", "fromJson=" + fromJson);
+						if (fromJson.size() > 0)
+						{
+							objects.clear();
+							for (Document document : fromJson)
+							{
+								objects.add(new DownloadHelper(document));
+							}
+							myAdapter.notifyDataSetChanged();
+						}
 
+						xListView.stopRefresh();
+						xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()).toString());
 					}
 
 					@Override
 					public void onFailure(HttpException error, String msg)
 					{
-						// TODO Auto-generated method stub
-
+						xListView.stopRefresh();
+						xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()) + " 刷新失败");
 					}
 				});
 
@@ -133,7 +154,35 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			@Override
 			public void onLoadMore()
 			{
-				// TODO Auto-generated method stub
+				new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath + "?skip=" + objects.size() + "&take=" + pageSize, new RequestCallBack<String>()
+				{
+
+					@Override
+					public void onSuccess(ResponseInfo<String> responseInfo)
+					{
+						List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
+						{}.getType());
+
+						if (fromJson.size() > 0)
+						{
+							for (Document d : fromJson)
+							{
+								objects.add(new DownloadHelper(d));
+							}
+							myAdapter.notifyDataSetChanged();
+						}
+						xListView.stopLoadMore();
+						xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()).toString());
+
+					}
+
+					@Override
+					public void onFailure(HttpException error, String msg)
+					{
+						xListView.stopRefresh();
+						xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()) + " 刷新失败");
+					}
+				});
 
 			}
 		});

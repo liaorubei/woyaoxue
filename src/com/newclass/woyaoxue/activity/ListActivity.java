@@ -149,7 +149,7 @@ public class ListActivity extends FragmentActivity
 		@Override
 		public Fragment getItem(int position)
 		{
-			final BaseFragment<List<Document>> fragment = new DocsListFragment();
+			final BaseFragment<List<Document>> fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(levels.get(position).Id));
 			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocsByLevelId(levels.get(position).Id), new RequestCallBack<String>()
 			{
 

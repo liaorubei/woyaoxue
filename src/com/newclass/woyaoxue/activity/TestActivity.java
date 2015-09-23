@@ -64,7 +64,7 @@ public class TestActivity extends FragmentActivity
 			@Override
 			public Fragment getItem(int position)
 			{
-				return new DocsListFragment();
+				return new DocsListFragment("");
 			}
 
 			@Override
