@@ -191,15 +191,18 @@ public class XListView extends ListView implements OnScrollListener
 	}
 
 	/**
-	 * stop load more, reset footer view.
+	 * 停止加载更多的动作,并以指定状态复原FooterView
+	 * 
+	 * @param state 停止加载更多后要显示的状态,一般是"查看更多","没有更多","加载失败"
 	 */
-	public void stopLoadMore()
+	public void stopLoadMore(int state)
 	{
-		if (mPullLoading == true)
+/*		if (mPullLoading == true)
 		{
 			mPullLoading = false;
-			mFooterView.setState(XListViewFooter.STATE_NORMAL);
-		}
+		}*/
+		mPullLoading=false;
+		mFooterView.setState(state);
 	}
 
 	/**

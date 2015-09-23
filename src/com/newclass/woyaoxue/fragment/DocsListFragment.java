@@ -42,6 +42,7 @@ import com.newclass.woyaoxue.util.DaoUtil;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.view.XListView;
 import com.newclass.woyaoxue.view.XListView.IXListViewListener;
+import com.newclass.woyaoxue.view.XListViewFooter;
 import com.voc.woyaoxue.R;
 
 public class DocsListFragment extends BaseFragment<List<Document>>
@@ -51,7 +52,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 	private MyAdapter myAdapter;
 	private MyServiceConnection myServiceConnection;
 	private List<DownloadHelper> objects;
-	protected int pageSize = 5;
+	protected int pageSize = 20;
 	@ViewInject(R.id.xListView)
 	private XListView xListView;
 
@@ -80,6 +81,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			public void onFailure(HttpException error, String msg)
 			{
 				xListView.stopRefresh();
+				xListView.stopLoadMore( XListViewFooter.STATE_ERRORS);
 				xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()) + " 刷新失败");
 			}
 
@@ -97,7 +99,8 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 					}
 					myAdapter.notifyDataSetChanged();
 				}
-				xListView.stopLoadMore();
+
+				xListView.stopLoadMore(fromJson.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL);
 				xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()).toString());
 
 			}
@@ -149,6 +152,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 				}
 
 				xListView.stopRefresh();
+				xListView.stopLoadMore(fromJson.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL);
 				xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()).toString());
 			}
 		});
