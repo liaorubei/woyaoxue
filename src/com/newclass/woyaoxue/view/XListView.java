@@ -127,11 +127,11 @@ public class XListView extends ListView implements OnScrollListener
 	}
 
 	/**
-	 * enable or disable pull down refresh feature.
+	 * 是否开启下拉刷新功能
 	 * 
 	 * @param enable
 	 */
-	public void setPullRefreshEnable(boolean enable)
+	public void set下拉刷新Enable(boolean enable)
 	{
 		mEnablePullRefresh = enable;
 		if (!mEnablePullRefresh)
@@ -149,7 +149,7 @@ public class XListView extends ListView implements OnScrollListener
 	 * 
 	 * @param enable
 	 */
-	public void setPullLoadEnable(boolean enable)
+	public void set上拉加载Enable(boolean enable)
 	{
 		mEnablePullLoad = enable;
 		if (!mEnablePullLoad)
@@ -197,11 +197,10 @@ public class XListView extends ListView implements OnScrollListener
 	 */
 	public void stopLoadMore(int state)
 	{
-/*		if (mPullLoading == true)
-		{
-			mPullLoading = false;
-		}*/
-		mPullLoading=false;
+		/*
+		 * if (mPullLoading == true) { mPullLoading = false; }
+		 */
+		mPullLoading = false;
 		mFooterView.setState(state);
 	}
 
@@ -320,12 +319,17 @@ public class XListView extends ListView implements OnScrollListener
 		case MotionEvent.ACTION_MOVE:
 			final float deltaY = ev.getRawY() - mLastY;
 			mLastY = ev.getRawY();
-			if (getFirstVisiblePosition() == 0 && (mHeaderView.getVisiableHeight() > 0 || deltaY > 0))
+
+			// 下拉刷新时,要求
+			// 1.下拉刷新功能开启了,
+			// 2.第一个可见的Item的位置是0,
+			// 3.要求是在下拉的过程deltaY > 0
+			if (mEnablePullRefresh && getFirstVisiblePosition() == 0 && (mHeaderView.getVisiableHeight() > 0 || deltaY > 0))
 			{
-				// the first item is showing, header has shown or pull down.
 				updateHeaderHeight(deltaY / OFFSET_RADIO);
 				invokeOnScrolling();
 			}
+
 			else if (getLastVisiblePosition() == mTotalItemCount - 1 && (mFooterView.getBottomMargin() > 0 || deltaY < 0))
 			{
 				// last item, already pulled up or want to pull up.

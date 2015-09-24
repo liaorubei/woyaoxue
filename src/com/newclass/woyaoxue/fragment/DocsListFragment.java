@@ -69,6 +69,8 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 		View view = View.inflate(getContext(), R.layout.fragment_docslist, null);
 		ViewUtils.inject(view, getActivity());
 		xListView = (XListView) view.findViewById(R.id.xListView);
+		xListView.set下拉刷新Enable(false);
+		xListView.set上拉加载Enable(true);
 		return view;
 	}
 
@@ -170,7 +172,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				DownloadHelper helper = objects.get(position);
+				DownloadHelper helper = objects.get(position-1);
 
 				Intent intent = new Intent(getActivity(), PlayActivity.class);
 				intent.putExtra("Id", helper.getDoc().Id);
@@ -178,7 +180,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			}
 		});
 
-		xListView.setPullLoadEnable(true);
+		xListView.set上拉加载Enable(true);
 		xListView.setXListViewListener(new IXListViewListener()
 		{
 
@@ -298,7 +300,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 				holder.tv_date = (TextView) convertView.findViewById(R.id.tv_date);
 				holder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
-				holder.fl_icon = convertView.findViewById(R.id.fl_icon);
+				holder.fl_icon = convertView.findViewById(R.id.iv_download);
 				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
 				convertView.setTag(holder);
 			}

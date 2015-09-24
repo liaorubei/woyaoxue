@@ -5,16 +5,10 @@
     android:background="#ffffffff"
     android:orientation="vertical" >
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/id_vp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" >
-    </android.support.v4.view.ViewPager>
-
-    <com.newclass.woyaoxue.view.PagerTab
-        android:id="@+id/id_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="45dp" />
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </LinearLayout>

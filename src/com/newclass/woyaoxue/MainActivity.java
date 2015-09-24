@@ -40,6 +40,7 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.DownActivity;
 import com.newclass.woyaoxue.activity.ListActivity;
+import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
@@ -92,6 +93,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		Intent intent = new Intent(this, ListActivity.class);
+		//Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
 		this.finish();
 	}

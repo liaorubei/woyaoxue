@@ -77,6 +77,11 @@ public class ListActivity extends FragmentActivity
 		// 自动升级服务
 		Intent service = new Intent(this, AutoUpdateService.class);
 		startService(service);
+		
+		
+		//PopupWindow popupWindow=new PopupWindow();
+		
+	
 
 	}
 
