@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="2.1" >
+    android:versionName="2.2" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -37,6 +37,8 @@
         <activity android:name="com.newclass.woyaoxue.activity.DownActivity" />
         <!-- 播放界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" />
+        <!-- 更多界面 -->
+        <activity android:name="com.newclass.woyaoxue.activity.MoreActivity" />
         <!-- 测试界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.TestActivity" />
 

@@ -12,4 +12,6 @@ public class Level
 	public int Id;
 	public String LevelName;
 	public int DocCount;
+	public int Sort;
+	public int Show;
 }
