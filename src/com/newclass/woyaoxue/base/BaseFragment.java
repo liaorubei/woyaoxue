@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 public abstract class BaseFragment<T> extends Fragment
 {
 
-	private ContentView contentView;
+	protected ContentView contentView;
 
 	protected abstract View initView();
 

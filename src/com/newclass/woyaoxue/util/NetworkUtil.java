@@ -54,4 +54,10 @@ public class NetworkUtil
 		return domain+"/NewClass/GetLatestPackage";
 	}
 
+	public static String getFolders(int levelId)
+	{
+		// TODO Auto-generated method stub
+		return domain+"/NewClass/Folders?levelId="+levelId;
+	}
+
 }
