@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+
+    <!-- Multi-sim sim colors -->
+    <color name="color_one">#3498db</color>
+    <color name="color_two">#95a5a6</color>
+ 
+</resources>

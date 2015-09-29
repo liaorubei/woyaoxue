@@ -6,4 +6,10 @@ public class Folder
 	public int Id;
 	public String Name;
 	public int DocsCount;
+	@Override
+	public String toString()
+	{
+		return "Folder [Id=" + Id + ", Name=" + Name + ", DocsCount=" + DocsCount + "]";
+	}
+	
 }

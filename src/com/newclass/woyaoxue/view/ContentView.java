@@ -4,18 +4,16 @@ import android.content.Context;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 public abstract class ContentView extends FrameLayout
 {
-	private ViewState CURRENTSTATE = ViewState.LOADING;
-	private View successView;
-	private View failureView;
-	private View emptyView;
-	private View loadingView;
 	private View contentView;
+	private ViewState CURRENTSTATE = ViewState.LOADING;
+	private View emptyView;
+	private View failureView;
+	private View loadingView;
+	private View successView;
 
 	public ContentView(Context context)
 	{
@@ -24,6 +22,8 @@ public abstract class ContentView extends FrameLayout
 		this.addView(contentView);
 		initView();
 	}
+
+	public abstract void initData();
 
 	private void initView()
 	{
@@ -38,6 +38,23 @@ public abstract class ContentView extends FrameLayout
 		showView(ViewState.LOADING);
 	}
 
+	private View onCreateEmptyView()
+	{
+		return contentView.findViewById(R.id.rl_empty);
+	}
+
+	private View onCreateFailureView()
+	{
+		return contentView.findViewById(R.id.rl_failure);
+	}
+
+	private View onCreateLoadingView()
+	{
+		return contentView.findViewById(R.id.rl_loading);
+	}
+
+	public abstract View onCreateSuccessView();
+	
 	public void showView(ViewState viewState)
 	{
 		this.CURRENTSTATE = viewState;
@@ -62,27 +79,12 @@ public abstract class ContentView extends FrameLayout
 		}
 	}
 
-	private View onCreateEmptyView()
-	{
-		return contentView.findViewById(R.id.rl_empty);
-	}
-
-	private View onCreateLoadingView()
-	{
-		return contentView.findViewById(R.id.rl_loading);
-	}
-
-	private View onCreateFailureView()
-	{
-		return contentView.findViewById(R.id.rl_failure);
-	}
-
-	public abstract View onCreateSuccessView();
-
 	public static enum ViewState
 	{
-		LOADING, SUCCESS, FAILURE, EMPTY
-		//LOADING,SUCCESS,		FAILURE,		vacancy
+		EMPTY, FAILURE, LOADING, SUCCESS
+		
+		
+		//LOADING,SUCCESS,FAILURE,VACANCY
 	}
 
 }

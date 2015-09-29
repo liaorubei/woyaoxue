@@ -40,12 +40,13 @@ import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
 import com.newclass.woyaoxue.util.DaoUtil;
 import com.newclass.woyaoxue.util.FolderUtil;
+import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.XListView;
 import com.newclass.woyaoxue.view.XListView.IXListViewListener;
 import com.newclass.woyaoxue.view.XListViewFooter;
 import com.voc.woyaoxue.R;
 
-public class DocsListFragment extends BaseFragment<List<Document>>
+public class DocsListFragment extends BaseFragment
 {
 	private BatchDownloadBinder batchDownloadBinder;
 	private String mPath;
@@ -55,35 +56,73 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 	protected int pageSize = 20;
 	@ViewInject(R.id.xListView)
 	private XListView xListView;
+	private int mFolderId;
+	private int mLevelId;
 
-	public DocsListFragment(String fullPath)
+	public DocsListFragment(int folderId, int levelid)
 	{
-		this.mPath = fullPath;
+		this.mFolderId = folderId;
+		this.mLevelId = levelid;
 		objects = new ArrayList<DocsListFragment.DownloadHelper>();
 		myAdapter = new MyAdapter(objects);
+		this.mPath = NetworkUtil.getDocs(folderId + "", levelid + "", objects.size() + "", pageSize + "");
 	}
 
 	@Override
 	protected View initView()
 	{
-		View view = View.inflate(getContext(), R.layout.fragment_docslist, null);
-		ViewUtils.inject(view, getActivity());
+		Log.i("logi", this.mPath);
+		View view = View.inflate(getActivity(), R.layout.fragment_docslist, null);
+
 		xListView = (XListView) view.findViewById(R.id.xListView);
 		xListView.set下拉刷新Enable(false);
 		xListView.set上拉加载Enable(true);
+		xListView.setAdapter(myAdapter);
+
+		xListView.setOnItemClickListener(new OnItemClickListener()
+		{
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				DownloadHelper helper = objects.get(position - 1);
+
+				Intent intent = new Intent(getActivity(), PlayActivity.class);
+				intent.putExtra("Id", helper.getDoc().Id);
+				startActivity(intent);
+			}
+		});
+
+		xListView.setXListViewListener(new IXListViewListener()
+		{
+
+			@Override
+			public void onLoadMore()
+			{
+				loadMore();
+			}
+
+			@Override
+			public void onRefresh()
+			{
+				refresh();
+			}
+
+		});
 		return view;
 	}
 
 	private void loadMore()
 	{
-		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath + "?skip=" + objects.size() + "&take=" + pageSize, new RequestCallBack<String>()
+		this.mPath = NetworkUtil.getDocs(this.mFolderId + "", this.mLevelId + "", objects.size() + "", pageSize + "");
+		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath, new RequestCallBack<String>()
 		{
 
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{
 				xListView.stopRefresh();
-				xListView.stopLoadMore( XListViewFooter.STATE_ERRORS);
+				xListView.stopLoadMore(XListViewFooter.STATE_ERRORS);
 				xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()) + " 刷新失败");
 			}
 
@@ -127,7 +166,8 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 
 	private void refresh()
 	{
-		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath + "?skip=" + 0 + "&take=" + pageSize, new RequestCallBack<String>()
+		this.mPath = NetworkUtil.getDocs(this.mFolderId + "", this.mLevelId + "", objects.size() + "", pageSize + "");
+		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath, new RequestCallBack<String>()
 		{
 
 			@Override
@@ -135,6 +175,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			{
 				xListView.stopRefresh();
 				xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()) + " 刷新失败");
+				failure();
 			}
 
 			@Override
@@ -142,7 +183,7 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 			{
 				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
 				{}.getType());
-				Log.i("logi", "fromJson=" + fromJson);
+
 				if (fromJson.size() > 0)
 				{
 					objects.clear();
@@ -151,6 +192,11 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 						objects.add(new DownloadHelper(document));
 					}
 					myAdapter.notifyDataSetChanged();
+					success();
+				}
+				else
+				{
+					vacancy();
 				}
 
 				xListView.stopRefresh();
@@ -161,42 +207,9 @@ public class DocsListFragment extends BaseFragment<List<Document>>
 	}
 
 	@Override
-	public void showData(List<Document> data)
+	public void initData()
 	{
 		refresh();
-
-		xListView.setAdapter(myAdapter);
-		xListView.setOnItemClickListener(new OnItemClickListener()
-		{
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-			{
-				DownloadHelper helper = objects.get(position-1);
-
-				Intent intent = new Intent(getActivity(), PlayActivity.class);
-				intent.putExtra("Id", helper.getDoc().Id);
-				startActivity(intent);
-			}
-		});
-
-		xListView.set上拉加载Enable(true);
-		xListView.setXListViewListener(new IXListViewListener()
-		{
-
-			@Override
-			public void onLoadMore()
-			{
-				loadMore();
-			}
-
-			@Override
-			public void onRefresh()
-			{
-				refresh();
-			}
-
-		});
 	}
 
 	/**

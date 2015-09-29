@@ -1,18 +1,20 @@
 package com.newclass.woyaoxue.base;
 
-import com.newclass.woyaoxue.view.ContentView;
-import com.newclass.woyaoxue.view.ContentView.ViewState;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public abstract class BaseFragment<T> extends Fragment
+import com.newclass.woyaoxue.view.ContentView;
+import com.newclass.woyaoxue.view.ContentView.ViewState;
+
+public abstract class BaseFragment extends Fragment
 {
 
-	protected ContentView contentView;
+	private ContentView contentView;
+
+	public abstract void initData();
 
 	protected abstract View initView();
 
@@ -29,31 +31,30 @@ public abstract class BaseFragment<T> extends Fragment
 					return BaseFragment.this.initView();
 				}
 
+				@Override
+				public void initData()
+				{
+					BaseFragment.this.initData();
+				}
 			};
 		}
 
 		return contentView;
 	}
 
-	public void onFailure()
+	protected void success()
+	{
+		contentView.showView(ViewState.SUCCESS);
+	}
+
+	protected void failure()
 	{
 		contentView.showView(ViewState.FAILURE);
 	}
 
-	public void onSuccess(T data)
+	protected void vacancy()
 	{
-		if (data != null)
-		{
-			showData(data);
-			contentView.showView(ViewState.SUCCESS);
-		}
-		else
-		{
-			contentView.showView(ViewState.EMPTY);
-		}
-
+		contentView.showView(ViewState.EMPTY);
 	}
-
-	public abstract void showData(T data);
 
 }

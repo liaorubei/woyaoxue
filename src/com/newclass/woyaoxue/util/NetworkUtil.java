@@ -6,9 +6,9 @@ public class NetworkUtil
 
 	public static String domain = "http://voc2015.azurewebsites.net";
 
-	public static String getDocs()
+	public static String getDocs(String folderId, String levelid, String skip, String take)
 	{
-		return domain + "";
+		return domain + "/NewClass/GetDocs?folderId=" + folderId + "&levelId=" + levelid + "&skip=" + skip + "&take=" + take;
 	}
 
 	public static String getLevels()
@@ -18,6 +18,7 @@ public class NetworkUtil
 
 	/**
 	 * /NewClass/DocsByLevelId/{levelId}
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -40,24 +41,30 @@ public class NetworkUtil
 	 */
 	public static String getFullPath(String path)
 	{
-		
+
 		return domain + path;
 	}
 
 	/**
 	 * /NewClass/GetLatestPackage
+	 * 
 	 * @return
 	 */
 	public static String getLatest()
 	{
-		
-		return domain+"/NewClass/GetLatestPackage";
+
+		return domain + "/NewClass/GetLatestPackage";
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param levelId 取得指定LevelId下文件夹内文档的个数, 如果不大于0,表示取得所有数据
+	 * @return domain + "/NewClass/Folders?levelId=" + levelId
+	 */
 	public static String getFolders(int levelId)
 	{
-		// TODO Auto-generated method stub
-		return domain+"/NewClass/Folders?levelId="+levelId;
+		return domain + "/NewClass/Folders?levelId=" + levelId;
 	}
 
 }
