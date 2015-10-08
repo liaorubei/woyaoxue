@@ -5,11 +5,12 @@ public class Folder
 //{"Id":6,"Name":"舌尖上的中国","DocsCount":0}
 	public int Id;
 	public String Name;
+	public int LevelId;
 	public int DocsCount;
 	@Override
 	public String toString()
 	{
-		return "Folder [Id=" + Id + ", Name=" + Name + ", DocsCount=" + DocsCount + "]";
+		return "Folder [Id=" + Id + ", Name=" + Name + ", LevelId=" + LevelId +", DocsCount=" + DocsCount + "]";
 	}
 	
 }
