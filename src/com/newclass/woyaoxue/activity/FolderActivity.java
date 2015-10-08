@@ -230,9 +230,9 @@ public class FolderActivity extends FragmentActivity
 			tabLayout.addView(tabsView, params);
 		}
 
-		// More按钮
+		// More按钮,(最新)
 		TextView moreView = new TextView(this);
-		moreView.setText("MORE");
+		moreView.setText("最新");
 		moreView.setGravity(Gravity.CENTER);
 		moreView.setTextColor(ConstantsUtil.ColorTwo);
 		moreView.setBackgroundResource(R.drawable.selector_levels);

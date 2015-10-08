@@ -3,16 +3,8 @@ package com.newclass.woyaoxue.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.newclass.woyaoxue.base.BaseAdapter;
-import com.newclass.woyaoxue.bean.Level;
-import com.voc.woyaoxue.R;
-
 import android.app.Activity;
-import android.app.ApplicationErrorReport.AnrInfo;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +13,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.bean.Level;
+import com.voc.woyaoxue.R;
 
 public class MoreActivity extends Activity
 {
