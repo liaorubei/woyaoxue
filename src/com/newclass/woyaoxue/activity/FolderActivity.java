@@ -242,9 +242,7 @@ public class FolderActivity extends FragmentActivity
 			@Override
 			public void onClick(View v)
 			{
-				Intent intent = new Intent(FolderActivity.this, MoreActivity.class);
-				String json = new Gson().toJson(hideLevels);
-				intent.putExtra("hideLevels", json);
+				Intent intent = new Intent(FolderActivity.this, ListActivity.class);				
 				startActivity(intent);
 			}
 		});
