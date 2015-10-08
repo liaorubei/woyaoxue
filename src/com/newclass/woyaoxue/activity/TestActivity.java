@@ -1,7 +1,9 @@
 package com.newclass.woyaoxue.activity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -14,9 +16,14 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -38,93 +45,143 @@ import com.voc.woyaoxue.R;
 public class TestActivity extends FragmentActivity
 {
 
-	private ListView listview;
-	private FragmentPagerAdapter mAdapter;
-	private ViewPager mViewPager;
-
-	private ArrayList<Level> levels;
-	protected PagerAdapter pagerAdapter;
-	protected ViewPagerIndicator indicator;
-	private List<Document> list;
-	private MyAdapter adapter;
+	private List<Group> list;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.vp_indicator);
+		setContentView(R.layout.activity_test);
+		ExpandableListView elv = (ExpandableListView) findViewById(R.id.elv);
 
-		listview = (ListView) findViewById(R.id.listview);
-		list = new ArrayList<Document>();
-		adapter = new MyAdapter(list);
-		listview.setAdapter(adapter);
-
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocsByLevelId(1), new RequestCallBack<String>()
+		// 设置当组被点击时的监听
+		elv.setOnGroupClickListener(new OnGroupClickListener()
 		{
 
 			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
+			public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id)
 			{
-				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
-				{}.getType());
-				if (fromJson.size() > 0)
-				{
-					list.addAll(fromJson);
-					adapter.notifyDataSetChanged();
-				}
-
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				// TODO Auto-generated method stub
-
+				Toast.makeText(TestActivity.this, list.get(groupPosition).Name, Toast.LENGTH_SHORT).show();
+				return false;
 			}
 		});
+
+		// 设置当子项目被点击时的监听
+		elv.setOnChildClickListener(new OnChildClickListener()
+		{
+
+			@Override
+			public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id)
+			{
+				Toast.makeText(TestActivity.this, list.get(groupPosition).Childs.get(childPosition).Name, Toast.LENGTH_SHORT).show();
+				return false;
+			}
+		});
+
+		initdata();
+
+		MyAdapter adapter = new MyAdapter();
+		elv.setAdapter(adapter);
+
 	}
 
-	private class MyAdapter extends BaseAdapter<Document> implements Observer
+	private void initdata()
+	{
+		list = new ArrayList<Group>();
+		for (int i = 0; i < 20; i++)
+		{
+			Group group = new Group();
+			group.Name = "Group" + i;
+			group.Childs = new ArrayList<TestActivity.Child>();
+
+			for (int j = 0; j < 5; j++)
+			{
+				Child child = new Child();
+				child.Name = "Group" + i + " Child" + j;
+				group.Childs.add(child);
+			}
+			list.add(group);
+		}
+	}
+
+	private class Group
+	{
+		String Name;
+		List<Child> Childs;
+	}
+
+	private class Child
+	{
+		String Name;
+	}
+
+	private class MyAdapter extends BaseExpandableListAdapter
 	{
 
-		public MyAdapter(List<Document> list)
+		@Override
+		public int getGroupCount()
 		{
-			super(list);
+			return list.size();
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
+		public int getChildrenCount(int groupPosition)
 		{
-			final Document item = getItem(position);
-			if (convertView == null)
-			{
-				convertView = View.inflate(TestActivity.this, R.layout.listitem_downloadable, null);
-			}
-
-			ImageView iv_download = (ImageView) convertView.findViewById(R.id.iv_download);
-			iv_download.getBackground().setLevel(8);
-			iv_download.setOnClickListener(new OnClickListener()
-			{
-				
-				@Override
-				public void onClick(View v)
-				{
-				if(	DownloadManager.con(item.SoundPath)){
-					Toast.makeText(TestActivity.this, "已经在队列中", Toast.LENGTH_SHORT).show();
-				}
-					v.setTag(1);
-					
-					
-				}
-			});
-
-			return convertView;
+			return list.get(groupPosition).Childs.size();
 		}
 
 		@Override
-		public void update(Observable observable, Object data)
+		public Object getGroup(int groupPosition)
 		{
-			notifyDataSetChanged();
+			return list.get(groupPosition);
+		}
+
+		@Override
+		public Object getChild(int groupPosition, int childPosition)
+		{
+			return list.get(groupPosition).Childs.get(childPosition);
+		}
+
+		@Override
+		public long getGroupId(int groupPosition)
+		{
+			return groupPosition;
+		}
+
+		@Override
+		public long getChildId(int groupPosition, int childPosition)
+		{
+			return childPosition;
+		}
+
+		@Override
+		public boolean hasStableIds()
+		{
+			return false;
+		}
+
+		@Override
+		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent)
+		{
+			TextView textView = new TextView(TestActivity.this);
+			textView.setPadding(30, 0, 0, 0);//缩进设置
+			textView.setText(list.get(groupPosition).Name);
+			return textView;
+		}
+
+		@Override
+		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent)
+		{
+			TextView textView = new TextView(TestActivity.this);
+			textView.setPadding(60, 0, 0, 0);//缩进设置
+			textView.setText(list.get(groupPosition).Childs.get(childPosition).Name);
+			return textView;
+		}
+
+		@Override
+		public boolean isChildSelectable(int groupPosition, int childPosition)
+		{
+			return true;
 		}
 	}
 }
