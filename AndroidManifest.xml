@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="2.2" >
+    android:versionName="2.3" >
 
     <uses-sdk
         android:minSdkVersion="15"
