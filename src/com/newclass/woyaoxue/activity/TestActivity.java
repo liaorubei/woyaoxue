@@ -1,45 +1,19 @@
 package com.newclass.woyaoxue.activity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.newclass.woyaoxue.base.BaseAdapter;
-import com.newclass.woyaoxue.bean.Document;
-import com.newclass.woyaoxue.bean.Level;
-import com.newclass.woyaoxue.download.DownloadManager;
-import com.newclass.woyaoxue.fragment.DocsListFragment;
-import com.newclass.woyaoxue.util.NetworkUtil;
-import com.newclass.woyaoxue.view.ViewPagerIndicator;
 import com.voc.woyaoxue.R;
 
 public class TestActivity extends FragmentActivity

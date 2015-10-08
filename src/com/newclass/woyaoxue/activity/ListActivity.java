@@ -9,12 +9,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
-import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 public class ListActivity extends FragmentActivity

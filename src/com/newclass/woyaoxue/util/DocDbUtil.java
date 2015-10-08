@@ -3,7 +3,6 @@ package com.newclass.woyaoxue.util;
 import android.content.Context;
 
 import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.db.annotation.Id;
 import com.lidroid.xutils.exception.DbException;
 import com.newclass.woyaoxue.bean.Document;
 

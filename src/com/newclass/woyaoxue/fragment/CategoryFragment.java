@@ -3,24 +3,9 @@ package com.newclass.woyaoxue.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.voc.woyaoxue.R;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.ViewUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.lidroid.xutils.view.annotation.ViewInject;
-import com.newclass.woyaoxue.activity.ListActivity;
-import com.newclass.woyaoxue.activity.PlayActivity;
-import com.newclass.woyaoxue.bean.Level;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.DocumentsContract.Document;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,9 +14,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.view.annotation.ViewInject;
+import com.newclass.woyaoxue.activity.ListActivity;
+import com.newclass.woyaoxue.bean.Level;
+import com.voc.woyaoxue.R;
 
 public class CategoryFragment extends Fragment
 {

@@ -21,7 +21,6 @@ import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Folder;
-import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.XListView;
 import com.voc.woyaoxue.R;

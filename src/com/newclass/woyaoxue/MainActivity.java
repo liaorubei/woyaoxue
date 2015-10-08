@@ -1,20 +1,12 @@
 package com.newclass.woyaoxue;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,29 +16,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.ViewUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.DownActivity;
-import com.newclass.woyaoxue.activity.FolderActivity;
-import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.bean.Level;
-import com.newclass.woyaoxue.bean.UpgradePatch;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
-import com.newclass.woyaoxue.service.AutoUpdateService;
-import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 public class MainActivity extends FragmentActivity implements android.view.View.OnClickListener

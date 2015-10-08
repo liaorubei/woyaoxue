@@ -1,31 +1,19 @@
 package com.newclass.woyaoxue.service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.SystemClock;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.fragment.DocsListFragment.DownloadHelper;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
-import com.newclass.woyaoxue.util.UpdateListenerUtil;
 
 /**
  * 批量音频下载服务

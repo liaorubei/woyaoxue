@@ -2,8 +2,6 @@ package com.newclass.woyaoxue.bean;
 
 import java.util.List;
 
-import android.widget.ProgressBar;
-
 public class Document
 {
 	public int Id;

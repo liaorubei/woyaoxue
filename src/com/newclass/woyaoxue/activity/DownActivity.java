@@ -15,12 +15,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.base.BaseAdapter;
-import com.newclass.woyaoxue.bean.database.*;
+import com.newclass.woyaoxue.bean.database.Document;
 import com.newclass.woyaoxue.util.DaoUtil;
 import com.voc.woyaoxue.R;
 

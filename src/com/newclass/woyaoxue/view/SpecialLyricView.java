@@ -1,12 +1,12 @@
 package com.newclass.woyaoxue.view;
 
-import com.newclass.woyaoxue.bean.Lyric;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.newclass.woyaoxue.bean.Lyric;
 
 public class SpecialLyricView extends LinearLayout implements Comparable<SpecialLyricView>
 {

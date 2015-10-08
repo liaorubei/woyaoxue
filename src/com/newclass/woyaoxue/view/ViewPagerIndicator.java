@@ -1,9 +1,5 @@
 package com.newclass.woyaoxue.view;
 
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -17,16 +13,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.TabWidget;
 import android.widget.TextView;
 
-import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 public class ViewPagerIndicator extends LinearLayout

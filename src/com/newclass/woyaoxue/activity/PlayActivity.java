@@ -3,13 +3,10 @@ package com.newclass.woyaoxue.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.R.integer;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
