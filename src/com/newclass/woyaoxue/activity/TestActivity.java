@@ -11,6 +11,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,26 @@ public class TestActivity extends FragmentActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_test);
+		//setContentView(R.layout.activity_test);
+
+		ListView listView = new ListView(this);
+	
+		TextView header = new TextView(this);
+		header.setText("header");
+		listView.addHeaderView(header);
+		TextView footer = new TextView(this);
+		footer.setText("footer");
+		listView.addFooterView(footer);
+		
+		setContentView(listView);
+	//	listView.getFirstVisiblePosition();
+
+		// initElv();
+
+	}
+
+	private void initElv()
+	{
 		ExpandableListView elv = (ExpandableListView) findViewById(R.id.elv);
 
 		// 设置当组被点击时的监听
@@ -56,7 +76,6 @@ public class TestActivity extends FragmentActivity
 
 		MyAdapter adapter = new MyAdapter();
 		elv.setAdapter(adapter);
-
 	}
 
 	private void initdata()
@@ -138,7 +157,7 @@ public class TestActivity extends FragmentActivity
 		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent)
 		{
 			TextView textView = new TextView(TestActivity.this);
-			textView.setPadding(30, 0, 0, 0);//缩进设置
+			textView.setPadding(30, 0, 0, 0);// 缩进设置
 			textView.setText(list.get(groupPosition).Name);
 			return textView;
 		}
@@ -147,7 +166,7 @@ public class TestActivity extends FragmentActivity
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent)
 		{
 			TextView textView = new TextView(TestActivity.this);
-			textView.setPadding(60, 0, 0, 0);//缩进设置
+			textView.setPadding(60, 0, 0, 0);// 缩进设置
 			textView.setText(list.get(groupPosition).Childs.get(childPosition).Name);
 			return textView;
 		}

@@ -23,15 +23,13 @@ public abstract class ContentView extends FrameLayout
 		initView();
 	}
 
-	public abstract void initData();
-
 	private void initView()
 	{
 		loadingView = onCreateLoadingView();
 		failureView = onCreateFailureView();
 		emptyView = onCreateEmptyView();
 		successView = onCreateSuccessView();
-		if (successView!=null)
+		if (successView != null)
 		{
 			this.addView(successView);
 		}
@@ -54,7 +52,7 @@ public abstract class ContentView extends FrameLayout
 	}
 
 	public abstract View onCreateSuccessView();
-	
+
 	public void showView(ViewState viewState)
 	{
 		this.CURRENTSTATE = viewState;
@@ -82,9 +80,8 @@ public abstract class ContentView extends FrameLayout
 	public static enum ViewState
 	{
 		EMPTY, FAILURE, LOADING, SUCCESS
-		
-		
-		//LOADING,SUCCESS,FAILURE,VACANCY
+
+		// LOADING,SUCCESS,FAILURE,VACANCY
 	}
 
 }

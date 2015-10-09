@@ -82,7 +82,7 @@ public class FolderFragment extends BaseFragment
 		xListView = (XListView) inflate.findViewById(R.id.xListView);
 		xListView.setAdapter(myAdapter);
 		xListView.set下拉刷新Enable(false);
-		xListView.set下拉刷新Enable(false);
+		xListView.set上拉加载Enable(false);
 
 		xListView.setOnItemClickListener(new OnItemClickListener()
 		{

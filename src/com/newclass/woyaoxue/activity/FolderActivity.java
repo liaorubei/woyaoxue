@@ -41,7 +41,6 @@ import com.voc.woyaoxue.R;
 
 public class FolderActivity extends FragmentActivity
 {
-	// #3498db #95a5a6
 	private LinearLayout tabLayout;
 	private List<Level> showLevels;
 	private List<Level> hideLevels;
@@ -66,13 +65,6 @@ public class FolderActivity extends FragmentActivity
 				tabLayout = (LinearLayout) view.findViewById(R.id.ll_tablayout);
 				viewpager = (ViewPager) view.findViewById(R.id.viewpager);
 				return view;
-			}
-
-			@Override
-			public void initData()
-			{
-				// TODO Auto-generated method stub
-
 			}
 		};
 		setContentView(contentView);
@@ -240,11 +232,11 @@ public class FolderActivity extends FragmentActivity
 			@Override
 			public void onClick(View v)
 			{
-				Intent intent = new Intent(FolderActivity.this, ListActivity.class);				
+				Intent intent = new Intent(FolderActivity.this, ListActivity.class);
 				startActivity(intent);
 			}
 		});
-		tabLayout.addView(moreView, params);
+		// tabLayout.addView(moreView, params);//20151009要求去掉最新的这个按钮,改为统一界面
 	}
 
 	private class MyPagerAdapter extends FragmentPagerAdapter
@@ -264,7 +256,6 @@ public class FolderActivity extends FragmentActivity
 		public Fragment getItem(int position)
 		{
 			BaseFragment fragment = new FolderFragment(showLevels.get(position).Id);
-			//fragment = new DocsListFragment(NetworkUtil.getDocsByLevelId(showLevels.get(position).Id));
 			fragment.initData();
 			return fragment;
 		}

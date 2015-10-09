@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.DownActivity;
+import com.newclass.woyaoxue.activity.FolderActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.fragment.DocsListFragment;

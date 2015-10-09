@@ -30,28 +30,31 @@ public abstract class BaseFragment extends Fragment
 				{
 					return BaseFragment.this.initView();
 				}
-
-				@Override
-				public void initData()
-				{
-					BaseFragment.this.initData();
-				}
 			};
 		}
 
 		return contentView;
 	}
 
+	/**
+	 * 成功
+	 */
 	protected void success()
 	{
 		contentView.showView(ViewState.SUCCESS);
 	}
 
+	/**
+	 * 失败
+	 */
 	protected void failure()
 	{
 		contentView.showView(ViewState.FAILURE);
 	}
 
+	/**
+	 * 空的
+	 */
 	protected void vacancy()
 	{
 		contentView.showView(ViewState.EMPTY);

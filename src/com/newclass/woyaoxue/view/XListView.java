@@ -330,7 +330,11 @@ public class XListView extends ListView implements OnScrollListener
 				invokeOnScrolling();
 			}
 
-			else if (getLastVisiblePosition() == mTotalItemCount - 1 && (mFooterView.getBottomMargin() > 0 || deltaY < 0))
+			// 上拉加载时,要求
+			// 1.开启了上拉加载更多的功能
+			// 2.最后一个Item可见
+			// 3.deltaY<0
+			else if (getLastVisiblePosition() == mTotalItemCount - 1 && (mFooterView.getBottomMargin() > 0 || deltaY < 0) && mEnablePullLoad)
 			{
 				// last item, already pulled up or want to pull up.
 				updateFooterHeight(-deltaY / OFFSET_RADIO);
