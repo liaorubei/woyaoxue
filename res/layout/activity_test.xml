@@ -1,11 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fylx="http://schemas.android.com/apk/res/com.voc.woyaoxue"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <ExpandableListView android:id="@+id/elv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ExpandableListView>
+    <com.newclass.woyaoxue.view.CircularProgressBar android:id="@+id/elv"
+        android:layout_width="80dp"
+        android:layout_height="80dp" 
+        fylx:roundColor="@color/color_two"
+        fylx:roundProgressColor="@color/color_one"
+        fylx:textColor="@color/color_one"
+        
+        >
+    </com.newclass.woyaoxue.view.CircularProgressBar>
 
 </RelativeLayout>

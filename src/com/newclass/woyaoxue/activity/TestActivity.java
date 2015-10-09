@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.newclass.woyaoxue.view.CircularProgressBar;
 import com.voc.woyaoxue.R;
 
 public class TestActivity extends FragmentActivity
@@ -26,19 +27,12 @@ public class TestActivity extends FragmentActivity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		//setContentView(R.layout.activity_test);
-
-		ListView listView = new ListView(this);
-	
-		TextView header = new TextView(this);
-		header.setText("header");
-		listView.addHeaderView(header);
-		TextView footer = new TextView(this);
-		footer.setText("footer");
-		listView.addFooterView(footer);
-		
-		setContentView(listView);
+		setContentView(R.layout.activity_test);
 	//	listView.getFirstVisiblePosition();
+		
+		CircularProgressBar elv = (CircularProgressBar) findViewById(R.id.elv);
+		elv.setMax(100);
+		elv.setProgress(25);
 
 		// initElv();
 

@@ -71,8 +71,8 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		//Intent intent = new Intent(this, FolderActivity.class);
-		Intent intent = new Intent(this, TestActivity.class);
+		Intent intent = new Intent(this, FolderActivity.class);
+		//Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
 		this.finish();
 	}

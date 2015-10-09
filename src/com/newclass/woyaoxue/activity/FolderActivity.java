@@ -41,75 +41,14 @@ import com.voc.woyaoxue.R;
 
 public class FolderActivity extends FragmentActivity
 {
-	private LinearLayout tabLayout;
-	private List<Level> showLevels;
-	private List<Level> hideLevels;
-
-	private FragmentPagerAdapter pagerAdapter;
-
-	private ViewPager viewpager;
 	private ContentView contentView;
-
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		contentView = new ContentView(this)
-		{
-
-			@Override
-			public View onCreateSuccessView()
-			{
-				View view = View.inflate(FolderActivity.this, R.layout.activity_folder, null);
-				tabLayout = (LinearLayout) view.findViewById(R.id.ll_tablayout);
-				viewpager = (ViewPager) view.findViewById(R.id.viewpager);
-				return view;
-			}
-		};
-		setContentView(contentView);
-		sInitData();
-
-		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
-		viewpager.setAdapter(pagerAdapter);
-
-		viewpager.setOnPageChangeListener(new OnPageChangeListener()
-		{
-
-			@Override
-			public void onPageSelected(int position)
-			{
-				for (int i = 0; i < tabLayout.getChildCount(); i++)
-				{
-					TextView view = (TextView) tabLayout.getChildAt(i);
-					view.setTextColor(i == position ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
-				}
-			}
-
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-			{
-
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state)
-			{
-
-			}
-		});
-
-		// ActionBar
-		getActionBar().setDisplayShowHomeEnabled(true);
-
-		// 自动升级服务
-		Intent service = new Intent(this, AutoUpdateService.class);
-		startService(service);
-
-		// PopupWindow popupWindow=new PopupWindow();
-
-	}
-
+	private List<Level> hideLevels;
+	private List<Level> showLevels;
+	private LinearLayout tabLayout;
+	
+	private FragmentPagerAdapter pagerAdapter;
+	private ViewPager viewpager;
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -189,6 +128,66 @@ public class FolderActivity extends FragmentActivity
 				contentView.showView(ViewState.SUCCESS);
 			}
 		});
+
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		contentView = new ContentView(this)
+		{
+
+			@Override
+			public View onCreateSuccessView()
+			{
+				View view = View.inflate(FolderActivity.this, R.layout.activity_folder, null);
+				tabLayout = (LinearLayout) view.findViewById(R.id.ll_tablayout);
+				viewpager = (ViewPager) view.findViewById(R.id.viewpager);
+				return view;
+			}
+		};
+		setContentView(contentView);
+		sInitData();
+
+		pagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
+		viewpager.setAdapter(pagerAdapter);
+
+		viewpager.setOnPageChangeListener(new OnPageChangeListener()
+		{
+
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+			{
+
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int state)
+			{
+
+			}
+
+			@Override
+			public void onPageSelected(int position)
+			{
+				for (int i = 0; i < tabLayout.getChildCount(); i++)
+				{
+					TextView view = (TextView) tabLayout.getChildAt(i);
+					view.setTextColor(i == position ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
+				}
+			}
+		});
+
+		// ActionBar
+		getActionBar().setDisplayShowHomeEnabled(true);
+
+		// 自动升级服务
+		Intent service = new Intent(this, AutoUpdateService.class);
+		startService(service);
+
+		// PopupWindow popupWindow=new PopupWindow();
 
 	}
 

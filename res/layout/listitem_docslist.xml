@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fylx="http://schemas.android.com/apk/res/com.voc.woyaoxue"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants" >
@@ -9,8 +10,15 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/file_download_enbale" >
+        android:layout_alignParentRight="true" >
+
+        <com.newclass.woyaoxue.view.CircularProgressBar
+            android:id="@+id/cpb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            fylx:roundColor="@color/color_two"
+            fylx:roundProgressColor="@color/color_one"
+            fylx:textColor="@color/color_one" />
 
         <ProgressBar
             android:id="@+id/pb_download"

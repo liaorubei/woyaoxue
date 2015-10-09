@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.DateFormat;
 import android.text.format.Formatter;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -30,7 +29,6 @@ import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.activity.PlayActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.base.BaseFragment;
@@ -39,7 +37,9 @@ import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.BatchDownloadService.BatchDownloadBinder;
 import com.newclass.woyaoxue.util.DaoUtil;
 import com.newclass.woyaoxue.util.FolderUtil;
+import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
+import com.newclass.woyaoxue.view.CircularProgressBar;
 import com.newclass.woyaoxue.view.XListView;
 import com.newclass.woyaoxue.view.XListView.IXListViewListener;
 import com.newclass.woyaoxue.view.XListViewFooter;
@@ -53,7 +53,6 @@ public class DocsListFragment extends BaseFragment
 	private MyServiceConnection myServiceConnection;
 	private List<DownloadHelper> objects;
 	protected int pageSize = 20;
-	@ViewInject(R.id.xListView)
 	private XListView xListView;
 	private int mFolderId;
 	private int mLevelId;
@@ -64,7 +63,7 @@ public class DocsListFragment extends BaseFragment
 		this.mLevelId = levelid;
 		objects = new ArrayList<DocsListFragment.DownloadHelper>();
 		myAdapter = new MyAdapter(objects);
-		this.mPath = NetworkUtil.getDocs(mFolderId==0?"":mFolderId + "", mLevelId==0?"":mLevelId+"", objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", mLevelId == 0 ? "" : mLevelId + "", objects.size() + "", pageSize + "");
 	}
 
 	@Override
@@ -78,19 +77,7 @@ public class DocsListFragment extends BaseFragment
 		xListView.set上拉加载Enable(true);
 		xListView.setAdapter(myAdapter);
 
-		xListView.setOnItemClickListener(new OnItemClickListener()
-		{
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-			{
-				DownloadHelper helper = objects.get(position - 1);
-
-				Intent intent = new Intent(getActivity(), PlayActivity.class);
-				intent.putExtra("Id", helper.getDoc().Id);
-				startActivity(intent);
-			}
-		});
+		// xListView.setOnItemClickListener();//不直接在ListView上设置监听,容易出现Item错位问题
 
 		xListView.setXListViewListener(new IXListViewListener()
 		{
@@ -113,7 +100,7 @@ public class DocsListFragment extends BaseFragment
 
 	private void loadMore()
 	{
-		this.mPath = NetworkUtil.getDocs(mFolderId==0?"":mFolderId + "", mLevelId==0?"":mLevelId+"", objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", mLevelId == 0 ? "" : mLevelId + "", objects.size() + "", pageSize + "");
 		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath, new RequestCallBack<String>()
 		{
 
@@ -165,7 +152,7 @@ public class DocsListFragment extends BaseFragment
 
 	private void refresh()
 	{
-		this.mPath = NetworkUtil.getDocs(mFolderId==0?"":mFolderId + "", mLevelId==0?"":mLevelId+"", objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", mLevelId == 0 ? "" : mLevelId + "", objects.size() + "", pageSize + "");
 		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath, new RequestCallBack<String>()
 		{
 
@@ -221,8 +208,7 @@ public class DocsListFragment extends BaseFragment
 	{
 		public ProgressBar bar;
 		private Document doc;
-		private long mCurrent;
-		private long mTotal;
+		private CircularProgressBar mCpb;
 
 		public DownloadHelper(Document document)
 		{
@@ -254,13 +240,17 @@ public class DocsListFragment extends BaseFragment
 		@Override
 		public void onLoading(long total, long current, boolean isUploading)
 		{
-			if (bar != null && bar.getTag().equals(doc.SoundPath))
+			if (this.bar != null && bar.getTag().equals(doc.SoundPath))
 			{
 				this.bar.setMax((int) total);
 				this.bar.setProgress((int) current);
 			}
-			this.mTotal = total;
-			this.mCurrent = current;
+
+			if (this.mCpb != null && this.mCpb.getTag().equals(doc.SoundPath))
+			{
+				this.mCpb.setMax((int) total);
+				this.mCpb.setProgress((int) current);
+			}
 		}
 
 		@Override
@@ -281,12 +271,10 @@ public class DocsListFragment extends BaseFragment
 			DaoUtil.documentSaveorUpdate(this.doc, getActivity());
 		}
 
-		public void setProgressBar(ProgressBar progressBar)
+		public void setProgressBar(ProgressBar progressBar, CircularProgressBar cpb)
 		{
 			this.bar = progressBar;
-			this.bar.setMax((int) mTotal);
-			this.bar.setProgress((int) mCurrent);
-			this.bar.setTag(doc.SoundPath);
+			this.mCpb = cpb;
 		}
 	}
 
@@ -314,6 +302,7 @@ public class DocsListFragment extends BaseFragment
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.fl_icon = convertView.findViewById(R.id.iv_download);
 				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
+				holder.cpb = (CircularProgressBar) convertView.findViewById(R.id.cpb);
 				convertView.setTag(holder);
 			}
 
@@ -324,11 +313,14 @@ public class DocsListFragment extends BaseFragment
 			tag.tv_time.setText(document.LengthString);
 			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
 
-			helper.setProgressBar(tag.pb_download);// 把进度条添加到回调管理中
+			tag.pb_download.setTag(document.SoundPath);
+			tag.cpb.setTag(document.SoundPath);
+
+			helper.setProgressBar(tag.pb_download, tag.cpb);// 把进度条添加到回调管理中
 
 			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色
 
-			tag.fl_icon.setBackgroundResource((helper.exists() || (batchDownloadBinder != null && batchDownloadBinder.isInDownloadQueue(helper))) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
+			// tag.fl_icon.setBackgroundResource((helper.exists() || (batchDownloadBinder != null && batchDownloadBinder.isInDownloadQueue(helper))) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
 
 			tag.fl_icon.setOnClickListener(new OnClickListener()
 			{
@@ -336,6 +328,7 @@ public class DocsListFragment extends BaseFragment
 				@Override
 				public void onClick(View v)
 				{
+					Log.i("" + "点击事件");
 					// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让点击跳过代码
 					if (helper.exists())
 					{
@@ -352,6 +345,21 @@ public class DocsListFragment extends BaseFragment
 					}
 				}
 			});
+
+			// 在这里设置点击事件监听,而不在ListView上设置是因为当添加上拉加载时,Item错位的问题
+			convertView.setOnClickListener(new OnClickListener()
+			{
+
+				@Override
+				public void onClick(View v)
+				{
+					// TODO Auto-generated method stub
+					Intent intent = new Intent(getActivity(), PlayActivity.class);
+					intent.putExtra("Id", helper.getDoc().Id);
+					startActivity(intent);
+				}
+			});
+
 			return convertView;
 		}
 	}
@@ -376,6 +384,7 @@ public class DocsListFragment extends BaseFragment
 	{
 		public View fl_icon;
 		public ProgressBar pb_download;
+		public CircularProgressBar cpb;
 		public TextView tv_date;
 		public TextView tv_size;
 		public TextView tv_time;

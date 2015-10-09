@@ -13,11 +13,11 @@ public class Log
 		}
 	}
 
-	public static void i(String msg)
+	public static void i(Object msg)
 	{
 		if (logOn)
 		{
-			android.util.Log.i("logi", msg);
+			android.util.Log.i("logi", "" + msg);
 		}
 	}
 
