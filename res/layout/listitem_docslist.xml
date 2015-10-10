@@ -19,8 +19,8 @@
             android:layout_height="match_parent"
             android:background="@drawable/download_begin"
             fylx:roundColor="@color/download_green"
-            fylx:roundWidth="5dp"
-            fylx:textIsDisplayable="false" />
+            fylx:roundWidth="3dp"
+            fylx:textIsDisplayable="false" android:layout_margin="5dp"/>
     </RelativeLayout>
 
     <LinearLayout
