@@ -14,22 +14,13 @@
 
         <com.newclass.woyaoxue.view.CircularProgressBar
             android:id="@+id/cpb"
+            fylx:style="STROKE"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            fylx:roundColor="@color/color_two"
-            fylx:roundProgressColor="@color/color_one"
-            fylx:textColor="@color/color_one" />
-
-        <ProgressBar
-            android:id="@+id/pb_download"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:maxHeight="8dp"
-            android:minHeight="8dp"
-            android:paddingBottom="5dp" />
+            android:background="@drawable/download_begin"
+            fylx:roundColor="@color/download_green"
+            fylx:roundWidth="5dp"
+            fylx:textIsDisplayable="false" />
     </RelativeLayout>
 
     <LinearLayout

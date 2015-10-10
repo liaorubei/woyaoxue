@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.DateFormat;
@@ -16,8 +17,6 @@ import android.text.format.Formatter;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -206,7 +205,6 @@ public class DocsListFragment extends BaseFragment
 	 */
 	public class DownloadHelper extends RequestCallBack<File>
 	{
-		public ProgressBar bar;
 		private Document doc;
 		private CircularProgressBar mCpb;
 
@@ -240,16 +238,14 @@ public class DocsListFragment extends BaseFragment
 		@Override
 		public void onLoading(long total, long current, boolean isUploading)
 		{
-			if (this.bar != null && bar.getTag().equals(doc.SoundPath))
-			{
-				this.bar.setMax((int) total);
-				this.bar.setProgress((int) current);
-			}
-
 			if (this.mCpb != null && this.mCpb.getTag().equals(doc.SoundPath))
 			{
 				this.mCpb.setMax((int) total);
 				this.mCpb.setProgress((int) current);
+
+				this.mCpb.setCricleColor(Color.parseColor("#95a5a6"));
+				this.mCpb.setCricleProgressColor(Color.parseColor("#5AB400"));
+				this.mCpb.setBackgroundResource(R.drawable.download_begin);
 			}
 		}
 
@@ -269,11 +265,16 @@ public class DocsListFragment extends BaseFragment
 
 			// 每次下载成功一个,就添加一条记录到数据库
 			DaoUtil.documentSaveorUpdate(this.doc, getActivity());
+
+			if (this.mCpb != null && this.mCpb.getTag().equals(doc.SoundPath))
+			{
+				this.mCpb.setBackgroundResource(R.drawable.download_finish);
+			}
+
 		}
 
-		public void setProgressBar(ProgressBar progressBar, CircularProgressBar cpb)
+		public void setProgressBar(CircularProgressBar cpb)
 		{
-			this.bar = progressBar;
 			this.mCpb = cpb;
 		}
 	}
@@ -301,8 +302,8 @@ public class DocsListFragment extends BaseFragment
 				holder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.fl_icon = convertView.findViewById(R.id.iv_download);
-				holder.pb_download = (ProgressBar) convertView.findViewById(R.id.pb_download);
 				holder.cpb = (CircularProgressBar) convertView.findViewById(R.id.cpb);
+
 				convertView.setTag(holder);
 			}
 
@@ -312,17 +313,16 @@ public class DocsListFragment extends BaseFragment
 			tag.tv_date.setText(document.DateString);
 			tag.tv_time.setText(document.LengthString);
 			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
-
-			tag.pb_download.setTag(document.SoundPath);
 			tag.cpb.setTag(document.SoundPath);
+			tag.cpb.setMax(100);
+			tag.cpb.setProgress(0);
+			tag.cpb.setCricleColor(Color.parseColor("#5AB400"));
+			tag.cpb.setCricleProgressColor(Color.parseColor("#95a5a6"));
+			tag.cpb.setBackgroundResource(helper.exists() ? R.drawable.download_finish : R.drawable.download_begin);
 
-			helper.setProgressBar(tag.pb_download, tag.cpb);// 把进度条添加到回调管理中
+			helper.setProgressBar(tag.cpb);// 把进度条添加到回调管理中
 
-			// 如果音频文件已经存在,或者音频文件已经在下载队列中,那么就让下载按钮的背景变灰色
-
-			// tag.fl_icon.setBackgroundResource((helper.exists() || (batchDownloadBinder != null && batchDownloadBinder.isInDownloadQueue(helper))) ? R.drawable.file_download_disable : R.drawable.file_download_enbale);
-
-			tag.fl_icon.setOnClickListener(new OnClickListener()
+			tag.cpb.setOnClickListener(new OnClickListener()
 			{
 
 				@Override
@@ -340,8 +340,12 @@ public class DocsListFragment extends BaseFragment
 					}
 					else
 					{
-						v.setBackgroundResource(R.drawable.file_download_disable);
 						batchDownloadBinder.addToDownloadQueue(helper);
+						CircularProgressBar bar = (CircularProgressBar) v;
+						bar.setMax(100);
+						bar.setProgress(0);
+						bar.setCricleColor(Color.parseColor("#95a5a6"));
+						bar.setCricleProgressColor(Color.parseColor("#5AB400"));
 					}
 				}
 			});
@@ -353,7 +357,7 @@ public class DocsListFragment extends BaseFragment
 				@Override
 				public void onClick(View v)
 				{
-					// TODO Auto-generated method stub
+
 					Intent intent = new Intent(getActivity(), PlayActivity.class);
 					intent.putExtra("Id", helper.getDoc().Id);
 					startActivity(intent);
@@ -383,8 +387,9 @@ public class DocsListFragment extends BaseFragment
 	private class ViewHolder
 	{
 		public View fl_icon;
-		public ProgressBar pb_download;
+
 		public CircularProgressBar cpb;
+
 		public TextView tv_date;
 		public TextView tv_size;
 		public TextView tv_time;

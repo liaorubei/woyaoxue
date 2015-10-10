@@ -125,6 +125,7 @@ public class CircularProgressBar extends View
 		/**
 		 * 画进度百分比
 		 */
+
 		paint.setStrokeWidth(0);
 		paint.setColor(textColor);
 		paint.setTextSize(textSize);
@@ -144,7 +145,7 @@ public class CircularProgressBar extends View
 		// 设置进度是实心还是空心
 		paint.setStrokeWidth(roundWidth); // 设置圆环的宽度
 		paint.setColor(roundProgressColor); // 设置进度的颜色
-		RectF oval = new RectF(centre - radius, centre - radius, centre + radius, centre + radius); // 用于定义的圆弧的形状和大小的界限
+		RectF oval = new RectF(centre - radius, centre - radius, centre + radius, centre + radius); // 用于定义的圆弧的形状和大小的界限,即以矩形一个角为圆心,矩形边长为半径的范围
 
 		switch (style)
 		{
@@ -222,9 +223,9 @@ public class CircularProgressBar extends View
 		return roundColor;
 	}
 
-	public void setCricleColor(int cricleColor)
+	public void setCricleColor(int color)
 	{
-		this.roundColor = cricleColor;
+		this.roundColor = color;
 	}
 
 	public int getCricleProgressColor()
@@ -232,9 +233,9 @@ public class CircularProgressBar extends View
 		return roundProgressColor;
 	}
 
-	public void setCricleProgressColor(int cricleProgressColor)
+	public void setCricleProgressColor(int color)
 	{
-		this.roundProgressColor = cricleProgressColor;
+		this.roundProgressColor = color;
 	}
 
 	public int getTextColor()
@@ -242,9 +243,9 @@ public class CircularProgressBar extends View
 		return textColor;
 	}
 
-	public void setTextColor(int textColor)
+	public void setTextColor(int color)
 	{
-		this.textColor = textColor;
+		this.textColor = color;
 	}
 
 	public float getTextSize()
