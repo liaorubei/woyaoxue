@@ -54,15 +54,15 @@ public class DocsListFragment extends BaseFragment
 	protected int pageSize = 20;
 	private XListView xListView;
 	private int mFolderId;
-	private int mLevelId;
+
 
 	public DocsListFragment(int folderId, int levelid)
 	{
 		this.mFolderId = folderId;
-		this.mLevelId = levelid;
+
 		objects = new ArrayList<DocsListFragment.DownloadHelper>();
 		myAdapter = new MyAdapter(objects);
-		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", mLevelId == 0 ? "" : mLevelId + "", objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "",  objects.size() + "", pageSize + "");
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class DocsListFragment extends BaseFragment
 
 	private void loadMore()
 	{
-		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", mLevelId == 0 ? "" : mLevelId + "", objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", objects.size() + "", pageSize + "");
 		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath, new RequestCallBack<String>()
 		{
 
@@ -151,7 +151,7 @@ public class DocsListFragment extends BaseFragment
 
 	private void refresh()
 	{
-		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", mLevelId == 0 ? "" : mLevelId + "", objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "",  objects.size() + "", pageSize + "");
 		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath, new RequestCallBack<String>()
 		{
 

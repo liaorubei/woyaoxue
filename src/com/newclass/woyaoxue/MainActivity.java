@@ -25,6 +25,9 @@ import com.newclass.woyaoxue.activity.FolderActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
+import com.newclass.woyaoxue.service.BatchDownloadService;
+import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 public class MainActivity extends FragmentActivity implements android.view.View.OnClickListener
@@ -70,9 +73,14 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_main);		
+
+		// 启动批量下载服务
+		Intent service = new Intent(this, BatchDownloadService.class);
+		startService(service);
+
 		Intent intent = new Intent(this, FolderActivity.class);
-		//Intent intent = new Intent(this, TestActivity.class);
+		// Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
 		this.finish();
 	}

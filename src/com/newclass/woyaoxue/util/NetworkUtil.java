@@ -1,14 +1,16 @@
 package com.newclass.woyaoxue.util;
 
+import android.text.TextUtils;
+
 public class NetworkUtil
 {
 	// public static String domain = "http://192.168.3.121:801";
 
 	public static String domain = "http://voc2015.azurewebsites.net";
 
-	public static String getDocs(String folderId, String levelid, String skip, String take)
+	public static String getDocs(String folderId, String skip, String take)
 	{
-		return domain + "/NewClass/GetDocs?folderId=" + folderId + "&levelId=" + levelid + "&skip=" + skip + "&take=" + take;
+		return domain + format("/NewClass/GetDocs?folderId={0}&skip={1}&take={2}", folderId, skip, take);// "/NewClass/GetDocs?folderId=" + folderId + "&skip=" + skip + "&take=" + take;
 	}
 
 	public static String getLevels()
@@ -59,12 +61,22 @@ public class NetworkUtil
 	/**
 	 * 
 	 * 
-	 * @param levelId 取得指定LevelId下文件夹内文档的个数, 如果不大于0,表示取得所有数据
+	 * @param levelId
+	 *            取得指定LevelId下文件夹内文档的个数, 如果不大于0,表示取得所有数据
 	 * @return domain + "/NewClass/Folders?levelId=" + levelId
 	 */
 	public static String getFolders(int levelId)
 	{
 		return domain + "/NewClass/Folders?levelId=" + levelId;
+	}
+
+	public static String format(String text, Object... para)
+	{
+		for (int i = 0; i < para.length; i++)
+		{
+			text = text.replaceAll("\\{" + i + "\\}", para[i] + "");
+		}
+		return text;
 	}
 
 }
