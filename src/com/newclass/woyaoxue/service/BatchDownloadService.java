@@ -75,6 +75,8 @@ public class BatchDownloadService extends Service
 		}
 		return batchDownloadBinder;
 	}
+	
+
 
 	public class BatchDownloadBinder extends Binder
 	{

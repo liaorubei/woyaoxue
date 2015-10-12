@@ -2,10 +2,14 @@ package com.newclass.woyaoxue.activity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -49,19 +53,6 @@ public class TestActivity extends FragmentActivity
 		list = new ArrayList<Document>();
 		adapter = new MyAdapter(list);
 		listview.setAdapter(adapter);
-		listview.setOnItemClickListener(new OnItemClickListener()
-		{
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-			{
-
-				Log.i("count=" + listview.getCount());
-				Log.i("HeaderViewsCount=" + listview.getHeaderViewsCount() + " FirstVisiblePosition=" + listview.getFirstVisiblePosition());
-				Log.i("FooterViewsCount=" + listview.getFooterViewsCount() + " LastVisiblePosition=" + listview.getLastVisiblePosition());
-
-			}
-		});
 
 		new HttpUtils().send(HttpMethod.GET, "http://voc2015.azurewebsites.net/NewClass/GetDocs?skip=0&take=5", new RequestCallBack<String>()
 		{
@@ -89,8 +80,9 @@ public class TestActivity extends FragmentActivity
 
 	}
 
-	private class MyAdapter extends BaseAdapter<Document>
+	private class MyAdapter extends BaseAdapter<Document> implements Observer
 	{
+		private Map<String, Document> downloadingList;
 
 		public MyAdapter(List<Document> list)
 		{
@@ -114,7 +106,25 @@ public class TestActivity extends FragmentActivity
 			ViewHolder holder = (ViewHolder) convertView.getTag();
 			holder.tv_title_one.setText(document.Title);
 
+			convertView.setOnClickListener(new OnClickListener()
+			{
+
+				@Override
+				public void onClick(View v)
+				{
+					// TODO Auto-generated method stub
+
+				}
+			});
+
 			return convertView;
+		}
+
+		@Override
+		public void update(Observable observable, Object data)
+		{
+			downloadingList = (Map<String, Document>) data;
+			notifyDataSetChanged();
 		}
 	}
 
