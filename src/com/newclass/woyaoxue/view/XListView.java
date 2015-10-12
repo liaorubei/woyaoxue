@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 
+import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 public class XListView extends ListView implements OnScrollListener
@@ -193,7 +194,8 @@ public class XListView extends ListView implements OnScrollListener
 	/**
 	 * 停止加载更多的动作,并以指定状态复原FooterView
 	 * 
-	 * @param state 停止加载更多后要显示的状态,一般是"查看更多","没有更多","加载失败"
+	 * @param state
+	 *            停止加载更多后要显示的状态,一般是"查看更多","没有更多","加载失败"
 	 */
 	public void stopLoadMore(int state)
 	{
@@ -306,6 +308,8 @@ public class XListView extends ListView implements OnScrollListener
 	@Override
 	public boolean onTouchEvent(MotionEvent ev)
 	{
+
+
 		if (mLastY == -1)
 		{
 			mLastY = ev.getRawY();
@@ -334,7 +338,7 @@ public class XListView extends ListView implements OnScrollListener
 			// 1.开启了上拉加载更多的功能
 			// 2.最后一个Item可见
 			// 3.deltaY<0
-			else if (getLastVisiblePosition() == mTotalItemCount - 1 && (mFooterView.getBottomMargin() > 0 || deltaY < 0) && mEnablePullLoad)
+			else if (getLastVisiblePosition() == mTotalItemCount - 1 && (mFooterView.getBottomMargin() > 0 || deltaY < 0) && mEnablePullLoad && mFooterView.getState() != XListViewFooter.STATE_NOMORE)
 			{
 				// last item, already pulled up or want to pull up.
 				updateFooterHeight(-deltaY / OFFSET_RADIO);

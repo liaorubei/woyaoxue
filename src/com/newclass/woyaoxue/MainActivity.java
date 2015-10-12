@@ -79,8 +79,8 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 		Intent service = new Intent(this, BatchDownloadService.class);
 		startService(service);
 
-		Intent intent = new Intent(this, FolderActivity.class);
-		// Intent intent = new Intent(this, TestActivity.class);
+		//Intent intent = new Intent(this, FolderActivity.class);
+		 Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
 		this.finish();
 	}

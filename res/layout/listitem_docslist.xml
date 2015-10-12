@@ -17,10 +17,11 @@
             fylx:style="STROKE"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="5dp"
             android:background="@drawable/download_begin"
             fylx:roundColor="@color/download_green"
             fylx:roundWidth="3dp"
-            fylx:textIsDisplayable="false" android:layout_margin="5dp"/>
+            fylx:textIsDisplayable="false" />
     </RelativeLayout>
 
     <LinearLayout

@@ -15,11 +15,20 @@ import com.voc.woyaoxue.R;
 
 public class XListViewFooter extends LinearLayout
 {
+
 	public final static int STATE_LOADING = 2;// 正在加载中,如果加载完了,会显示正常
+	/**
+	 * 没有更多
+	 */
 	public final static int STATE_NOMORE = 4;// 数据到底了,没有更多数据了
+	/**
+	 * 已经加载完毕,一切正常
+	 */
 	public final static int STATE_NORMAL = 0;// 已经加载完毕
 	public final static int STATE_READY = 1;// 已经准备好了,如果松开就会请求数据,并加载更多
 	public static final int STATE_ERRORS = 5;// 表明连接出错了
+
+	private int mState;
 
 	private View mContentView;
 
@@ -78,6 +87,7 @@ public class XListViewFooter extends LinearLayout
 
 	public void setState(int state)
 	{
+		this.mState = state;
 		mHintView.setVisibility(View.INVISIBLE);
 		mProgressBar.setVisibility(View.INVISIBLE);
 		if (state == STATE_READY)
@@ -100,6 +110,11 @@ public class XListViewFooter extends LinearLayout
 			mHintView.setVisibility(View.VISIBLE);
 			mHintView.setText(R.string.xlistview_footer_hint_normal);
 		}
+	}
+
+	public int getState()
+	{
+		return this.mState;
 	}
 
 	/**
