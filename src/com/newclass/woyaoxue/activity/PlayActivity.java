@@ -116,7 +116,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	/**
 	 * 使用指定的音频路径初始化MediaPlayer
 	 * 
-	 * @param url 音频的相对路径
+	 * @param url
+	 *            音频的相对路径
 	 */
 	private void initMediaPlayer(String url)
 	{
@@ -270,6 +271,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 		Intent intent = getIntent();
 		int id = intent.getIntExtra("Id", 429);
+
+		// 从数据库读取缓存,如果时间超过10分钟
 
 		iv_line.setOnClickListener(this);
 		iv_prev.setOnClickListener(this);

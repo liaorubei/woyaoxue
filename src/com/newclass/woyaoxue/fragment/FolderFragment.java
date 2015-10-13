@@ -21,6 +21,7 @@ import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Folder;
+import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.XListView;
 import com.voc.woyaoxue.R;
@@ -63,7 +64,7 @@ public class FolderFragment extends BaseFragment
 				{
 					vacancy();
 				}
-
+				//Log.i("FolderFragment " + this.getRequestUrl() + " 加载成功");
 			}
 
 			@Override
@@ -81,8 +82,8 @@ public class FolderFragment extends BaseFragment
 		View inflate = View.inflate(getActivity(), R.layout.fragment_folder, null);
 		xListView = (XListView) inflate.findViewById(R.id.xListView);
 		xListView.setAdapter(myAdapter);
-		xListView.set下拉刷新Enable(false);
-		xListView.set上拉加载Enable(false);
+		xListView.setPullDownEnable(false);
+		xListView.setPullupEnable(false);
 
 		xListView.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -92,7 +93,7 @@ public class FolderFragment extends BaseFragment
 			{
 				Intent intent = new Intent(getActivity(), ListActivity.class);
 				intent.putExtra("LevelId", FolderFragment.this.mLevelId);
-				intent.putExtra("FolderId", list.get(position-1).Id);
+				intent.putExtra("FolderId", list.get(position - 1).Id);
 				startActivity(intent);
 			}
 		});

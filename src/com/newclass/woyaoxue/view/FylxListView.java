@@ -34,12 +34,12 @@ public class FylxListView extends ListView
 		footerView = View.inflate(context, R.layout.fylxlistview_footer, null);
 		headerView.measure(0, 0);// 手动测量
 		int headerMeasuredHeight = headerView.getMeasuredHeight();
-		Log.i("headerMeasuredHeight=" + headerMeasuredHeight);
+		//
 		headerView.setPadding(0, -headerMeasuredHeight, 0, 0);
 		headerView.invalidate();
 
-		addHeaderView(headerView);
-		addFooterView(footerView);
+		//addHeaderView(headerView);
+		//addFooterView(footerView);
 
 	}
 

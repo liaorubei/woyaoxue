@@ -17,6 +17,8 @@ import android.text.format.Formatter;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,28 +57,38 @@ public class DocsListFragment extends BaseFragment
 	private XListView xListView;
 	private int mFolderId;
 
-
 	public DocsListFragment(int folderId, int levelid)
 	{
 		this.mFolderId = folderId;
 
 		objects = new ArrayList<DocsListFragment.DownloadHelper>();
 		myAdapter = new MyAdapter(objects);
-		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "",  objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", objects.size() + "", pageSize + "");
 	}
 
 	@Override
 	protected View initView()
 	{
-		Log.i("logi", this.mPath);
+
 		View view = View.inflate(getActivity(), R.layout.fragment_docslist, null);
 
 		xListView = (XListView) view.findViewById(R.id.xListView);
-		xListView.set下拉刷新Enable(false);
-		xListView.set上拉加载Enable(true);
+		xListView.setPullDownEnable(false);
+		xListView.setPullupEnable(true);
 		xListView.setAdapter(myAdapter);
 
-		// xListView.setOnItemClickListener();//不直接在ListView上设置监听,容易出现Item错位问题
+		xListView.setOnItemClickListener(new OnItemClickListener()
+		{
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				Intent intent = new Intent(getActivity(), PlayActivity.class);
+				intent.putExtra("Id", objects.get(position - 1).doc.Id);
+				startActivity(intent);
+
+			}
+		});
 
 		xListView.setXListViewListener(new IXListViewListener()
 		{
@@ -151,7 +163,7 @@ public class DocsListFragment extends BaseFragment
 
 	private void refresh()
 	{
-		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "",  objects.size() + "", pageSize + "");
+		this.mPath = NetworkUtil.getDocs(mFolderId == 0 ? "" : mFolderId + "", objects.size() + "", pageSize + "");
 		new HttpUtils().send(HttpMethod.GET, DocsListFragment.this.mPath, new RequestCallBack<String>()
 		{
 
@@ -187,6 +199,7 @@ public class DocsListFragment extends BaseFragment
 				xListView.stopRefresh();
 				xListView.stopLoadMore(fromJson.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL);
 				xListView.setRefreshTime(DateFormat.format("HH:mm:ss", new Date()).toString());
+				Log.i("DocsListFragment " + this.getRequestUrl() + " 加载成功");
 			}
 		});
 	}
@@ -351,18 +364,13 @@ public class DocsListFragment extends BaseFragment
 			});
 
 			// 在这里设置点击事件监听,而不在ListView上设置是因为当添加上拉加载时,Item错位的问题
-			convertView.setOnClickListener(new OnClickListener()
-			{
-
-				@Override
-				public void onClick(View v)
-				{
-
-					Intent intent = new Intent(getActivity(), PlayActivity.class);
-					intent.putExtra("Id", helper.getDoc().Id);
-					startActivity(intent);
-				}
-			});
+			/*
+			 * convertView.setOnClickListener(new OnClickListener() {
+			 * 
+			 * @Override public void onClick(View v) {
+			 * 
+			 * Intent intent = new Intent(getActivity(), PlayActivity.class); intent.putExtra("Id", helper.getDoc().Id); startActivity(intent); } });
+			 */
 
 			return convertView;
 		}

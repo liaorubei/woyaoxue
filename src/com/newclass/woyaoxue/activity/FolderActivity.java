@@ -45,10 +45,10 @@ public class FolderActivity extends FragmentActivity
 	private List<Level> hideLevels;
 	private List<Level> showLevels;
 	private LinearLayout tabLayout;
-	
+
 	private FragmentPagerAdapter pagerAdapter;
 	private ViewPager viewpager;
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -77,7 +77,6 @@ public class FolderActivity extends FragmentActivity
 	private void sInitData()
 	{
 		showLevels = new ArrayList<Level>();
-
 		hideLevels = new ArrayList<Level>();
 
 		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()

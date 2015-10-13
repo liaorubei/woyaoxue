@@ -132,7 +132,7 @@ public class XListView extends ListView implements OnScrollListener
 	 * 
 	 * @param enable
 	 */
-	public void set下拉刷新Enable(boolean enable)
+	public void setPullDownEnable(boolean enable)
 	{
 		mEnablePullRefresh = enable;
 		if (!mEnablePullRefresh)
@@ -146,11 +146,11 @@ public class XListView extends ListView implements OnScrollListener
 	}
 
 	/**
-	 * enable or disable pull up load more feature.
+	 * 是否开启上拉加载功能
 	 * 
 	 * @param enable
 	 */
-	public void set上拉加载Enable(boolean enable)
+	public void setPullupEnable(boolean enable)
 	{
 		mEnablePullLoad = enable;
 		if (!mEnablePullLoad)
@@ -180,7 +180,7 @@ public class XListView extends ListView implements OnScrollListener
 	}
 
 	/**
-	 * stop refresh, reset header view.
+	 * 停止刷新并还原HeaderView高度
 	 */
 	public void stopRefresh()
 	{
@@ -308,7 +308,6 @@ public class XListView extends ListView implements OnScrollListener
 	@Override
 	public boolean onTouchEvent(MotionEvent ev)
 	{
-
 
 		if (mLastY == -1)
 		{

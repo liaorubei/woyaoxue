@@ -1,5 +1,7 @@
 package com.newclass.woyaoxue.activity;
 
+import java.util.List;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,10 +11,16 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
+import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.base.BaseFragment;
+import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
+import com.newclass.woyaoxue.view.XListView;
 import com.voc.woyaoxue.R;
 
 public class ListActivity extends FragmentActivity
@@ -75,7 +83,7 @@ public class ListActivity extends FragmentActivity
 		@Override
 		public Fragment getItem(int position)
 		{
-			BaseFragment fragment = new DocsListFragment(folderId,levelid);
+			BaseFragment fragment = new DocsListFragment(folderId, levelid);
 			fragment.initData();
 			return fragment;
 		}
