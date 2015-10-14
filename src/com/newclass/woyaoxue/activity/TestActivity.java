@@ -58,6 +58,7 @@ public class TestActivity extends FragmentActivity
 		list = new ArrayList<Document>();
 		adapter = new MyAdapter(list);
 		listview.setAdapter(adapter);
+		
 
 		new HttpUtils().send(HttpMethod.GET, "http://voc2015.azurewebsites.net/NewClass/GetDocs?skip=0&take=5", new RequestCallBack<String>()
 		{

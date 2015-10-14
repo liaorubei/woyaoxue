@@ -74,7 +74,7 @@
                 android:layout_toStartOf="@id/tv_date"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题"
+                android:text="第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题"
                 android:textColor="#000000" />
         </RelativeLayout>
 

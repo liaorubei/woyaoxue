@@ -1,0 +1,1 @@
+create table document(Id int primary key,DocumentId int,TitleOne varchar,TitleTwo varchar,SoundPath varchar,DownloadPath varchar,Length long,Duration int,Md5 varchar,IsDownload int ,ModifyTime varchar);

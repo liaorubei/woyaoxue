@@ -26,21 +26,16 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 
 public class DownloadService extends Service
 {
-	private LinkedList<Document> toDownloadList;// 等待下载列表
-	private Map<String, Document> downloadingMap;// 正在下载列表
+
 	private int downloadCount = 5;// 最多下载数
-
 	private MyBinder myBinder;
-
-	private File root;
 	private DownloadManager manager;
-	boolean observable = false;
 
 	public DownloadService()
 	{
 		myBinder = new MyBinder();
-			manager = new DownloadManager();
-		
+		manager = new DownloadManager();
+
 	}
 
 	@Override
@@ -53,12 +48,7 @@ public class DownloadService extends Service
 	@Override
 	public void onCreate()
 	{
-		root = FolderUtil.rootDir(this);
 		Log.i("DownloadService--onCreate");
-		
-		toDownloadList = new LinkedList<Document>();
-		downloadingMap = new HashMap<String, Document>();
-	
 
 		new Thread(new Runnable()
 		{
@@ -66,16 +56,14 @@ public class DownloadService extends Service
 			{
 				while (true)
 				{
-					if (toDownloadList.size() > 0)
+					if (manager.toDownloadList.size() > 0)
 					{
-						Document remove = toDownloadList.remove();
+						
+							DownloadInfo remove = manager.toDownloadList.remove();
+							manager.downloadingMap.put(remove.Url, remove);
+					
 
-						String url = NetworkUtil.getFullPath(remove.SoundPath);
-
-						downloadingMap.put(url, remove);
-						Log.i("正在下载:" + remove.Title);
-
-						new HttpUtils().download(url, new File(root, remove.SoundPath).getAbsolutePath(), new RequestCallBack<File>()
+						new HttpUtils().download(remove.Url, remove.Target.getAbsolutePath(), new RequestCallBack<File>()
 						{
 							@Override
 							public void onFailure(HttpException error, String msg)
@@ -83,26 +71,22 @@ public class DownloadService extends Service
 
 							public void onLoading(long total, long current, boolean isUploading)
 							{
-								if (observable)
-								{
-									manager.Chang(this.getRequestUrl(), current, total);
-									manager.notifyObservers();
-								}
-
+								manager.change(this.getRequestUrl(), current, total);
+								manager.notifyObservers();
 							}
 
 							@Override
 							public void onSuccess(ResponseInfo<File> responseInfo)
 							{
 								Log.i("onSuccess=" + this.getRequestUrl());
-								Document document = downloadingMap.remove(this.getRequestUrl());
+
+								// 从正在下载列表中移除
+								manager.downloadingMap.remove(this.getRequestUrl());
+								// 写入数据库说明下载完成,因为在"我的下载"模块还要乃用到这些数据
 							}
 						});
 					}
-
-					observable = true;
 					SystemClock.sleep(2000);
-					observable = false;
 				}
 			}
 		}).start();
@@ -117,30 +101,51 @@ public class DownloadService extends Service
 			return manager;
 		}
 
-		public void add(Document document)
-		{
-			toDownloadList.add(document);
-
-		}
-
-		public boolean contains(Document document)
-		{
-			return toDownloadList.contains(document) || downloadingMap.containsValue(document);
-
-		}
-
 	}
 
 	public class DownloadManager extends Observable
 	{
-		private Map<String, DownloadInfo> infos;
+		private LinkedList<DownloadInfo> toDownloadList;// 等待下载列表
+		private Map<String, DownloadInfo> downloadingMap;// 正在下载列表
 
-		public void Chang(String requestUrl, long current, long total)
+		DownloadManager()
 		{
-			DownloadInfo downloadInfo = infos.get(requestUrl);
-			downloadInfo.Current = current;
-			downloadInfo.Total = total;
+			toDownloadList = new LinkedList<DownloadInfo>();
+			downloadingMap = new HashMap<String, DownloadInfo>();
+		}
+
+		public void change(String key, long current, long total)
+		{
+			DownloadInfo down = this.downloadingMap.get(key);
+			down.Current = current;
+			down.Total = total;
 			setChanged();
+		}
+
+		public void enqueue(DownloadInfo path)
+		{
+			toDownloadList.add(path);
+		}
+
+		public boolean contains(DownloadInfo path)
+		{
+			return toDownloadList.contains(path) || downloadingMap.containsKey(path.Url);
+		}
+
+		public DownloadInfo get(String key)
+		{
+			DownloadInfo downloadInfo = this.downloadingMap.get(key);
+			if (downloadInfo == null)
+			{
+				for (DownloadInfo i : toDownloadList)
+				{
+					if (i.Url.equals(key))
+					{
+						downloadInfo = i;
+					}
+				}
+			}
+			return downloadInfo;
 		}
 
 	}

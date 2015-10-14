@@ -20,16 +20,11 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.lidroid.xutils.view.annotation.ViewInject;
-import com.newclass.woyaoxue.activity.DownActivity;
-import com.newclass.woyaoxue.activity.FolderActivity;
-import com.newclass.woyaoxue.activity.HomeActivity;
-import com.newclass.woyaoxue.activity.TestActivity;
+import com.newclass.woyaoxue.activity.*;
 import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.fragment.DocsListFragment;
 import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.DownloadService;
-import com.newclass.woyaoxue.util.Log;
-import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 public class MainActivity extends FragmentActivity implements android.view.View.OnClickListener
@@ -84,7 +79,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 		Intent sIntent = new Intent(this, DownloadService.class);
 		startService(sIntent);
 
-		Intent intent = new Intent(this, HomeActivity.class);
+		Intent intent = new Intent(this, DocsActivity.class);
 		// Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
 		this.finish();

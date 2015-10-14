@@ -328,10 +328,10 @@ public class DocsListFragment extends BaseFragment
 			tag.tv_size.setText(Formatter.formatFileSize(getActivity(), document.Length));
 			tag.cpb.setTag(document.SoundPath);
 			tag.cpb.setMax(100);
-			tag.cpb.setProgress(0);
-			tag.cpb.setCricleColor(Color.parseColor("#5AB400"));
-			tag.cpb.setCricleProgressColor(Color.parseColor("#95a5a6"));
-			tag.cpb.setBackgroundResource(helper.exists() ? R.drawable.download_finish : R.drawable.download_begin);
+			tag.cpb.setProgress(helper.exists() ? 100 : 0);
+			// tag.cpb.setCricleColor(Color.parseColor("#5AB400"));
+			// tag.cpb.setCricleProgressColor(Color.parseColor("#95a5a6"));
+			tag.cpb.setBackgroundResource(helper.exists() ? R.drawable.download_finish : R.drawable.download_notyet);
 
 			helper.setProgressBar(tag.cpb);// 把进度条添加到回调管理中
 

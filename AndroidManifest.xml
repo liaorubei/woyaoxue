@@ -30,7 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <!-- 文件夹界面 -->
+        <activity android:name="com.newclass.woyaoxue.activity.DocsActivity" />
         <!-- 文件夹界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.FolderActivity" />
         <!-- 文件夹界面 -->
