@@ -20,6 +20,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.entity.FileUploadEntity;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.DownloadInfo;
+import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
@@ -30,6 +31,7 @@ public class DownloadService extends Service
 	private int downloadCount = 5;// 最多下载数
 	private MyBinder myBinder;
 	private DownloadManager manager;
+	private Database database;
 
 	public DownloadService()
 	{
@@ -48,6 +50,7 @@ public class DownloadService extends Service
 	@Override
 	public void onCreate()
 	{
+		database = new Database(this);
 		Log.i("DownloadService--onCreate");
 
 		new Thread(new Runnable()
@@ -58,34 +61,11 @@ public class DownloadService extends Service
 				{
 					if (manager.toDownloadList.size() > 0)
 					{
-						
-							DownloadInfo remove = manager.toDownloadList.remove();
-							manager.downloadingMap.put(remove.Url, remove);
-					
-
-						new HttpUtils().download(remove.Url, remove.Target.getAbsolutePath(), new RequestCallBack<File>()
-						{
-							@Override
-							public void onFailure(HttpException error, String msg)
-							{}
-
-							public void onLoading(long total, long current, boolean isUploading)
-							{
-								manager.change(this.getRequestUrl(), current, total);
-								manager.notifyObservers();
-							}
-
-							@Override
-							public void onSuccess(ResponseInfo<File> responseInfo)
-							{
-								Log.i("onSuccess=" + this.getRequestUrl());
-
-								// 从正在下载列表中移除
-								manager.downloadingMap.remove(this.getRequestUrl());
-								// 写入数据库说明下载完成,因为在"我的下载"模块还要乃用到这些数据
-							}
-						});
+						DownloadInfo info = manager.toDownloadList.remove();
+						manager.downloadingMap.put(info.Url, info);
+						new HttpUtils().download(info.Url, info.Target.getAbsolutePath(), new MyCallBack(info));
 					}
+
 					SystemClock.sleep(2000);
 				}
 			}
@@ -148,6 +128,38 @@ public class DownloadService extends Service
 			return downloadInfo;
 		}
 
+	}
+
+	private class MyCallBack extends RequestCallBack<File>
+	{
+
+		private DownloadInfo mInfo;
+
+		public MyCallBack(DownloadInfo info)
+		{
+			this.mInfo = info;
+		}
+
+		@Override
+		public void onLoading(long total, long current, boolean isUploading)
+		{
+			manager.change(this.getRequestUrl(), current, total);
+		}
+
+		@Override
+		public void onSuccess(ResponseInfo<File> responseInfo)
+		{
+			Log.i(mInfo.Title + " 下载完毕");
+			manager.downloadingMap.remove(this.getRequestUrl());
+			database.docsUpdateSuccessByDownloadPath(this.getRequestUrl());
+		}
+
+		@Override
+		public void onFailure(HttpException error, String msg)
+		{
+			// TODO Auto-generated method stub
+
+		}
 	}
 
 }

@@ -40,4 +40,9 @@ public class Database
 		write.insert("document", null, values);
 	}
 
+	public void docsUpdateSuccessByDownloadPath(String downloadPath)
+	{
+		write.execSQL("update document set IsDownload=1 where DownloadPath=?", new String[] { downloadPath });
+	}
+
 }

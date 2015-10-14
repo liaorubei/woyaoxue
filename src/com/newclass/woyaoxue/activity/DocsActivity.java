@@ -196,8 +196,9 @@ public class DocsActivity extends Activity
 			info.Total = 100L;
 			info.Current = 0L;
 			holder.cpb.setTag(info.Url);
-
-			if (info.Target.exists() || myBinder.getDownloadManager().contains(info))
+			info.bar = holder.cpb;
+			info.Title = item.Title;
+			if (database.docsExists(item.Id))
 			{
 				DownloadInfo downloadInfo = myBinder.getDownloadManager().get(info.Url);
 				if (downloadInfo != null)
@@ -231,7 +232,11 @@ public class DocsActivity extends Activity
 					}
 					else
 					{
+						// 加入待下载队列中
+						myBinder.getDownloadManager().enqueue(info);
+						// 保存数据到数据库
 						database.docsInsert(item);
+						v.setBackgroundResource(R.drawable.download_begin);
 					}
 				}
 			});
