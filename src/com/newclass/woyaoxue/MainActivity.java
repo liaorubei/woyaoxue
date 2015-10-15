@@ -111,7 +111,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 		switch (item.getItemId())
 		{
 		case R.id.menu_mydownload:
-			Intent intent = new Intent(this, DownActivity.class);
+			Intent intent = new Intent(this, FolderDownActivity.class);
 			startActivity(intent);
 			return true;
 
@@ -141,7 +141,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 					public void onClick(View v)
 					{
 						window.dismiss();
-						Intent intent = new Intent(MainActivity.this, DownActivity.class);
+						Intent intent = new Intent(MainActivity.this, FolderDownActivity.class);
 						startActivity(intent);
 					}
 

@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="2.5" >
+    android:versionName="2.6" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -30,6 +30,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 文件夹界面 -->
+        <activity android:name="com.newclass.woyaoxue.activity.DocsDownActivity" />
         <!-- 文件夹界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.DocsActivity" />
         <!-- 文件夹界面 -->
@@ -39,7 +42,7 @@
         <!-- 列表界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.ListActivity" />
         <!-- 我的下载 -->
-        <activity android:name="com.newclass.woyaoxue.activity.DownActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.FolderDownActivity" />
         <!-- 播放界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" />
         <!-- 更多界面 -->

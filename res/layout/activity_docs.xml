@@ -5,10 +5,12 @@
     android:orientation="vertical" >
 
     <RelativeLayout
+        android:id="@+id/rl_download"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <TextView android:id="@+id/tv_folder"
+        <TextView
+            android:id="@+id/tv_folder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -19,8 +21,8 @@
             fylx:style="STROKE"
             android:layout_width="38dp"
             android:layout_height="38dp"
-            android:layout_marginRight="5dp"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
             android:background="@drawable/download_begin"
             fylx:roundColor="@color/download_green"
             fylx:textIsDisplayable="false" />
@@ -28,7 +30,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-          android:layout_centerVertical="true"
+            android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/cpb_download"
             android:text="全部下载" />
     </RelativeLayout>

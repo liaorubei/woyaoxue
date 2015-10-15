@@ -60,7 +60,7 @@ public class ListActivity extends FragmentActivity
 			this.finish();
 			break;
 		case R.id.menu_download:
-			Intent intent = new Intent(this, DownActivity.class);
+			Intent intent = new Intent(this, FolderDownActivity.class);
 			startActivity(intent);
 			break;
 		case R.id.menu_setting:

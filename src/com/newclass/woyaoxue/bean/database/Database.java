@@ -16,9 +16,9 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 public class Database
 {
 
+	private MySQLiteOpenHelper helper;
 	private SQLiteDatabase readableDatabase;
 	private SQLiteDatabase write;
-	private MySQLiteOpenHelper helper;
 
 	public Database(Context context)
 	{
@@ -33,6 +33,22 @@ public class Database
 	public void closeConnection()
 	{
 		helper.close();
+	}
+
+	public int docsCountByFolderId(int folderId)
+	{
+		Cursor cursor = readableDatabase.rawQuery("select count(FolderId) from document where FolderId=?", new String[] { folderId + "" });
+		int count = 0;
+		if (cursor.moveToNext())
+		{
+			count = cursor.getInt(0);
+		}
+		return count;
+	}
+
+	public void docsDeleteByDownloadPath(String downloadPath)
+	{
+		write.execSQL("delete from document where DownloadPath=?", new String[] { downloadPath });
 	}
 
 	/**
@@ -62,14 +78,22 @@ public class Database
 		write.insert("document", null, values);
 	}
 
-	public void docsUpdateSuccessByDownloadPath(String downloadPath)
+	public List<Document> docsSelectListByFolderId(Integer folderId)
 	{
-		write.execSQL("update document set IsDownload=1 where DownloadPath=?", new String[] { downloadPath });
-	}
-
-	public void docsDeleteByDownloadPath(String downloadPath)
-	{
-		write.execSQL("delete from document where DownloadPath=?", new String[] { downloadPath });
+		Cursor cursor = readableDatabase.rawQuery("select Id,LevelId,FolderId,TitleOne,TitleTwo,SoundPath from document where IsDownload=1 and FolderId=?", new String[] { folderId + "" });
+		List<Document> list = new ArrayList<Document>();
+		while (cursor.moveToNext())
+		{
+			Document document = new Document();
+			document.Id = cursor.getInt(0);
+			document.LevelId = cursor.getInt(1);
+			document.FolderId = cursor.getInt(2);
+			document.Title = cursor.getString(3);
+			document.TitleTwo = cursor.getString(4);
+			document.SoundPath = cursor.getString(5);
+			list.add(document);
+		}
+		return list;
 	}
 
 	public void docsSelectUnfinishedDownload()
@@ -77,31 +101,14 @@ public class Database
 
 	}
 
-	public int docsCountByFolderId(int folderId)
+	public void docsUpdateSuccessByDownloadPath(String downloadPath)
 	{
-		Cursor cursor = readableDatabase.rawQuery("select count(FolderId) from document where FolderId=?", new String[] { folderId + "" });
-		int count = 0;
-		if (cursor.moveToNext())
-		{
-			count = cursor.getInt(0);
-		}
-		return count;
+		write.execSQL("update document set IsDownload=1 where DownloadPath=?", new String[] { downloadPath });
 	}
 
-	public void levelClear()
-	{}
-
-	public void levelInsert(Level level)
+	public boolean folderExists(int id)
 	{
-		ContentValues values = new ContentValues();
-		values.put("Id", level.Id);
-		values.put("Name", level.Name);
-		write.insert("level", null, values);
-	}
-
-	public boolean levelExists(int id)
-	{
-		Cursor cursor = readableDatabase.rawQuery("select Id from level where Id=?", new String[] { id + "" });
+		Cursor cursor = readableDatabase.rawQuery("select Id from folder where Id=?", new String[] { id + "" });
 		int count = cursor.getCount();
 		cursor.close();
 		return count > 0;
@@ -113,14 +120,6 @@ public class Database
 		values.put("Id", folder.Id);
 		values.put("Name", folder.Name);
 		write.insert("folder", null, values);
-	}
-
-	public boolean folderExists(int id)
-	{
-		Cursor cursor = readableDatabase.rawQuery("select Id from folder where Id=?", new String[] { id + "" });
-		int count = cursor.getCount();
-		cursor.close();
-		return count > 0;
 	}
 
 	public List<Folder> folderSelectList()
@@ -153,6 +152,25 @@ public class Database
 			list.add(folder);
 		}
 		return list;
+	}
+
+	public void levelClear()
+	{}
+
+	public boolean levelExists(int id)
+	{
+		Cursor cursor = readableDatabase.rawQuery("select Id from level where Id=?", new String[] { id + "" });
+		int count = cursor.getCount();
+		cursor.close();
+		return count > 0;
+	}
+
+	public void levelInsert(Level level)
+	{
+		ContentValues values = new ContentValues();
+		values.put("Id", level.Id);
+		values.put("Name", level.Name);
+		write.insert("level", null, values);
 	}
 
 }
