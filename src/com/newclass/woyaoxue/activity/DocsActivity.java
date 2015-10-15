@@ -11,10 +11,10 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.Formatter;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -44,6 +44,8 @@ import com.newclass.woyaoxue.view.CircularProgressBar;
 import com.newclass.woyaoxue.view.ContentView;
 import com.newclass.woyaoxue.view.ContentView.ViewState;
 import com.newclass.woyaoxue.view.XListView;
+import com.newclass.woyaoxue.view.XListView.IXListViewListener;
+import com.newclass.woyaoxue.view.XListViewFooter;
 import com.voc.woyaoxue.R;
 
 public class DocsActivity extends Activity
@@ -54,8 +56,11 @@ public class DocsActivity extends Activity
 	private MyAdapter adapter;
 	private ServiceConnection conn;
 	private MyBinder myBinder;
-	private MySQLiteOpenHelper sql;
 	private Database database;
+	private XListView listview;
+	private View cpb_download;
+	private TextView tv_folder;
+	protected int pageSize = 15;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -68,6 +73,9 @@ public class DocsActivity extends Activity
 			public View onCreateSuccessView()
 			{
 				View view = View.inflate(DocsActivity.this, R.layout.activity_docs, null);
+				tv_folder = (TextView) view.findViewById(R.id.tv_folder);
+				cpb_download = view.findViewById(R.id.cpb_download);
+				listview = (XListView) view.findViewById(R.id.listview);
 				return view;
 			}
 		};
@@ -75,12 +83,14 @@ public class DocsActivity extends Activity
 
 		database = new Database(this);
 
-		sql = new MySQLiteOpenHelper(this);
+		new MySQLiteOpenHelper(this);
 
 		// 取得传递过来的数据
 		Intent intent = getIntent();
-		folderId = intent.getIntExtra("folderId", 0);
-		int levelId = intent.getIntExtra("levleId", 0);
+		folderId = intent.getIntExtra("FolderId", 0);
+		intent.getIntExtra("LevelId", 0);
+		String folderName = intent.getStringExtra("FolderName");
+		tv_folder.setText(folderName);
 
 		list = new ArrayList<Document>();
 		adapter = new MyAdapter(list);
@@ -90,7 +100,9 @@ public class DocsActivity extends Activity
 
 			@Override
 			public void onServiceDisconnected(ComponentName name)
-			{}
+			{
+
+			}
 
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service)
@@ -101,8 +113,10 @@ public class DocsActivity extends Activity
 		};
 		bindService(new Intent(this, DownloadService.class), conn, Service.BIND_AUTO_CREATE);
 
-		XListView listview = (XListView) findViewById(R.id.listview);
 		listview.setAdapter(adapter);
+		// 其他设置
+		listview.setPullDownEnable(false);
+		listview.setPullupEnable(true);
 		listview.setOnItemClickListener(new OnItemClickListener()
 		{
 
@@ -113,26 +127,94 @@ public class DocsActivity extends Activity
 
 			}
 		});
+		listview.setXListViewListener(new IXListViewListener()
+		{
+
+			@Override
+			public void onRefresh()
+			{}
+
+			@Override
+			public void onLoadMore()
+			{
+				loadMore();
+			}
+		});
+
+		cpb_download.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View v)
+			{
+				// 添加到下载列表中,添加到数据库中,提示数据适配器更新
+				for (Document i : list)
+				{
+					if (!database.docsExists(i.Id))
+					{
+						DownloadInfo info = new DownloadInfo();
+						info.Title = i.Title;
+						info.Url = NetworkUtil.getFullPath(i.SoundPath);
+						info.Target = new File(FolderUtil.rootDir(DocsActivity.this), i.SoundPath);
+						info.Total = 100L;
+						info.Current = 0L;
+						myBinder.getDownloadManager().enqueue(info);
+						database.docsInsert(i);
+					}
+					adapter.notifyDataSetChanged();
+				}
+
+			}
+		});
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		loadMore();
+	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		case android.R.id.home:
+			this.finish();
+			break;
+
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
 	protected void onDestroy()
 	{
 		super.onDestroy();
+		
+		database.closeConnection();
+	
+		if (myBinder.getDownloadManager().size() > 0)
+		{
+			Toast.makeText(this, "后台下载中", Toast.LENGTH_SHORT).show();
+		}
+
+		// 移除观察者,让下载服务后台自行下载
+		myBinder.getDownloadManager().deleteObserver(adapter);
+
+		// 移除服务绑定,避免内存泄漏
 		unbindService(conn);
 	}
 
 	private void loadMore()
 	{
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocs(folderId + "", list.size() + "", "50"), new RequestCallBack<String>()
+		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + ""), new RequestCallBack<String>()
 		{
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
+				Log.i("加载成功=" + this.getRequestUrl());
 				List<Document> json = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
 				{}.getType());
 				if (json.size() > 0)
@@ -143,10 +225,10 @@ public class DocsActivity extends Activity
 				}
 				else
 				{
-					contentView.showView(ViewState.EMPTY);
+					contentView.showView(list.size() > 0 ? ViewState.SUCCESS : ViewState.EMPTY);
 				}
-				Log.i("加载成功=" + this.getRequestUrl());
 
+				listview.stopLoadMore(json.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL);
 			}
 
 			@Override
@@ -164,7 +246,6 @@ public class DocsActivity extends Activity
 		public MyAdapter(List<Document> list)
 		{
 			super(list);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
@@ -195,8 +276,6 @@ public class DocsActivity extends Activity
 			info.Target = new File(FolderUtil.rootDir(DocsActivity.this), item.SoundPath);
 			info.Total = 100L;
 			info.Current = 0L;
-			holder.cpb.setTag(info.Url);
-			info.bar = holder.cpb;
 			info.Title = item.Title;
 			if (database.docsExists(item.Id))
 			{
@@ -254,14 +333,12 @@ public class DocsActivity extends Activity
 
 	private class ViewHolder
 	{
-
 		public TextView tv_title_one;
 		public TextView tv_title_two;
 		public TextView tv_date;
 		public TextView tv_size;
 		public TextView tv_time;
 		public CircularProgressBar cpb;
-
 	}
 
 }

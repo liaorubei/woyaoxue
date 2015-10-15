@@ -79,7 +79,7 @@ public class MainActivity extends FragmentActivity implements android.view.View.
 		Intent sIntent = new Intent(this, DownloadService.class);
 		startService(sIntent);
 
-		Intent intent = new Intent(this, DocsActivity.class);
+		Intent intent = new Intent(this, HomeActivity.class);
 		// Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
 		this.finish();

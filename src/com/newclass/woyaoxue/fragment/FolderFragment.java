@@ -17,6 +17,7 @@ import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.newclass.woyaoxue.activity.DocsActivity;
 import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.base.BaseFragment;
@@ -64,7 +65,7 @@ public class FolderFragment extends BaseFragment
 				{
 					vacancy();
 				}
-				//Log.i("FolderFragment " + this.getRequestUrl() + " 加载成功");
+				// Log.i("FolderFragment " + this.getRequestUrl() + " 加载成功");
 			}
 
 			@Override
@@ -91,9 +92,10 @@ public class FolderFragment extends BaseFragment
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				Intent intent = new Intent(getActivity(), ListActivity.class);
+				Intent intent = new Intent(getActivity(), DocsActivity.class);
 				intent.putExtra("LevelId", FolderFragment.this.mLevelId);
 				intent.putExtra("FolderId", list.get(position - 1).Id);
+				intent.putExtra("FolderName", list.get(position - 1).Name);
 				startActivity(intent);
 			}
 		});
