@@ -5,6 +5,8 @@ import java.util.List;
 public class Document
 {
 	public int Id;
+	public int LevelId;
+	public int FolderId;
 	public String Title;
 	public String TitleTwo;
 	public List<Lyric> Lyrics;

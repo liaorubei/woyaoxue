@@ -14,6 +14,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Level;
+import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.fragment.FolderFragment;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.util.ConstantsUtil;
@@ -173,6 +174,17 @@ public class HomeActivity extends FragmentActivity
 
 						ll_levels.addView(child, params);
 					}
+
+					// 保存等级数据在数据库
+					Database database = new Database(HomeActivity.this);
+					for (Level level : fromJson)
+					{
+						if (!database.levelExists(level.Id))
+						{
+							database.levelInsert(level);
+						}
+					}
+
 				}
 			}
 		});

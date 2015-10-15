@@ -61,6 +61,7 @@ public class DocsActivity extends Activity
 	private View cpb_download;
 	private TextView tv_folder;
 	protected int pageSize = 15;
+	private int levelId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -87,8 +88,8 @@ public class DocsActivity extends Activity
 
 		// 取得传递过来的数据
 		Intent intent = getIntent();
+		levelId = intent.getIntExtra("LevelId", 0);
 		folderId = intent.getIntExtra("FolderId", 0);
-		intent.getIntExtra("LevelId", 0);
 		String folderName = intent.getStringExtra("FolderName");
 		tv_folder.setText(folderName);
 
@@ -191,9 +192,9 @@ public class DocsActivity extends Activity
 	protected void onDestroy()
 	{
 		super.onDestroy();
-		
+
 		database.closeConnection();
-	
+
 		if (myBinder.getDownloadManager().size() > 0)
 		{
 			Toast.makeText(this, "后台下载中", Toast.LENGTH_SHORT).show();
@@ -314,6 +315,8 @@ public class DocsActivity extends Activity
 						// 加入待下载队列中
 						myBinder.getDownloadManager().enqueue(info);
 						// 保存数据到数据库
+						item.LevelId = levelId;
+						item.FolderId = folderId;
 						database.docsInsert(item);
 						v.setBackgroundResource(R.drawable.download_begin);
 					}

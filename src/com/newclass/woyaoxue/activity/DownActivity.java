@@ -2,6 +2,7 @@ package com.newclass.woyaoxue.activity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,8 +20,13 @@ import android.widget.TextView;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.bean.Folder;
+import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.bean.database.Document;
 import com.newclass.woyaoxue.util.DaoUtil;
+import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.view.ContentView;
+import com.newclass.woyaoxue.view.ContentView.ViewState;
 import com.voc.woyaoxue.R;
 
 /**
@@ -31,29 +37,65 @@ import com.voc.woyaoxue.R;
  */
 public class DownActivity extends Activity
 {
-	@ViewInject(R.id.listview)
+
 	private ListView listview;
-	private ListAdapter adapter;
+	private MyAdapter adapter;
 	private List<Document> documents;
+	private ContentView contentView;
+	private List<Folder> list;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_down);
-		ViewUtils.inject(this);
+
+		contentView = new ContentView(this)
+		{
+
+			@Override
+			public View onCreateSuccessView()
+			{
+				View view = View.inflate(DownActivity.this, R.layout.activity_down, null);
+				listview = (ListView) view.findViewById(R.id.listview);
+				return view;
+			}
+		};
+
+		setContentView(contentView);
+
+		Database database = new Database(this);
+		List<Folder> folders = database.folderSelectListWithDocsCount();
+
+		list = new ArrayList<Folder>();
+		for (Folder folder : folders)
+		{
+			if (folder.DocsCount > 0)
+			{
+				list.add(folder);
+			}
+		}
+
+		contentView.showView(ViewState.SUCCESS);
+		database.closeConnection();
+
+		adapter = new MyAdapter(list);
+		listview.setAdapter(adapter);
+
 		// 返回首页按钮
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		sInitData();
-		sInitView();
+	}
 
+	@Override
+	protected void onDestroy()
+	{
+		// TODO Auto-generated method stub
+		super.onDestroy();
 	}
 
 	private void sInitView()
 	{
-		adapter = new MyAdapter(documents);
+		adapter = null;
 		listview.setAdapter(adapter);
 
 		// Item点击事件
@@ -93,18 +135,17 @@ public class DownActivity extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
-	private class MyAdapter extends BaseAdapter<Document>
+	private class MyAdapter extends BaseAdapter<Folder>
 	{
 
-		public MyAdapter(List<Document> list)
+		public MyAdapter(List<Folder> list)
 		{
 			super(list);
 		}
 
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
+		public View getView1(int position, View convertView, ViewGroup parent)
 		{
-			Document document = getItem(position);
+			Document document = null;
 			if (convertView == null)
 			{
 				convertView = View.inflate(DownActivity.this, R.layout.listitem_down, null);
@@ -127,6 +168,31 @@ public class DownActivity extends Activity
 
 			return convertView;
 		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			Folder folder = getItem(position);
+			Log.i("" + folder);
+			if (convertView == null)
+			{
+				convertView = View.inflate(DownActivity.this, R.layout.listitem_folder, null);
+				FolderViewHolder holder = new FolderViewHolder();
+				holder.tv_folder_name = (TextView) convertView.findViewById(R.id.tv_folder_name);
+				holder.tv_document_count = (TextView) convertView.findViewById(R.id.tv_document_count);
+				convertView.setTag(holder);
+			}
+			FolderViewHolder holder = (FolderViewHolder) convertView.getTag();
+			holder.tv_folder_name.setText(folder.Name);
+			holder.tv_document_count.setText("课程:" + folder.DocsCount);
+			return convertView;
+		}
+	}
+
+	private class FolderViewHolder
+	{
+		public TextView tv_folder_name;
+		public TextView tv_document_count;
 	}
 
 	private class ViewHolder
@@ -137,4 +203,5 @@ public class DownActivity extends Activity
 		public TextView tv_title_two;
 		public TextView tv_title_one;
 	}
+
 }

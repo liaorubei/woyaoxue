@@ -22,6 +22,7 @@ import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Folder;
+import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.XListView;
@@ -60,12 +61,24 @@ public class FolderFragment extends BaseFragment
 					list.addAll(fromJson);
 					myAdapter.notifyDataSetChanged();
 					success();
+
+					//添加数据到数据库
+					Database database = new Database(getActivity());
+					for (Folder folder : fromJson)
+					{
+						if (!database.folderExists(folder.Id))
+						{
+							database.folderInsert(folder);
+						}
+					}
+
 				}
 				else
 				{
 					vacancy();
 				}
-				// Log.i("FolderFragment " + this.getRequestUrl() + " 加载成功");
+				Log.i("FolderFragment " + this.getRequestUrl() + " 加载成功");
+
 			}
 
 			@Override

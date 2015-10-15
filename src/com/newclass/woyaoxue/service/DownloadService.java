@@ -58,14 +58,20 @@ public class DownloadService extends Service
 	}
 
 	@Override
+	public void onDestroy()
+	{
+		database.closeConnection();
+	}
+
+	@Override
 	public void onCreate()
 	{
 		Log.i("DownloadService--onCreate");
 		binder = new MyBinder();
 		manager = new DownloadManager();
 		database = new Database(this);
-		
-		//把数据库里面还没有下载完毕的任务取出来重新下载
+
+		// 把数据库里面还没有下载完毕的任务取出来重新下载
 		database.docsSelectUnfinishedDownload();
 
 		new Thread(new Runnable()
