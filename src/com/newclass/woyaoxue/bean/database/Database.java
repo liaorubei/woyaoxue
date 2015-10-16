@@ -75,12 +75,15 @@ public class Database
 		values.put("SoundPath", item.SoundPath);
 		values.put("IsDownload", 0);
 		values.put("DownloadPath", NetworkUtil.getFullPath(item.SoundPath));
+		values.put("Length", item.Length);
+		values.put("Duration", item.Duration);
+		values.put("ModifyTime", item.DateString);
 		write.insert("document", null, values);
 	}
 
 	public List<Document> docsSelectListByFolderId(Integer folderId)
 	{
-		Cursor cursor = readableDatabase.rawQuery("select Id,LevelId,FolderId,TitleOne,TitleTwo,SoundPath from document where IsDownload=1 and FolderId=?", new String[] { folderId + "" });
+		Cursor cursor = readableDatabase.rawQuery("select Id,LevelId,FolderId,TitleOne,TitleTwo,SoundPath,Length,ModifyTime from document where IsDownload=1 and FolderId=?", new String[] { folderId + "" });
 		List<Document> list = new ArrayList<Document>();
 		while (cursor.moveToNext())
 		{
@@ -91,6 +94,8 @@ public class Database
 			document.Title = cursor.getString(3);
 			document.TitleTwo = cursor.getString(4);
 			document.SoundPath = cursor.getString(5);
+			document.Length = cursor.getLong(6);
+			document.DateString = cursor.getString(7);
 			list.add(document);
 		}
 		return list;

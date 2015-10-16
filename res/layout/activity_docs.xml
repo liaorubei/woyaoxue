@@ -13,18 +13,21 @@
             android:id="@+id/tv_folder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="成语故事汇" />
+            android:layout_centerVertical="true"
+            android:text="成语故事汇"
+            android:textColor="@color/color_one" />
 
         <com.newclass.woyaoxue.view.CircularProgressBar
             android:id="@+id/cpb_download"
             fylx:style="STROKE"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignParentRight="true"
+            android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:background="@drawable/download_begin"
             fylx:roundColor="@color/download_green"
+            fylx:roundWidth="2dp"
             fylx:textIsDisplayable="false" />
 
         <TextView

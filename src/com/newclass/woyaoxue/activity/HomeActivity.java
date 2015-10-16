@@ -5,29 +5,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.newclass.woyaoxue.base.BaseFragment;
-import com.newclass.woyaoxue.bean.Level;
-import com.newclass.woyaoxue.bean.database.Database;
-import com.newclass.woyaoxue.fragment.FolderFragment;
-import com.newclass.woyaoxue.service.AutoUpdateService;
-import com.newclass.woyaoxue.util.ConstantsUtil;
-import com.newclass.woyaoxue.util.NetworkUtil;
-import com.newclass.woyaoxue.view.ContentView;
-import com.newclass.woyaoxue.view.ContentView.ViewState;
-import com.voc.woyaoxue.R;
-
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Telephony.Sms.Conversations;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -39,10 +18,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.newclass.woyaoxue.base.BaseFragment;
+import com.newclass.woyaoxue.bean.Level;
+import com.newclass.woyaoxue.bean.database.Database;
+import com.newclass.woyaoxue.bean.database.UrlCache;
+import com.newclass.woyaoxue.fragment.FolderFragment;
+import com.newclass.woyaoxue.service.AutoUpdateService;
+import com.newclass.woyaoxue.util.ConstantsUtil;
+import com.newclass.woyaoxue.util.NetworkUtil;
+import com.voc.woyaoxue.R;
 
 public class HomeActivity extends FragmentActivity
 {
@@ -118,6 +113,8 @@ public class HomeActivity extends FragmentActivity
 				}
 			}
 		});
+
+		loadData();
 
 		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
 		{
@@ -195,6 +192,21 @@ public class HomeActivity extends FragmentActivity
 		// 自动升级服务
 		Intent service = new Intent(this, AutoUpdateService.class);
 		startService(service);
+	}
+
+	private void loadData()
+	{
+		String requestUrl = NetworkUtil.getLevels();
+		UrlCache cache = new UrlCache();
+		if (System.currentTimeMillis() - cache.UpdateAt > 10 * 60 * 1000)
+		{
+
+		}else{
+			
+			Object json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>(){}.getType());
+			
+		}
+
 	}
 
 	private class MyFragmentPagerAdapter extends FragmentPagerAdapter

@@ -161,11 +161,14 @@ public class DocsActivity extends Activity
 						info.Total = 100L;
 						info.Current = 0L;
 						myBinder.getDownloadManager().enqueue(info);
+
+						// 要添加表关联
+						i.LevelId = levelId;
+						i.FolderId = folderId;
 						database.docsInsert(i);
 					}
 					adapter.notifyDataSetChanged();
 				}
-
 			}
 		});
 
@@ -314,6 +317,7 @@ public class DocsActivity extends Activity
 						item.LevelId = levelId;
 						item.FolderId = folderId;
 						database.docsInsert(item);
+
 						v.setBackgroundResource(R.drawable.download_begin);
 					}
 				}
