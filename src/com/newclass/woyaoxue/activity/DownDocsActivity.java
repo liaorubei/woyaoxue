@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import android.R.integer;
 import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
@@ -16,38 +15,29 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.Formatter;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
-import com.newclass.woyaoxue.bean.DownloadInfo;
 import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.bean.database.MySQLiteOpenHelper;
 import com.newclass.woyaoxue.service.DownloadService;
 import com.newclass.woyaoxue.service.DownloadService.MyBinder;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
-import com.newclass.woyaoxue.util.NetworkUtil;
-import com.newclass.woyaoxue.view.CircularProgressBar;
 import com.newclass.woyaoxue.view.ContentView;
 import com.newclass.woyaoxue.view.ContentView.ViewState;
-import com.newclass.woyaoxue.view.XListView;
-import com.newclass.woyaoxue.view.XListView.IXListViewListener;
-import com.newclass.woyaoxue.view.XListViewFooter;
 import com.voc.woyaoxue.R;
 
 /**
@@ -56,20 +46,25 @@ import com.voc.woyaoxue.R;
  * @author liaorubei
  *
  */
-public class DocsDownActivity extends Activity
+public class DownDocsActivity extends Activity implements OnClickListener
 {
-	private List<Document> list;
+	private List<ViewHelper> list;
 	private int folderId;
 	private ContentView contentView;
 	private MyAdapter adapter;
 	private ServiceConnection conn;
 	private MyBinder myBinder;
 	private Database database;
-	private XListView listview;
-
+	private ListView listview;
 
 	protected int pageSize = 15;
 	private int levelId;
+
+	private View ll_ctrl;
+	private CheckBox cb_select;
+	private CheckBox cb_Invert;
+	private TextView tv_delete;
+	private TextView tv_cancel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -82,9 +77,14 @@ public class DocsDownActivity extends Activity
 			@Override
 			public View onCreateSuccessView()
 			{
-				View view = View.inflate(DocsDownActivity.this, R.layout.activity_docs, null);
-				view.findViewById(R.id.rl_download).setVisibility(view.GONE);
-				listview = (XListView) view.findViewById(R.id.listview);
+				View view = View.inflate(DownDocsActivity.this, R.layout.activity_downdocs, null);
+				listview = (ListView) view.findViewById(R.id.listview);
+				ll_ctrl = view.findViewById(R.id.ll_ctrl);
+
+				cb_select = (CheckBox) view.findViewById(R.id.cb_select);
+				cb_Invert = (CheckBox) view.findViewById(R.id.cb_Invert);
+				tv_delete = (TextView) view.findViewById(R.id.tv_delete);
+				tv_cancel = (TextView) view.findViewById(R.id.tv_cancel);
 				return view;
 			}
 		};
@@ -97,11 +97,10 @@ public class DocsDownActivity extends Activity
 		// 取得传递过来的数据
 		Intent intent = getIntent();
 		levelId = intent.getIntExtra("LevelId", 0);
-		folderId = intent.getIntExtra("FolderId", 0);
-		String folderName = intent.getStringExtra("FolderName");
+		folderId = intent.getIntExtra("FolderId", 16);
+		Log.i("folderId" + folderId);
 
-
-		list = new ArrayList<Document>();
+		list = new ArrayList<ViewHelper>();
 		adapter = new MyAdapter(list);
 
 		conn = new ServiceConnection()
@@ -124,8 +123,6 @@ public class DocsDownActivity extends Activity
 
 		listview.setAdapter(adapter);
 		// 其他设置
-		listview.setPullDownEnable(false);
-		listview.setPullupEnable(true);
 		listview.setOnItemClickListener(new OnItemClickListener()
 		{
 
@@ -136,24 +133,16 @@ public class DocsDownActivity extends Activity
 
 			}
 		});
-		listview.setXListViewListener(new IXListViewListener()
-		{
-
-			@Override
-			public void onRefresh()
-			{}
-
-			@Override
-			public void onLoadMore()
-			{
-				loadMore();
-			}
-		});
-
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		loadMore();
+
+		cb_select.setOnClickListener(this);
+		cb_Invert.setOnClickListener(this);
+		tv_delete.setOnClickListener(this);
+		tv_cancel.setOnClickListener(this);
+
 	}
 
 	@Override
@@ -164,11 +153,29 @@ public class DocsDownActivity extends Activity
 		case android.R.id.home:
 			this.finish();
 			break;
+		case R.id.menu_delete:
+			ll_ctrl.setVisibility(View.VISIBLE);
+
+			for (ViewHelper i : list)
+			{
+				i.isShow = true;
+			}
+			adapter.notifyDataSetChanged();
+
+			break;
 
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.activity_downdocs, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
@@ -209,7 +216,11 @@ public class DocsDownActivity extends Activity
 			protected Integer doInBackground(Integer... params)
 			{
 				List<Document> docs = database.docsSelectListByFolderId(params[0]);
-				list.addAll(docs);
+				for (Document document : docs)
+				{
+					ViewHelper object = new ViewHelper(document, false, false);
+					list.add(object);
+				}
 				return docs.size();
 			}
 
@@ -224,10 +235,10 @@ public class DocsDownActivity extends Activity
 
 	}
 
-	private class MyAdapter extends BaseAdapter<Document> implements Observer
+	private class MyAdapter extends BaseAdapter<ViewHelper> implements Observer
 	{
 
-		public MyAdapter(List<Document> list)
+		public MyAdapter(List<ViewHelper> list)
 		{
 			super(list);
 		}
@@ -235,35 +246,36 @@ public class DocsDownActivity extends Activity
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			final Document item = getItem(position);
+			final ViewHelper item = getItem(position);
 			if (convertView == null)
 			{
-				convertView = View.inflate(DocsDownActivity.this, R.layout.listitem_docs, null);
+				convertView = View.inflate(DownDocsActivity.this, R.layout.listitem_downdocs, null);
 				ViewHolder holder = new ViewHolder();
 				holder.tv_title_one = (TextView) convertView.findViewById(R.id.tv_title_one);
 				holder.tv_title_two = (TextView) convertView.findViewById(R.id.tv_title_two);
 				holder.tv_date = (TextView) convertView.findViewById(R.id.tv_date);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
-				holder.cpb = (CircularProgressBar) convertView.findViewById(R.id.cpb);
+				holder.cb_delete = (CheckBox) convertView.findViewById(R.id.cb_delete);
 				convertView.setTag(holder);
 			}
 			ViewHolder holder = (ViewHolder) convertView.getTag();
-			holder.tv_title_one.setText(item.Title);
-			holder.tv_title_two.setText(item.TitleTwo);
+			holder.tv_title_one.setText(item.document.Title);
+			holder.tv_title_two.setText(item.document.TitleTwo);
+			holder.tv_date.setText(item.document.DateString);
+			holder.tv_size.setText(Formatter.formatFileSize(DownDocsActivity.this, item.document.Length));
+			holder.tv_time.setText(item.document.LengthString);
 
-			if (database.docsExists(item.Id))
+			holder.cb_delete.setChecked(item.isChecked);
+			holder.cb_delete.setVisibility(item.isShow ? View.VISIBLE : View.GONE);
+			holder.cb_delete.setOnClickListener(new OnClickListener()
 			{
-				holder.cpb.setMax(100);
-				holder.cpb.setProgress(100);
-				holder.cpb.setBackgroundResource(R.drawable.download_finish);
-			}
-			else
-			{
-				holder.cpb.setMax(100);
-				holder.cpb.setProgress(0);
-				holder.cpb.setBackgroundResource(R.drawable.download_notyet);
-			}
+				@Override
+				public void onClick(View v)
+				{
+					item.isChecked = ((CheckBox) v).isChecked();
+				}
+			});
 
 			return convertView;
 		}
@@ -283,7 +295,96 @@ public class DocsDownActivity extends Activity
 		public TextView tv_date;
 		public TextView tv_size;
 		public TextView tv_time;
-		public CircularProgressBar cpb;
+		public CheckBox cb_delete;
+	}
+
+	private class ViewHelper
+	{
+		public ViewHelper(Document doc, boolean check, boolean show)
+		{
+			this.document = doc;
+			this.isChecked = check;
+			this.isShow = show;
+		}
+
+		public boolean isShow;
+		public boolean isChecked;
+		public Document document;
+	}
+
+	@Override
+	public void onClick(View v)
+	{
+		switch (v.getId())
+		{
+		case R.id.cb_select:
+			cb_Invert.setChecked(false);
+			for (ViewHelper i : list)
+			{
+				i.isChecked = cb_select.isChecked();
+				i.isShow = true;
+			}
+			adapter.notifyDataSetChanged();
+
+			break;
+
+		case R.id.cb_Invert:
+			cb_Invert.setChecked(true);
+			cb_select.setChecked(false);
+			for (ViewHelper i : list)
+			{
+				i.isChecked = !i.isChecked;
+				i.isShow = true;
+			}
+			adapter.notifyDataSetChanged();
+
+			break;
+
+		case R.id.tv_delete:
+			List<ViewHelper> removeList = new ArrayList<DownDocsActivity.ViewHelper>();// 被删除的集合
+
+			for (ViewHelper viewHelper : list)
+			{
+				if (viewHelper.isChecked)
+				{
+					removeList.add(viewHelper);// 把被删除的对象收集到一个集合中
+				}
+			}
+
+			list.removeAll(removeList);
+
+			// 清除数据库及文件夹里面的数据
+			for (ViewHelper viewHelper : removeList)
+			{
+				// 从数据库移除
+				database.docsDeleteById(viewHelper.document.Id);
+
+				// 从文件夹移除
+				File file = new File(FolderUtil.rootDir(DownDocsActivity.this), viewHelper.document.SoundPath);
+				if (file.isFile() && file.exists())
+				{
+					file.delete();
+				}
+				Log.i("" + viewHelper.document.Title + " " + file.getAbsolutePath() + " 被移除了");
+			}
+
+			adapter.notifyDataSetChanged();
+			break;
+
+		case R.id.tv_cancel:
+			// 按钮重置
+			cb_select.setChecked(false);
+			cb_Invert.setChecked(false);
+			ll_ctrl.setVisibility(View.GONE);
+
+			for (ViewHelper i : list)
+			{
+				i.isChecked = false;
+				i.isShow = false;
+			}
+			adapter.notifyDataSetChanged();
+			break;
+		}
 	}
 
 }

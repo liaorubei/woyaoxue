@@ -28,7 +28,7 @@ import com.voc.woyaoxue.R;
  * @author liaorubei
  *
  */
-public class FolderDownActivity extends Activity
+public class DownFolderActivity extends Activity
 {
 
 	private MyAdapter adapter;
@@ -65,7 +65,7 @@ public class FolderDownActivity extends Activity
 			@Override
 			public View onCreateSuccessView()
 			{
-				View view = View.inflate(FolderDownActivity.this, R.layout.activity_down, null);
+				View view = View.inflate(DownFolderActivity.this, R.layout.activity_down, null);
 				listview = (ListView) view.findViewById(R.id.listview);
 				return view;
 			}
@@ -97,7 +97,7 @@ public class FolderDownActivity extends Activity
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
 				Log.i("点击了");
-				Intent intent = new Intent(FolderDownActivity.this, DocsDownActivity.class);
+				Intent intent = new Intent(DownFolderActivity.this, DownDocsActivity.class);
 				intent.putExtra("FolderId", list.get(position).Id);
 				startActivity(intent);
 				
@@ -124,7 +124,7 @@ public class FolderDownActivity extends Activity
 			Folder folder = getItem(position);
 			if (convertView == null)
 			{
-				convertView = View.inflate(FolderDownActivity.this, R.layout.listitem_folder, null);
+				convertView = View.inflate(DownFolderActivity.this, R.layout.listitem_folder, null);
 				ViewHolder holder = new ViewHolder();
 				holder.tv_folder_name = (TextView) convertView.findViewById(R.id.tv_folder_name);
 				holder.tv_document_count = (TextView) convertView.findViewById(R.id.tv_document_count);

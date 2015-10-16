@@ -18,12 +18,6 @@
     </style>
 
 
-
-    <style name="CustomTabPageIndicator.Text" parent="android:TextAppearance.Medium">
-        <item name="android:typeface">monospace</item>
-        <item name="android:textColor">@drawable/selector_tabtext</item>
-    </style>
-
     <style name="Widget.SeekBar.Normal" parent="@android:style/Widget.SeekBar">
         <item name="android:maxHeight">2dip</item>
         <item name="android:indeterminateOnly">false</item>

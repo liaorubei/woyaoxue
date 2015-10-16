@@ -173,4 +173,9 @@ public class Database
 		write.insert("level", null, values);
 	}
 
+	public void docsDeleteById(int id)
+	{
+		write.delete("document", "Id=?", new String[] { id + "" });
+	}
+
 }

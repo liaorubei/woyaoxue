@@ -195,11 +195,6 @@ public class DocsActivity extends Activity
 
 		database.closeConnection();
 
-		if (myBinder.getDownloadManager().size() > 0)
-		{
-			Toast.makeText(this, "后台下载中", Toast.LENGTH_SHORT).show();
-		}
-
 		// 移除观察者,让下载服务后台自行下载
 		myBinder.getDownloadManager().deleteObserver(adapter);
 
