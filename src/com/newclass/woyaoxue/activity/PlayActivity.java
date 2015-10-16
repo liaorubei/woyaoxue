@@ -392,8 +392,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			int state = subTitleState % subTitleIcons.size();
 			showOrHideSubtitle(state);
 			item.setIcon(subTitleIcons.get(state));
-			Toast.makeText(this, "点击了语言切换", Toast.LENGTH_LONG).show();
-
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

@@ -52,12 +52,10 @@ public class DownDocsActivity extends Activity implements OnClickListener
 	private int folderId;
 	private ContentView contentView;
 	private MyAdapter adapter;
-	private ServiceConnection conn;
-	private MyBinder myBinder;
+
 	private Database database;
 	private ListView listview;
 
-	protected int pageSize = 15;
 	private int levelId;
 
 	private View ll_ctrl;
@@ -102,25 +100,6 @@ public class DownDocsActivity extends Activity implements OnClickListener
 
 		list = new ArrayList<ViewHelper>();
 		adapter = new MyAdapter(list);
-
-		conn = new ServiceConnection()
-		{
-
-			@Override
-			public void onServiceDisconnected(ComponentName name)
-			{
-
-			}
-
-			@Override
-			public void onServiceConnected(ComponentName name, IBinder service)
-			{
-				myBinder = (MyBinder) service;
-				myBinder.getDownloadManager().addObserver(adapter);
-			}
-		};
-		bindService(new Intent(this, DownloadService.class), conn, Service.BIND_AUTO_CREATE);
-
 		listview.setAdapter(adapter);
 		// 其他设置
 		listview.setOnItemClickListener(new OnItemClickListener()
@@ -129,8 +108,9 @@ public class DownDocsActivity extends Activity implements OnClickListener
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				// TODO Auto-generated method stub
-
+				Intent play = new Intent(DownDocsActivity.this, PlayActivity.class);
+				play.putExtra("Id", list.get(position).document.Id);
+				startActivity(play);
 			}
 		});
 
@@ -174,7 +154,7 @@ public class DownDocsActivity extends Activity implements OnClickListener
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		MenuInflater menuInflater = getMenuInflater();
-		menuInflater.inflate(R.menu.activity_downdocs, menu);
+		menuInflater.inflate(R.menu.menu_downdocs, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -182,33 +162,11 @@ public class DownDocsActivity extends Activity implements OnClickListener
 	protected void onDestroy()
 	{
 		super.onDestroy();
-
 		database.closeConnection();
-
-		if (myBinder.getDownloadManager().size() > 0)
-		{
-			Toast.makeText(this, "后台下载中", Toast.LENGTH_SHORT).show();
-		}
-
-		// 移除观察者,让下载服务后台自行下载
-		myBinder.getDownloadManager().deleteObserver(adapter);
-
-		// 移除服务绑定,避免内存泄漏
-		unbindService(conn);
 	}
 
 	private void loadMore()
 	{
-		/*
-		 * new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + ""), new RequestCallBack<String>() {
-		 * 
-		 * @Override public void onSuccess(ResponseInfo<String> responseInfo) { Log.i("加载成功=" + this.getRequestUrl()); List<Document> json = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>() {}.getType()); if (json.size() > 0) { list.addAll(json); adapter.notifyDataSetChanged(); contentView.showView(ViewState.SUCCESS); } else { contentView.showView(list.size() > 0 ? ViewState.SUCCESS : ViewState.EMPTY); }
-		 * 
-		 * listview.stopLoadMore(json.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL); }
-		 * 
-		 * @Override public void onFailure(HttpException error, String msg) { contentView.showView(ViewState.FAILURE); } });
-		 */
-
 		new AsyncTask<Integer, Integer, Integer>()
 		{
 
@@ -232,7 +190,6 @@ public class DownDocsActivity extends Activity implements OnClickListener
 			}
 
 		}.execute(folderId);
-
 	}
 
 	private class MyAdapter extends BaseAdapter<ViewHelper> implements Observer

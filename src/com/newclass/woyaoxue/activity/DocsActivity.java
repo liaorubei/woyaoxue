@@ -124,8 +124,9 @@ public class DocsActivity extends Activity
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				// TODO Auto-generated method stub
-
+				Intent play = new Intent(DocsActivity.this, PlayActivity.class);
+				play.putExtra("Id", list.get(position - 1).Id);
+				startActivity(play);
 			}
 		});
 		listview.setXListViewListener(new IXListViewListener()

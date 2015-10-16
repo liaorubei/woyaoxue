@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,9 +43,12 @@ public class DownFolderActivity extends Activity
 		switch (item.getItemId())
 		{
 		case android.R.id.home:
-
 			this.finish();
 			return true;
+
+		case R.id.menu_refresh:
+
+			break;
 
 		default:
 			break;
@@ -52,6 +56,12 @@ public class DownFolderActivity extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		getMenuInflater().inflate(R.menu.menu_downfolder, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -100,7 +110,7 @@ public class DownFolderActivity extends Activity
 				Intent intent = new Intent(DownFolderActivity.this, DownDocsActivity.class);
 				intent.putExtra("FolderId", list.get(position).Id);
 				startActivity(intent);
-				
+
 			}
 		});
 
@@ -116,7 +126,6 @@ public class DownFolderActivity extends Activity
 		{
 			super(list);
 		}
-
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
@@ -142,6 +151,5 @@ public class DownFolderActivity extends Activity
 		public TextView tv_document_count;
 		public TextView tv_folder_name;
 	}
-
 
 }
