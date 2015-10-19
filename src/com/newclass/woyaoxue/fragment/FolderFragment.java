@@ -3,6 +3,7 @@ package com.newclass.woyaoxue.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,11 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.activity.DocsActivity;
-import com.newclass.woyaoxue.activity.ListActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.base.BaseFragment;
 import com.newclass.woyaoxue.bean.Folder;
 import com.newclass.woyaoxue.bean.database.Database;
+import com.newclass.woyaoxue.bean.database.UrlCache;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.XListView;
@@ -36,6 +37,7 @@ public class FolderFragment extends BaseFragment
 	private MyAdapter myAdapter;
 	private List<Folder> list;
 	private int mLevelId;
+	private Database database;
 
 	public FolderFragment(int levelid)
 	{
@@ -45,49 +47,73 @@ public class FolderFragment extends BaseFragment
 	}
 
 	@Override
-	public void initData()
+	public void initData(Context context)
 	{
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getFolders(mLevelId), new RequestCallBack<String>()
+		String url = NetworkUtil.getFolders(mLevelId);
+		database = new Database(context);
+		UrlCache cache =null;
+
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 		{
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
+			Log.i("请求网络=" + url);
+			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
 			{
-				List<Folder> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
-				{}.getType());
 
-				if (fromJson.size() > 0)
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
-					list.clear();
-					list.addAll(fromJson);
-					myAdapter.notifyDataSetChanged();
-					success();
+					List<Folder> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
+					{}.getType());
 
-					// 添加数据到数据库
-					Database database = new Database(getActivity());
-					for (Folder folder : fromJson)
+					if (fromJson.size() > 0)
 					{
-						if (!database.folderExists(folder.Id))
+						list.clear();
+						list.addAll(fromJson);
+						myAdapter.notifyDataSetChanged();
+						success();
+
+						// 添加数据到数据库
+						for (Folder folder : fromJson)
 						{
-							database.folderInsert(folder);
+							if (!database.folderExists(folder.Id))
+							{
+								database.folderInsert(folder);
+							}
 						}
 					}
+					else
+					{
+						vacancy();
+					}
 
+					// 缓存数据
+					UrlCache urlCache = new UrlCache();
+					urlCache.Url = this.getRequestUrl();
+					urlCache.Json = responseInfo.result;
+					urlCache.UpdateAt = System.currentTimeMillis();
+					database.cacheInsertOrUpdate(urlCache);
 				}
-				else
+
+				@Override
+				public void onFailure(HttpException error, String msg)
 				{
-					vacancy();
+					failure();
 				}
-				Log.i("FolderFragment " + this.getRequestUrl() + " 加载成功");
-
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
+			});
+		}
+		else
+		{
+			Log.i("加载缓存=" + url);
+			List<Folder> fromJson = new Gson().fromJson(cache.Json, new TypeToken<List<Folder>>()
+			{}.getType());
+			if (fromJson.size() > 0)
 			{
-				failure();
+				list.clear();
+				list.addAll(fromJson);
+				myAdapter.notifyDataSetChanged();
+				success();
 			}
-		});
+		}
 
 	}
 
@@ -114,6 +140,13 @@ public class FolderFragment extends BaseFragment
 			}
 		});
 		return inflate;
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		database.closeConnection();
 	}
 
 	private class MyAdapter extends BaseAdapter<Folder>

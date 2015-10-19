@@ -1,5 +1,6 @@
 package com.newclass.woyaoxue.base;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,10 +12,9 @@ import com.newclass.woyaoxue.view.ContentView.ViewState;
 
 public abstract class BaseFragment extends Fragment
 {
-
 	private ContentView contentView;
 
-	public abstract void initData();
+	public abstract void initData(Context context);
 
 	protected abstract View initView();
 

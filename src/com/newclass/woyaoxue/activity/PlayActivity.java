@@ -43,6 +43,8 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.Lyric;
+import com.newclass.woyaoxue.bean.database.Database;
+import com.newclass.woyaoxue.bean.database.UrlCache;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.SpecialLyricView;
@@ -112,6 +114,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	private TextView tv_bSide;
 	@ViewInject(R.id.tv_title)
 	private TextView tv_title;
+	private int documentId;
+	private Database database;
 
 	/**
 	 * 使用指定的音频路径初始化MediaPlayer
@@ -151,11 +155,9 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	protected String millisecondsFormat(int milliseconds)
 	{
-
 		long minutes = (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
 		long seconds = (milliseconds % (1000 * 60)) / 1000;
-
-		return minutes + ":" + seconds;
+		return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 	}
 
 	@Override
@@ -269,8 +271,12 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_cn);
 		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_encn);
 
+		tv_aSide.setText("");
+		tv_bSide.setText("");
+		tv_title.setText("");
+
 		Intent intent = getIntent();
-		int id = intent.getIntExtra("Id", 429);
+		documentId = intent.getIntExtra("Id", 429);
 
 		// 从数据库读取缓存,如果时间超过10分钟
 
@@ -283,43 +289,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		ActionBar actionBar = getActionBar();
 		// 返回按钮
 		actionBar.setDisplayHomeAsUpEnabled(true);
-
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocById(id), new RequestCallBack<String>()
-		{
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-
-			}
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				Document document = new Gson().fromJson(responseInfo.result, Document.class);
-				tv_title.setText(document.Title);
-
-				specialLyricViews = new ArrayList<SpecialLyricView>();
-
-				for (Lyric lyric : document.Lyrics)
-				{
-					SpecialLyricView specialLyricView = new SpecialLyricView(PlayActivity.this, lyric);
-					specialLyricViews.add(specialLyricView);
-				}
-
-				Collections.sort(specialLyricViews);
-
-				for (SpecialLyricView specialLyricView : specialLyricViews)
-				{
-					// 在刚开始的时候,显示中文字幕的
-					specialLyricView.showEnCn(SpecialLyricView.SHOW_NONE);
-					ll_lyrics.addView(specialLyricView);
-				}
-
-				// 因为使用的是相对路径,但是在实际请求时要加上域名
-				initMediaPlayer(document.SoundPath);
-			}
-		});
 
 		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
 		{
@@ -349,7 +318,76 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 			}
 		});
+		database = new Database(this);
+		initData();
+	}
 
+	private void initData()
+	{
+		String url = NetworkUtil.getDocById(documentId);
+
+		UrlCache cache = database.cacheSelectByUrl(url);
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 6000000))// 60分钟
+		{
+			Log.i("logi", "使用网络:" + url);
+			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
+			{
+
+				@Override
+				public void onFailure(HttpException error, String msg)
+				{
+
+				}
+
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
+				{
+					Document document = new Gson().fromJson(responseInfo.result, Document.class);
+					fillData(document);
+
+					UrlCache urlCache = new UrlCache();
+					urlCache.Url = this.getRequestUrl();
+					urlCache.Json = responseInfo.result;
+					urlCache.UpdateAt = System.currentTimeMillis();
+					database.cacheInsertOrUpdate(urlCache);
+				}
+
+			});
+		}
+		else
+		{
+			Log.i("logi", "使用缓存:" + url);
+			Document document = new Gson().fromJson(cache.Json, Document.class);
+			fillData(document);
+		}
+
+	}
+
+	private void fillData(Document document)
+	{
+		tv_aSide.setText("00:00");
+		tv_bSide.setText(document.LengthString);
+		tv_title.setText(document.Title);
+
+		specialLyricViews = new ArrayList<SpecialLyricView>();
+
+		for (Lyric lyric : document.Lyrics)
+		{
+			SpecialLyricView specialLyricView = new SpecialLyricView(PlayActivity.this, lyric);
+			specialLyricViews.add(specialLyricView);
+		}
+
+		Collections.sort(specialLyricViews);
+
+		for (SpecialLyricView specialLyricView : specialLyricViews)
+		{
+			// 在刚开始的时候,显示中文字幕的
+			specialLyricView.showEnCn(SpecialLyricView.SHOW_NONE);
+			ll_lyrics.addView(specialLyricView);
+		}
+
+		// 因为使用的是相对路径,但是在实际请求时要加上域名
+		initMediaPlayer(document.SoundPath);
 	}
 
 	@Override
@@ -369,6 +407,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			mediaPlayer.release();
 			mediaPlayer = null;
 		}
+		database.closeConnection();
 		super.onDestroy();
 	}
 

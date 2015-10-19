@@ -34,7 +34,7 @@ import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.DownloadInfo;
 import com.newclass.woyaoxue.bean.database.Database;
-import com.newclass.woyaoxue.bean.database.MySQLiteOpenHelper;
+import com.newclass.woyaoxue.bean.database.UrlCache;
 import com.newclass.woyaoxue.service.DownloadService;
 import com.newclass.woyaoxue.service.DownloadService.MyBinder;
 import com.newclass.woyaoxue.util.FolderUtil;
@@ -83,8 +83,6 @@ public class DocsActivity extends Activity
 		setContentView(contentView);
 
 		database = new Database(this);
-
-		new MySQLiteOpenHelper(this);
 
 		// 取得传递过来的数据
 		Intent intent = getIntent();
@@ -208,36 +206,60 @@ public class DocsActivity extends Activity
 
 	private void loadMore()
 	{
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + ""), new RequestCallBack<String>()
+		String url = NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + "");
+		UrlCache cache = database.cacheSelectByUrl(url);
+
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 		{
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
+			Log.i("使用网络:" + url);
+			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + ""), new RequestCallBack<String>()
 			{
-				Log.i("加载成功=" + this.getRequestUrl());
-				List<Document> json = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
-				{}.getType());
-				if (json.size() > 0)
+
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
-					list.addAll(json);
-					adapter.notifyDataSetChanged();
-					contentView.showView(ViewState.SUCCESS);
+					List<Document> json = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
+					{}.getType());
+
+					fillData(json);
+					UrlCache urlCache = new UrlCache();
+					urlCache.Url = this.getRequestUrl();
+					urlCache.Json = responseInfo.result;
+					urlCache.UpdateAt = System.currentTimeMillis();
+					database.cacheInsertOrUpdate(urlCache);
 				}
-				else
+
+				@Override
+				public void onFailure(HttpException error, String msg)
 				{
-					contentView.showView(list.size() > 0 ? ViewState.SUCCESS : ViewState.EMPTY);
+					contentView.showView(ViewState.FAILURE);
 				}
+			});
+		}
+		else
+		{
+			Log.i("使用缓存:" + url);
+			List<Document> json = new Gson().fromJson(cache.Json, new TypeToken<List<Document>>()
+			{}.getType());
+			fillData(json);
+		}
 
-				listview.stopLoadMore(json.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL);
-			}
+	}
 
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				contentView.showView(ViewState.FAILURE);
-			}
-		});
+	private void fillData(List<Document> json)
+	{
+		if (json.size() > 0)
+		{
+			list.addAll(json);
+			adapter.notifyDataSetChanged();
+			contentView.showView(ViewState.SUCCESS);
+		}
+		else
+		{
+			contentView.showView(list.size() > 0 ? ViewState.SUCCESS : ViewState.EMPTY);
+		}
 
+		listview.stopLoadMore(json.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL);
 	}
 
 	private class MyAdapter extends BaseAdapter<Document> implements Observer

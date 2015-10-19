@@ -205,7 +205,7 @@ public class DocsListFragment extends BaseFragment
 	}
 
 	@Override
-	public void initData()
+	public void initData(Context context)
 	{
 		refresh();
 	}

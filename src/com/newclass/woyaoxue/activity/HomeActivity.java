@@ -36,6 +36,7 @@ import com.newclass.woyaoxue.bean.database.UrlCache;
 import com.newclass.woyaoxue.fragment.FolderFragment;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.util.ConstantsUtil;
+import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
@@ -47,6 +48,8 @@ public class HomeActivity extends FragmentActivity
 	private LinearLayout ll_levels;
 
 	private ViewPager vp_folder;
+
+	protected Database database;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -73,6 +76,14 @@ public class HomeActivity extends FragmentActivity
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	protected void onDestroy()
+	{
+
+		super.onDestroy();
+		database.closeConnection();
+	}
+
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -92,14 +103,12 @@ public class HomeActivity extends FragmentActivity
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2)
 			{
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void onPageScrollStateChanged(int arg0)
 			{
-				// TODO Auto-generated method stub
 
 			}
 
@@ -113,78 +122,8 @@ public class HomeActivity extends FragmentActivity
 				}
 			}
 		});
-
+		database = new Database(HomeActivity.this);
 		loadData();
-
-		new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
-		{
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{}
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-				{}.getType());
-				if (fromJson.size() > 0)
-				{
-					// 排序
-					Collections.sort(fromJson, new Comparator<Level>()
-					{
-
-						@Override
-						public int compare(Level lhs, Level rhs)
-						{
-							return Integer.valueOf(rhs.Sort).compareTo(lhs.Sort);
-						}
-					});
-
-					// ViewPager数据源
-					for (Level level : fromJson)
-					{
-						fragments.add(new FolderFragment(level.Id));
-					}
-					adapter.notifyDataSetChanged();
-
-					// tabs数据源
-					LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
-					for (int i = 0; i < fromJson.size(); i++)
-					{
-						final int item = i;
-						TextView child = new TextView(HomeActivity.this);
-						child.setGravity(Gravity.CENTER);
-						child.setText(fromJson.get(i).Name);
-						child.setBackgroundResource(R.drawable.selector_levels);
-						child.setTextColor(i == 0 ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
-
-						child.setOnClickListener(new OnClickListener()
-						{
-
-							@Override
-							public void onClick(View v)
-							{
-								vp_folder.setCurrentItem(item);
-							}
-						});
-
-						ll_levels.addView(child, params);
-					}
-
-					// 保存等级数据在数据库
-					Database database = new Database(HomeActivity.this);
-					for (Level level : fromJson)
-					{
-						if (!database.levelExists(level.Id))
-						{
-							database.levelInsert(level);
-						}
-					}
-
-				}
-			}
-		});
 
 		// ActionBar
 		getActionBar().setDisplayShowHomeEnabled(true);
@@ -197,14 +136,109 @@ public class HomeActivity extends FragmentActivity
 	private void loadData()
 	{
 		String requestUrl = NetworkUtil.getLevels();
-		UrlCache cache = new UrlCache();
-		if (System.currentTimeMillis() - cache.UpdateAt > 10 * 60 * 1000)
+		UrlCache cache = database.cacheSelectByUrl(requestUrl);
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
+		{
+			Log.i("使用网络数据");
+			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
+			{
+
+				@Override
+				public void onFailure(HttpException error, String msg)
+				{}
+
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
+				{
+					List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
+					{}.getType());
+
+					if (fromJson.size() > 0)
+					{
+						fillData(fromJson);
+
+						// 保存等级信息
+						for (Level level : fromJson)
+						{
+							if (!database.levelExists(level.Id))
+							{
+								database.levelInsert(level);
+							}
+						}
+					}
+
+					// 把数据缓存到数据库里面
+					UrlCache urlCache = new UrlCache();
+					urlCache.Url = this.getRequestUrl();
+					urlCache.Json = responseInfo.result;
+					urlCache.UpdateAt = System.currentTimeMillis();
+					database.cacheInsertOrUpdate(urlCache);
+				}
+
+			});
+		}
+		else
+		{
+			Log.i("使用缓存数据");
+
+			List<Level> json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
+			{}.getType());
+
+			if (json.size() > 0)
+			{
+				fillData(json);
+			}
+		}
+
+	}
+
+	/**
+	 * @param json
+	 */
+	private void fillData(List<Level> json)
+	{
+		// 排序
+		Collections.sort(json, new Comparator<Level>()
 		{
 
-		}else{
-			
-			Object json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>(){}.getType());
-			
+			@Override
+			public int compare(Level lhs, Level rhs)
+			{
+				return Integer.valueOf(rhs.Sort).compareTo(lhs.Sort);
+			}
+		});
+
+		// ViewPager数据源
+		fragments.clear();
+		for (Level level : json)
+		{
+			fragments.add(new FolderFragment(level.Id));
+		}
+		adapter.notifyDataSetChanged();
+
+		// tabs数据源
+		ll_levels.removeAllViews();
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
+		for (int i = 0; i < json.size(); i++)
+		{
+			final int item = i;
+			TextView child = new TextView(HomeActivity.this);
+			child.setGravity(Gravity.CENTER);
+			child.setText(json.get(i).Name);
+			child.setBackgroundResource(R.drawable.selector_levels);
+			child.setTextColor(i == 0 ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
+
+			child.setOnClickListener(new OnClickListener()
+			{
+
+				@Override
+				public void onClick(View v)
+				{
+					vp_folder.setCurrentItem(item);
+				}
+			});
+
+			ll_levels.addView(child, params);
 		}
 
 	}
@@ -227,7 +261,7 @@ public class HomeActivity extends FragmentActivity
 		public Fragment getItem(int arg0)
 		{
 			BaseFragment baseFragment = fragments.get(arg0);
-			baseFragment.initData();
+			baseFragment.initData(HomeActivity.this);
 			return baseFragment;
 		}
 	}

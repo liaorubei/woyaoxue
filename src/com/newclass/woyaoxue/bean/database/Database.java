@@ -183,4 +183,36 @@ public class Database
 		write.delete("document", "Id=?", new String[] { id + "" });
 	}
 
+	public UrlCache cacheSelectByUrl(String url)
+	{
+		Cursor cursor = readableDatabase.rawQuery("select Url,Json,UpdateAt from UrlCache where Url=?", new String[] { url });
+		UrlCache cache = null;
+		if (cursor.moveToNext())
+		{
+			cache = new UrlCache();
+			cache.Url = cursor.getString(0);
+			cache.Json = cursor.getString(1);
+			cache.UpdateAt = cursor.getLong(2);
+		}
+		cursor.close();
+		return cache;
+	}
+
+	public void cacheInsertOrUpdate(UrlCache urlCache)
+	{
+		Cursor cursor = readableDatabase.rawQuery("Select Url From UrlCache where Url=?", new String[] { urlCache.Url });
+		ContentValues values = new ContentValues();
+		values.put("Json", urlCache.Json);
+		values.put("UpdateAt", urlCache.UpdateAt);
+		if (cursor.getCount() > 0)
+		{
+			write.update("UrlCache", values, "Url=?", new String[] { urlCache.Url });
+		}
+		else
+		{
+			values.put("Url", urlCache.Url);
+			write.insert("UrlCache", null, values);
+		}
+		cursor.close();
+	}
 }
