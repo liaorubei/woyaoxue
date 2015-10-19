@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -62,7 +63,7 @@ public class FolderFragment extends BaseFragment
 					myAdapter.notifyDataSetChanged();
 					success();
 
-					//添加数据到数据库
+					// 添加数据到数据库
 					Database database = new Database(getActivity());
 					for (Folder folder : fromJson)
 					{
@@ -131,21 +132,22 @@ public class FolderFragment extends BaseFragment
 			{
 				convertView = View.inflate(getActivity(), R.layout.listitem_folder, null);
 				ViewHolder holder = new ViewHolder();
-				holder.tv_folder_name = (TextView) convertView.findViewById(R.id.tv_folder_name);
-				holder.tv_document_count = (TextView) convertView.findViewById(R.id.tv_document_count);
+				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
+				holder.tv_counts = (TextView) convertView.findViewById(R.id.tv_counts);
 				convertView.setTag(holder);
 			}
 			ViewHolder holder = (ViewHolder) convertView.getTag();
-			holder.tv_folder_name.setText(folder.Name);
-			holder.tv_document_count.setText("课程:" + folder.DocsCount);
+			holder.tv_folder.setText(folder.Name);
+			holder.tv_counts.setText("课程:" + folder.DocsCount);
 			return convertView;
 		}
 	}
 
 	private class ViewHolder
 	{
-		public TextView tv_folder_name;
-		public TextView tv_document_count;
+		public CheckBox cb_delete;
+		public TextView tv_folder;
+		public TextView tv_counts;
 	}
 
 }

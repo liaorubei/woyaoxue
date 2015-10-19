@@ -41,11 +41,27 @@
             android:textColor="@drawable/selector_foreground" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_folder"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"
+        android:text="成语故事汇"
+        android:textColor="@color/color_one" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_below="@id/tv_folder"
+        android:background="#a0a0a0" />
+
     <ListView
         android:id="@+id/listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/ll_ctrl" >
+        android:layout_above="@id/ll_ctrl"
+        android:layout_below="@id/tv_folder" >
     </ListView>
 
 </RelativeLayout>

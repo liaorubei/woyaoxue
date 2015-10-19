@@ -5,6 +5,6 @@
         android:id="@+id/menu_delete"
         android:icon="@drawable/ic_launcher"
         android:showAsAction="never"
-        android:title="删除文档"/>
+        android:title="@string/batch_remove"/>
 
 </menu>

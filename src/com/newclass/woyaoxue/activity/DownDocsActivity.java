@@ -63,6 +63,7 @@ public class DownDocsActivity extends Activity implements OnClickListener
 	private CheckBox cb_Invert;
 	private TextView tv_delete;
 	private TextView tv_cancel;
+	protected TextView tv_folder;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -76,9 +77,10 @@ public class DownDocsActivity extends Activity implements OnClickListener
 			public View onCreateSuccessView()
 			{
 				View view = View.inflate(DownDocsActivity.this, R.layout.activity_downdocs, null);
+				tv_folder = (TextView) view.findViewById(R.id.tv_folder);
 				listview = (ListView) view.findViewById(R.id.listview);
-				ll_ctrl = view.findViewById(R.id.ll_ctrl);
 
+				ll_ctrl = view.findViewById(R.id.ll_ctrl);
 				cb_select = (CheckBox) view.findViewById(R.id.cb_select);
 				cb_Invert = (CheckBox) view.findViewById(R.id.cb_Invert);
 				tv_delete = (TextView) view.findViewById(R.id.tv_delete);
@@ -96,7 +98,8 @@ public class DownDocsActivity extends Activity implements OnClickListener
 		Intent intent = getIntent();
 		levelId = intent.getIntExtra("LevelId", 0);
 		folderId = intent.getIntExtra("FolderId", 16);
-		Log.i("folderId" + folderId);
+		String folderName = intent.getStringExtra("FolderName");
+		tv_folder.setText(folderName);
 
 		list = new ArrayList<ViewHelper>();
 		adapter = new MyAdapter(list);
