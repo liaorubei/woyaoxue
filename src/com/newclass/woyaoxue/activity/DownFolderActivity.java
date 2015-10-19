@@ -46,7 +46,9 @@ public class DownFolderActivity extends Activity
 			this.finish();
 			return true;
 
-		case R.id.menu_refresh:
+		case R.id.menu_delete:
+			
+			
 
 			break;
 
