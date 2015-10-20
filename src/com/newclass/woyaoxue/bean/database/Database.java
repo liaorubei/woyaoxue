@@ -215,4 +215,10 @@ public class Database
 		}
 		cursor.close();
 	}
+
+	public void docsUpdateJson(String result)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

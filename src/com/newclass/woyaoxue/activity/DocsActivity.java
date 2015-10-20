@@ -154,7 +154,7 @@ public class DocsActivity extends Activity
 					{
 						DownloadInfo info = new DownloadInfo();
 						info.Title = i.Title;
-						info.Url = NetworkUtil.getFullPath(i.SoundPath);
+						info.AudioUrl = NetworkUtil.getFullPath(i.SoundPath);
 						info.Target = new File(FolderUtil.rootDir(DocsActivity.this), i.SoundPath);
 						info.Total = 100L;
 						info.Current = 0L;
@@ -294,14 +294,16 @@ public class DocsActivity extends Activity
 			holder.tv_time.setText(item.LengthString);
 
 			final DownloadInfo info = new DownloadInfo();
-			info.Url = NetworkUtil.getFullPath(item.SoundPath);
+			info.Id = item.Id;
+			info.Title = item.Title;
+			info.AudioUrl = NetworkUtil.getFullPath(item.SoundPath);
+			info.LyricUrl = NetworkUtil.getDocById(item.Id);
 			info.Target = new File(FolderUtil.rootDir(DocsActivity.this), item.SoundPath);
 			info.Total = 100L;
 			info.Current = 0L;
-			info.Title = item.Title;
 			if (database.docsExists(item.Id))
 			{
-				DownloadInfo downloadInfo = myBinder.getDownloadManager().get(info.Url);
+				DownloadInfo downloadInfo = myBinder.getDownloadManager().get(info.AudioUrl);
 				if (downloadInfo != null)
 				{
 					holder.cpb.setMax((int) downloadInfo.Total);
@@ -339,7 +341,6 @@ public class DocsActivity extends Activity
 						item.LevelId = levelId;
 						item.FolderId = folderId;
 						database.docsInsert(item);
-
 						v.setBackgroundResource(R.drawable.download_begin);
 					}
 				}

@@ -8,14 +8,24 @@ public class NetworkUtil
 
 	public static String domain = "http://voc2015.azurewebsites.net";
 
+	public static String format(String text, Object... para)
+	{
+		for (int i = 0; i < para.length; i++)
+		{
+			text = text.replaceAll("\\{" + i + "\\}", para[i] + "");
+		}
+		return text;
+	}
+
+	public static String getDocById(int id)
+	{
+
+		return domain + "/NewClass/DocById/" + id;
+	}
+
 	public static String getDocs(String folderId, String skip, String take)
 	{
 		return domain + format("/NewClass/GetDocs?folderId={0}&skip={1}&take={2}", folderId, skip, take);// "/NewClass/GetDocs?folderId=" + folderId + "&skip=" + skip + "&take=" + take;
-	}
-
-	public static String getLevels()
-	{
-		return domain + "/NewClass/levels";
 	}
 
 	/**
@@ -29,10 +39,16 @@ public class NetworkUtil
 		return domain + "/NewClass/DocsByLevelId/" + id;
 	}
 
-	public static String getDocById(int id)
+	/**
+	 * 
+	 * 
+	 * @param levelId
+	 *            取得指定LevelId下文件夹内文档的个数, 如果不大于0,表示取得所有数据
+	 * @return domain + "/NewClass/Folders?levelId=" + levelId
+	 */
+	public static String getFolders(int levelId)
 	{
-
-		return domain + "/NewClass/DocById/" + id;
+		return domain + "/NewClass/Folders?levelId=" + levelId;
 	}
 
 	/**
@@ -58,25 +74,9 @@ public class NetworkUtil
 		return domain + "/NewClass/GetLatestPackage";
 	}
 
-	/**
-	 * 
-	 * 
-	 * @param levelId
-	 *            取得指定LevelId下文件夹内文档的个数, 如果不大于0,表示取得所有数据
-	 * @return domain + "/NewClass/Folders?levelId=" + levelId
-	 */
-	public static String getFolders(int levelId)
+	public static String getLevels()
 	{
-		return domain + "/NewClass/Folders?levelId=" + levelId;
-	}
-
-	public static String format(String text, Object... para)
-	{
-		for (int i = 0; i < para.length; i++)
-		{
-			text = text.replaceAll("\\{" + i + "\\}", para[i] + "");
-		}
-		return text;
+		return domain + "/NewClass/levels";
 	}
 
 }

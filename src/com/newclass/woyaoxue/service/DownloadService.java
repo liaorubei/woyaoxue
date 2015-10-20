@@ -17,10 +17,13 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
+import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.DownloadInfo;
 import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.util.Log;
@@ -85,8 +88,13 @@ public class DownloadService extends Service
 					if (manager.toDownloadList.size() > 0)
 					{
 						DownloadInfo info = manager.toDownloadList.remove();
-						manager.downloadingMap.put(info.Url, info);
-						new HttpUtils().download(info.Url, info.Target.getAbsolutePath(), new MyRequestCallBack());
+						manager.downloadingMap.put(info.AudioUrl, info);
+
+						// 下载音频文件
+						new HttpUtils().download(info.AudioUrl, info.Target.getAbsolutePath(), new MyAudioCallBack());
+						// 下载歌词文件
+						new HttpUtils().send(HttpMethod.GET, info.LyricUrl, new MyLyricCallBack());
+
 					}
 
 					if (manager.toDownloadList.size() + manager.downloadingMap.size() > 0)
@@ -129,7 +137,7 @@ public class DownloadService extends Service
 
 		public boolean contains(DownloadInfo path)
 		{
-			return toDownloadList.contains(path) || downloadingMap.containsKey(path.Url);
+			return toDownloadList.contains(path) || downloadingMap.containsKey(path.AudioUrl);
 		}
 
 		public void enqueue(DownloadInfo path)
@@ -144,7 +152,7 @@ public class DownloadService extends Service
 			{
 				for (DownloadInfo i : toDownloadList)
 				{
-					if (i.Url.equals(key))
+					if (i.AudioUrl.equals(key))
 					{
 						downloadInfo = i;
 					}
@@ -170,7 +178,21 @@ public class DownloadService extends Service
 
 	}
 
-	private class MyRequestCallBack extends RequestCallBack<File>
+	private class MyLyricCallBack extends RequestCallBack<String>
+	{
+
+		@Override
+		public void onSuccess(ResponseInfo<String> responseInfo)
+		{
+			database.docsUpdateJson(responseInfo.result);
+		}
+
+		@Override
+		public void onFailure(HttpException error, String msg)
+		{}
+	}
+
+	private class MyAudioCallBack extends RequestCallBack<File>
 	{
 		private Builder builder;
 		private DownloadInfo info;
