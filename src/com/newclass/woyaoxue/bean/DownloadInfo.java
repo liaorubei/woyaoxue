@@ -4,6 +4,7 @@ import java.io.File;
 
 public class DownloadInfo
 {
+	public int Id;
 	public String Url;
 	public File Target;
 	public String Md5;

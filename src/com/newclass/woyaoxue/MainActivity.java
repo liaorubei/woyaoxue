@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.newclass.woyaoxue.activity.HomeActivity;
-import com.newclass.woyaoxue.service.BatchDownloadService;
 import com.newclass.woyaoxue.service.DownloadService;
 import com.voc.woyaoxue.R;
 
@@ -18,10 +17,6 @@ public class MainActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		// 启动批量下载服务
-		Intent service = new Intent(this, BatchDownloadService.class);
-		startService(service);
 
 		Intent sIntent = new Intent(this, DownloadService.class);
 		startService(sIntent);
