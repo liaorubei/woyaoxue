@@ -296,22 +296,21 @@ public class DocsActivity extends Activity
 			holder.tv_size.setText(Formatter.formatFileSize(DocsActivity.this, item.Length));
 			holder.tv_time.setText(item.LengthString);
 
-			if (database.docsExists(item.Id))
+			DownloadInfo ssss = database.docsSelectById(item.Id);
+			if (ssss != null)
 			{
-				Log.i("myBinder=" + myBinder);
-				Log.i("myBinder.getDownloadManager()=" + myBinder.getDownloadManager());
-				DownloadInfo info = myBinder.getDownloadManager().get(item.Id);
-				if (info != null)
-				{
-					holder.cpb.setMax((int) info.Total);
-					holder.cpb.setProgress((int) info.Current);
-					holder.cpb.setBackgroundResource(R.drawable.download_begin);
-				}
-				else
+				if (ssss.IsDownload == 1)
 				{
 					holder.cpb.setMax(100);
 					holder.cpb.setProgress(100);
 					holder.cpb.setBackgroundResource(R.drawable.download_finish);
+				}
+				else
+				{
+					DownloadInfo info = myBinder.getDownloadManager().get(item.Id);
+					holder.cpb.setMax((int) info.Total);
+					holder.cpb.setProgress((int) info.Current);
+					holder.cpb.setBackgroundResource(R.drawable.download_begin);
 				}
 			}
 			else
