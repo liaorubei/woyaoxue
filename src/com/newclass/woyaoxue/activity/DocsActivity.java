@@ -104,6 +104,7 @@ public class DocsActivity extends Activity
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service)
 			{
+				Log.i("onServiceConnected");
 				myBinder = (MyBinder) service;
 				myBinder.getDownloadManager().addObserver(adapter);
 			}
@@ -135,7 +136,7 @@ public class DocsActivity extends Activity
 			@Override
 			public void onLoadMore()
 			{
-				loadMore();
+				loadData();
 			}
 		});
 
@@ -159,7 +160,7 @@ public class DocsActivity extends Activity
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		loadMore();
+		loadData();
 	}
 
 	@Override
@@ -204,10 +205,10 @@ public class DocsActivity extends Activity
 		database.docsInsert(doc);
 	}
 
-	private void loadMore()
+	private void loadData()
 	{
 		String url = NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + "");
-		UrlCache cache = database.cacheSelectByUrl(url);
+		final UrlCache cache = database.cacheSelectByUrl(url);
 
 		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 		{
@@ -218,37 +219,38 @@ public class DocsActivity extends Activity
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
-					List<Document> json = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
-					{}.getType());
+					showData(responseInfo.result);
 
-					fillData(json);
-
-					UrlCache urlCache = new UrlCache();
-					urlCache.Url = this.getRequestUrl();
-					urlCache.Json = responseInfo.result;
-					urlCache.UpdateAt = System.currentTimeMillis();
+					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
 					database.cacheInsertOrUpdate(urlCache);
 				}
 
 				@Override
 				public void onFailure(HttpException error, String msg)
 				{
-					contentView.showView(ViewState.FAILURE);
+					if (cache != null)
+					{
+						showData(cache.Json);
+					}
+					else
+					{
+						contentView.showView(ViewState.FAILURE);
+					}
 				}
 			});
 		}
 		else
 		{
 			Log.i("使用缓存:" + url);
-			List<Document> json = new Gson().fromJson(cache.Json, new TypeToken<List<Document>>()
-			{}.getType());
-			fillData(json);
+			showData(cache.Json);
 		}
 
 	}
 
-	private void fillData(List<Document> json)
+	private void showData(String result)
 	{
+		List<Document> json = new Gson().fromJson(result, new TypeToken<List<Document>>()
+		{}.getType());
 		if (json.size() > 0)
 		{
 			list.addAll(json);
@@ -296,6 +298,8 @@ public class DocsActivity extends Activity
 
 			if (database.docsExists(item.Id))
 			{
+				Log.i("myBinder=" + myBinder);
+				Log.i("myBinder.getDownloadManager()=" + myBinder.getDownloadManager());
 				DownloadInfo info = myBinder.getDownloadManager().get(item.Id);
 				if (info != null)
 				{

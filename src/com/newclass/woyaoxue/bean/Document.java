@@ -18,4 +18,11 @@ public class Document
 	 */
 	public String LengthString;
 	public String DateString;
+
+	@Override
+	public String toString()
+	{
+		return "Document [Id=" + Id + ", LevelId=" + LevelId + ", FolderId=" + FolderId + ", Title=" + Title + ", TitleTwo=" + TitleTwo + ", Lyrics=" + Lyrics + ", SoundPath=" + SoundPath + ", Duration=" + Duration + ", Length=" + Length + ", LengthString=" + LengthString + ", DateString=" + DateString + "]";
+	}
+
 }

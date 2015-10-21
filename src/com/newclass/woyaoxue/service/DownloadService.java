@@ -214,8 +214,6 @@ public class DownloadService extends Service
 			// 下载失败了,通知下载失败并移除数据库里的数据
 			builder.setContentText("下载失败");
 			notificationManager.notify(this.mDocId, builder.build());
-
-			database.docsDeleteById(this.mDocId);
 		}
 
 		public void onLoading(long total, long current, boolean isUploading)
@@ -242,9 +240,6 @@ public class DownloadService extends Service
 		{
 			// 下载成功之后要先移除下载列表里面的任务,并更新数据库,显示系统通知
 			notificationManager.cancel(this.mDocId);
-			// builder.setContentText("下载完成");
-			// builder.setProgress(100, 100, false);
-			// notificationManager.notify(this.getRequestUrl(), 0, builder.build());
 
 			// 移除并更新数据库
 			manager.downloading.remove(this.mDocId);

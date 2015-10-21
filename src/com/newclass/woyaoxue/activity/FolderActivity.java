@@ -47,7 +47,7 @@ import com.newclass.woyaoxue.view.ContentView;
 import com.newclass.woyaoxue.view.ContentView.ViewState;
 import com.voc.woyaoxue.R;
 
-public class HomeActivity extends FragmentActivity
+public class FolderActivity extends FragmentActivity
 {
 	private Database database;
 	private List<Fragment> fragments;
@@ -83,7 +83,7 @@ public class HomeActivity extends FragmentActivity
 	/**
 	 * @param json
 	 */
-	private void fillData(List<Level> json)
+	private void showData(List<Level> json)
 	{
 		// 排序
 		Collections.sort(json, new Comparator<Level>()
@@ -110,7 +110,7 @@ public class HomeActivity extends FragmentActivity
 		for (int i = 0; i < json.size(); i++)
 		{
 			final int item = i;
-			TextView child = new TextView(HomeActivity.this);
+			TextView child = new TextView(FolderActivity.this);
 			child.setGravity(Gravity.CENTER);
 			child.setText(json.get(i).Name);
 			child.setBackgroundResource(R.drawable.selector_levels);
@@ -134,7 +134,7 @@ public class HomeActivity extends FragmentActivity
 	private void loadData()
 	{
 		String url = NetworkUtil.getLevels();
-		UrlCache cache = database.cacheSelectByUrl(url);
+		final UrlCache cache = database.cacheSelectByUrl(url);
 
 		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 		{
@@ -144,7 +144,14 @@ public class HomeActivity extends FragmentActivity
 
 				@Override
 				public void onFailure(HttpException error, String msg)
-				{}
+				{
+					if (cache != null)
+					{
+						List<Level> fromJson = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
+						{}.getType());
+						showData(fromJson);
+					}
+				}
 
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo)
@@ -154,7 +161,8 @@ public class HomeActivity extends FragmentActivity
 
 					if (fromJson.size() > 0)
 					{
-						fillData(fromJson);
+						// 显示数据
+						showData(fromJson);
 
 						// 保存等级信息
 						for (Level level : fromJson)
@@ -167,10 +175,7 @@ public class HomeActivity extends FragmentActivity
 					}
 
 					// 把数据缓存到数据库里面
-					UrlCache urlCache = new UrlCache();
-					urlCache.Url = this.getRequestUrl();
-					urlCache.Json = responseInfo.result;
-					urlCache.UpdateAt = System.currentTimeMillis();
+					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
 					database.cacheInsertOrUpdate(urlCache);
 				}
 
@@ -185,7 +190,7 @@ public class HomeActivity extends FragmentActivity
 
 			if (json.size() > 0)
 			{
-				fillData(json);
+				showData(json);
 			}
 		}
 
@@ -229,7 +234,7 @@ public class HomeActivity extends FragmentActivity
 				}
 			}
 		});
-		database = new Database(HomeActivity.this);
+		database = new Database(FolderActivity.this);
 		loadData();
 
 		// ActionBar
@@ -261,7 +266,7 @@ public class HomeActivity extends FragmentActivity
 			Folder item = getItem(position);
 			if (convertView == null)
 			{
-				convertView = View.inflate(HomeActivity.this, R.layout.listitem_folder, null);
+				convertView = View.inflate(FolderActivity.this, R.layout.listitem_folder, null);
 				ViewHolder holder = new ViewHolder();
 				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
 				holder.tv_counts = (TextView) convertView.findViewById(R.id.tv_counts);
@@ -285,13 +290,13 @@ public class HomeActivity extends FragmentActivity
 		public MyFragment(int id)
 		{
 			this.mLevelId = id;
-			contentView = new ContentView(HomeActivity.this)
+			contentView = new ContentView(FolderActivity.this)
 			{
 
 				@Override
 				public View onCreateSuccessView()
 				{
-					View view = View.inflate(HomeActivity.this, R.layout.fragment_folder, null);
+					View view = View.inflate(FolderActivity.this, R.layout.fragment_folder, null);
 					listview = (ListView) view.findViewById(R.id.listview);
 					list = new ArrayList<Folder>();
 					adapter = new MyAdapter(list);
@@ -304,7 +309,7 @@ public class HomeActivity extends FragmentActivity
 						{
 							Folder folder = list.get(position);
 
-							Intent intent = new Intent(HomeActivity.this, DocsActivity.class);
+							Intent intent = new Intent(FolderActivity.this, DocsActivity.class);
 							intent.putExtra("FolderId", folder.Id);
 							intent.putExtra("FolderName", folder.Name);
 							startActivity(intent);
@@ -320,7 +325,7 @@ public class HomeActivity extends FragmentActivity
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
 			String url = NetworkUtil.getFolders(mLevelId);
-			UrlCache cache = database.cacheSelectByUrl(url);
+			final UrlCache cache = database.cacheSelectByUrl(url);
 			if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 			{
 				Log.i("请求网络:" + url);
@@ -330,14 +335,21 @@ public class HomeActivity extends FragmentActivity
 					@Override
 					public void onFailure(HttpException error, String msg)
 					{
-						contentView.showView(ViewState.FAILURE);
+						if (cache != null)
+						{
+							subShowData(cache.Json);
+						}
+						else
+						{
+							contentView.showView(ViewState.FAILURE);
+						}
 					}
 
 					@Override
 					public void onSuccess(ResponseInfo<String> responseInfo)
 					{
 						// 填充数据
-						subFillData(responseInfo.result);
+						subShowData(responseInfo.result);
 
 						// 缓存文件夹
 						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
@@ -351,10 +363,7 @@ public class HomeActivity extends FragmentActivity
 						}
 
 						// 缓存数据
-						UrlCache urlCache = new UrlCache();
-						urlCache.Url = this.getRequestUrl();
-						urlCache.Json = responseInfo.result;
-						urlCache.UpdateAt = System.currentTimeMillis();
+						UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
 						database.cacheInsertOrUpdate(urlCache);
 					}
 				});
@@ -362,13 +371,13 @@ public class HomeActivity extends FragmentActivity
 			else
 			{
 				Log.i("使用缓存:" + url);
-				subFillData(cache.Json);
+				subShowData(cache.Json);
 			}
 
 			return contentView;
 		}
 
-		private void subFillData(String json)
+		private void subShowData(String json)
 		{
 			List<Folder> folders = new Gson().fromJson(json, new TypeToken<List<Folder>>()
 			{}.getType());

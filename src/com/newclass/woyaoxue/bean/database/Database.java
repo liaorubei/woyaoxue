@@ -218,9 +218,19 @@ public class Database
 		mWritable.insert("level", null, values);
 	}
 
-	public void docsSelectById(int documentId)
+	public DownloadInfo docsSelectById(int id)
 	{
-		// TODO Auto-generated method stub
-
+		Cursor cursor = mReadable.rawQuery("select Id,Json,Title,IsDownload from document where Id=?", new String[] { id + "" });
+		DownloadInfo info = null;
+		if (cursor.moveToNext())
+		{
+			info = new DownloadInfo();
+			info.Id = cursor.getInt(0);
+			info.Json = cursor.getString(1);
+			info.Title = cursor.getString(2);
+			info.IsDownload = cursor.getInt(3);
+		}
+		cursor.close();
+		return info;
 	}
 }

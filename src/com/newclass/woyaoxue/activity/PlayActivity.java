@@ -18,6 +18,7 @@ import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +43,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Document;
+import com.newclass.woyaoxue.bean.DownloadInfo;
 import com.newclass.woyaoxue.bean.Lyric;
 import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.bean.database.UrlCache;
@@ -324,11 +326,15 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	private void initData()
 	{
-		//如果已经下载,那么直接使用下载的数据
-		database.docsSelectById(documentId);
-		
-		
-		
+		// 如果已经下载,那么直接使用下载的数据
+		DownloadInfo info = database.docsSelectById(documentId);
+		if (info != null && info.IsDownload == 1 && !TextUtils.isEmpty(info.Json))
+		{
+			Document document = new Gson().fromJson(info.Json, Document.class);
+			fillData(document);
+			return;
+		}
+
 		String url = NetworkUtil.getDocById(documentId);
 
 		UrlCache cache = database.cacheSelectByUrl(url);
