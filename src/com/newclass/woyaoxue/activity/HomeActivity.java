@@ -135,9 +135,10 @@ public class HomeActivity extends FragmentActivity
 	{
 		String url = NetworkUtil.getLevels();
 		UrlCache cache = database.cacheSelectByUrl(url);
+
 		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 		{
-			Log.i("使用网络数据");
+			Log.i("使用网络:" + url);
 			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
 			{
 
@@ -177,7 +178,7 @@ public class HomeActivity extends FragmentActivity
 		}
 		else
 		{
-			Log.i("使用缓存数据");
+			Log.i("使用缓存:" + url);
 
 			List<Level> json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
 			{}.getType());
@@ -337,6 +338,18 @@ public class HomeActivity extends FragmentActivity
 					{
 						// 填充数据
 						subFillData(responseInfo.result);
+
+						// 缓存文件夹
+						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
+						{}.getType());
+						for (Folder folder : folders)
+						{
+							if (!database.folderExists(folder.Id))
+							{
+								database.folderInsert(folder);
+							}
+						}
+
 						// 缓存数据
 						UrlCache urlCache = new UrlCache();
 						urlCache.Url = this.getRequestUrl();

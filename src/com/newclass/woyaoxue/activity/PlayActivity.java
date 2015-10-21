@@ -324,6 +324,11 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 	private void initData()
 	{
+		//如果已经下载,那么直接使用下载的数据
+		database.docsSelectById(documentId);
+		
+		
+		
 		String url = NetworkUtil.getDocById(documentId);
 
 		UrlCache cache = database.cacheSelectByUrl(url);

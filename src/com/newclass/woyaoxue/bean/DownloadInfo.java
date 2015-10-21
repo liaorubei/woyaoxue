@@ -1,15 +1,15 @@
 package com.newclass.woyaoxue.bean;
 
-import java.io.File;
 
 public class DownloadInfo
 {
 	public int Id;
+	public String Json;
 	public String Title;
-	public String AudioUrl;
-	public String LyricUrl;
-	public File Target;
-	public String Md5;
-	public long Total;
-	public long Current;
+
+	public String SoundPath;
+	public int IsDownload;
+
+	public long Total = 100L;
+	public long Current = 0L;
 }

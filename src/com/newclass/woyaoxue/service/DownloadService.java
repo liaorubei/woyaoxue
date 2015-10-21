@@ -1,9 +1,8 @@
 package com.newclass.woyaoxue.service;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
+import java.util.List;
 import java.util.Observable;
 
 import android.app.NotificationManager;
@@ -16,17 +15,18 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
+import android.util.SparseArray;
 
-import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.DownloadInfo;
 import com.newclass.woyaoxue.bean.database.Database;
+import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 public class DownloadService extends Service
@@ -39,7 +39,8 @@ public class DownloadService extends Service
 	private DownloadManager manager;
 
 	private NotificationManager notificationManager;
-	Handler handler = new Handler()
+
+	private static Handler handler = new Handler()
 	{
 
 		@Override
@@ -49,7 +50,7 @@ public class DownloadService extends Service
 			{
 
 			case NOTIFY:
-				manager.notifyObservers();
+				((Observable) msg.obj).notifyObservers();
 				break;
 
 			default:
@@ -74,7 +75,8 @@ public class DownloadService extends Service
 		database = new Database(this);
 
 		// 把数据库里面还没有下载完毕的任务取出来重新下载
-		database.docsSelectUnfinishedDownload();
+		List<DownloadInfo> unfinishedDownload = database.docsSelectUnfinishedDownload();
+		manager.toDownload.addAll(unfinishedDownload);
 
 		// 通知管理器
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -85,21 +87,23 @@ public class DownloadService extends Service
 			{
 				while (true)
 				{
-					if (manager.toDownloadList.size() > 0)
+					if (manager.toDownload.size() > 0)
 					{
-						DownloadInfo info = manager.toDownloadList.remove();
-						manager.downloadingMap.put(info.AudioUrl, info);
+						DownloadInfo info = manager.toDownload.remove();
+						manager.downloading.put(info.Id, info);
 
 						// 下载音频文件
-						new HttpUtils().download(info.AudioUrl, info.Target.getAbsolutePath(), new MyAudioCallBack());
+						new HttpUtils().download(NetworkUtil.getFullPath(info.SoundPath), new File(FolderUtil.rootDir(DownloadService.this), info.SoundPath).getAbsolutePath(), new MyAudioCallBack(info.Id));
 						// 下载歌词文件
-						new HttpUtils().send(HttpMethod.GET, info.LyricUrl, new MyLyricCallBack());
-
+						new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocById(info.Id), new MyLyricCallBack(info.Id));
 					}
 
-					if (manager.toDownloadList.size() + manager.downloadingMap.size() > 0)
+					if (manager.size() > 0)
 					{
-						handler.sendEmptyMessage(NOTIFY);
+						Message message = handler.obtainMessage();
+						message.obj = manager;
+						message.what = NOTIFY;
+						handler.sendMessage(message);
 					}
 					SystemClock.sleep(1000);
 				}
@@ -116,18 +120,18 @@ public class DownloadService extends Service
 
 	public class DownloadManager extends Observable
 	{
-		private Map<String, DownloadInfo> downloadingMap;// 正在下载列表
-		private LinkedList<DownloadInfo> toDownloadList;// 等待下载列表
+		private SparseArray<DownloadInfo> downloading;// 正在下载
+		private LinkedList<DownloadInfo> toDownload;// 准备下载
 
 		DownloadManager()
 		{
-			toDownloadList = new LinkedList<DownloadInfo>();
-			downloadingMap = new HashMap<String, DownloadInfo>();
+			toDownload = new LinkedList<DownloadInfo>();
+			downloading = new SparseArray<DownloadInfo>();
 		}
 
-		public void change(String key, long current, long total)
+		public void change(int key, long current, long total)
 		{
-			DownloadInfo down = this.downloadingMap.get(key);
+			DownloadInfo down = this.downloading.get(key);
 			down.Current = current;
 			down.Total = total;
 
@@ -135,24 +139,19 @@ public class DownloadService extends Service
 			setChanged();
 		}
 
-		public boolean contains(DownloadInfo path)
-		{
-			return toDownloadList.contains(path) || downloadingMap.containsKey(path.AudioUrl);
-		}
-
 		public void enqueue(DownloadInfo path)
 		{
-			toDownloadList.add(path);
+			toDownload.add(path);
 		}
 
-		public DownloadInfo get(String key)
+		public DownloadInfo get(int key)
 		{
-			DownloadInfo downloadInfo = this.downloadingMap.get(key);
+			DownloadInfo downloadInfo = this.downloading.get(key);
 			if (downloadInfo == null)
 			{
-				for (DownloadInfo i : toDownloadList)
+				for (DownloadInfo i : toDownload)
 				{
-					if (i.AudioUrl.equals(key))
+					if (i.Id == key)
 					{
 						downloadInfo = i;
 					}
@@ -163,9 +162,8 @@ public class DownloadService extends Service
 
 		public int size()
 		{
-			return this.toDownloadList.size() + downloadingMap.size();
+			return this.toDownload.size() + downloading.size();
 		}
-
 	}
 
 	public class MyBinder extends Binder
@@ -181,10 +179,18 @@ public class DownloadService extends Service
 	private class MyLyricCallBack extends RequestCallBack<String>
 	{
 
+		private int mDocId;
+
+		public MyLyricCallBack(int id)
+		{
+			this.mDocId = id;
+		}
+
 		@Override
 		public void onSuccess(ResponseInfo<String> responseInfo)
 		{
-			database.docsUpdateJson(responseInfo.result);
+			Log.i("歌词信息下载完毕");
+			database.docsUpdateJson(this.mDocId, responseInfo.result);
 		}
 
 		@Override
@@ -195,54 +201,56 @@ public class DownloadService extends Service
 	private class MyAudioCallBack extends RequestCallBack<File>
 	{
 		private Builder builder;
-		private DownloadInfo info;
+		private int mDocId;
+
+		public MyAudioCallBack(int id)
+		{
+			this.mDocId = id;
+		}
 
 		@Override
 		public void onFailure(HttpException error, String msg)
 		{
-			// 下载失败了,日志通知下载失败并移除数据库里的数据
-			Log.i(manager.downloadingMap.get(this.getRequestUrl()).Title + " 下载失败");
-
+			// 下载失败了,通知下载失败并移除数据库里的数据
 			builder.setContentText("下载失败");
-			notificationManager.notify(info.Id, builder.build());
-			database.docsDeleteByDownloadPath(this.getRequestUrl());
+			notificationManager.notify(this.mDocId, builder.build());
+
+			database.docsDeleteById(this.mDocId);
 		}
 
 		public void onLoading(long total, long current, boolean isUploading)
 		{
-			builder.setProgress((int) total, (int) current, false);
 			builder.setContentText("正在下载");
-			notificationManager.notify(info.Id, builder.build());
-			manager.change(this.getRequestUrl(), current, total);
+			builder.setProgress((int) total, (int) current, false);
+			notificationManager.notify(this.mDocId, builder.build());
+
+			manager.change(this.mDocId, current, total);
 		}
 
 		public void onStart()
 		{
-			info = manager.downloadingMap.get(this.getRequestUrl());
 			builder = new NotificationCompat.Builder(DownloadService.this);
-
-			builder.setContentTitle(info.Title);
-			builder.setContentText("开始下载");
 			builder.setSmallIcon(R.drawable.ic_launcher);
+			builder.setContentTitle(manager.downloading.get(this.mDocId).Title);
+			builder.setContentText("开始下载");
 			builder.setProgress(100, 0, false);
-
-			notificationManager.notify(info.Id, builder.build());
+			notificationManager.notify(this.mDocId, builder.build());
 		}
 
 		@Override
 		public void onSuccess(ResponseInfo<File> responseInfo)
 		{
-			// 下载成功之后要先移除下载列表里面的任务,并更新数据库之后再通知更新
-
-			builder.setContentText("下载完成");
-			builder.setProgress(100, 100, false);
-			notificationManager.notify(info.Id, builder.build());
+			// 下载成功之后要先移除下载列表里面的任务,并更新数据库,显示系统通知
+			notificationManager.cancel(this.mDocId);
+			// builder.setContentText("下载完成");
+			// builder.setProgress(100, 100, false);
+			// notificationManager.notify(this.getRequestUrl(), 0, builder.build());
 
 			// 移除并更新数据库
-			manager.downloadingMap.remove(this.getRequestUrl());
-			database.docsUpdateSuccessByDownloadPath(this.getRequestUrl());
+			manager.downloading.remove(this.mDocId);
+			database.docsUpdateDownloadStatusById(this.mDocId);
 
-			// 通知更新
+			// 通知观察者更新,让界面刷新
 			manager.notifyObservers();
 		}
 	}

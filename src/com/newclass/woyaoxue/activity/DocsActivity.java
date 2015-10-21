@@ -1,6 +1,5 @@
 package com.newclass.woyaoxue.activity;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -37,7 +36,6 @@ import com.newclass.woyaoxue.bean.database.Database;
 import com.newclass.woyaoxue.bean.database.UrlCache;
 import com.newclass.woyaoxue.service.DownloadService;
 import com.newclass.woyaoxue.service.DownloadService.MyBinder;
-import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.CircularProgressBar;
@@ -152,18 +150,7 @@ public class DocsActivity extends Activity
 				{
 					if (!database.docsExists(i.Id))
 					{
-						DownloadInfo info = new DownloadInfo();
-						info.Title = i.Title;
-						info.AudioUrl = NetworkUtil.getFullPath(i.SoundPath);
-						info.Target = new File(FolderUtil.rootDir(DocsActivity.this), i.SoundPath);
-						info.Total = 100L;
-						info.Current = 0L;
-						myBinder.getDownloadManager().enqueue(info);
-
-						// 要添加表关联
-						i.LevelId = levelId;
-						i.FolderId = folderId;
-						database.docsInsert(i);
+						download(i);
 					}
 					adapter.notifyDataSetChanged();
 				}
@@ -204,6 +191,19 @@ public class DocsActivity extends Activity
 		unbindService(conn);
 	}
 
+	private void download(Document doc)
+	{
+		DownloadInfo info = new DownloadInfo();
+		info.Id = doc.Id;
+		info.Title = doc.Title;
+		info.SoundPath = doc.SoundPath;
+		myBinder.getDownloadManager().enqueue(info);
+
+		doc.LevelId = levelId;
+		doc.FolderId = folderId;
+		database.docsInsert(doc);
+	}
+
 	private void loadMore()
 	{
 		String url = NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + "");
@@ -222,6 +222,7 @@ public class DocsActivity extends Activity
 					{}.getType());
 
 					fillData(json);
+
 					UrlCache urlCache = new UrlCache();
 					urlCache.Url = this.getRequestUrl();
 					urlCache.Json = responseInfo.result;
@@ -293,21 +294,13 @@ public class DocsActivity extends Activity
 			holder.tv_size.setText(Formatter.formatFileSize(DocsActivity.this, item.Length));
 			holder.tv_time.setText(item.LengthString);
 
-			final DownloadInfo info = new DownloadInfo();
-			info.Id = item.Id;
-			info.Title = item.Title;
-			info.AudioUrl = NetworkUtil.getFullPath(item.SoundPath);
-			info.LyricUrl = NetworkUtil.getDocById(item.Id);
-			info.Target = new File(FolderUtil.rootDir(DocsActivity.this), item.SoundPath);
-			info.Total = 100L;
-			info.Current = 0L;
 			if (database.docsExists(item.Id))
 			{
-				DownloadInfo downloadInfo = myBinder.getDownloadManager().get(info.AudioUrl);
-				if (downloadInfo != null)
+				DownloadInfo info = myBinder.getDownloadManager().get(item.Id);
+				if (info != null)
 				{
-					holder.cpb.setMax((int) downloadInfo.Total);
-					holder.cpb.setProgress((int) downloadInfo.Current);
+					holder.cpb.setMax((int) info.Total);
+					holder.cpb.setProgress((int) info.Current);
 					holder.cpb.setBackgroundResource(R.drawable.download_begin);
 				}
 				else
@@ -335,12 +328,7 @@ public class DocsActivity extends Activity
 					}
 					else
 					{
-						// 加入待下载队列中
-						myBinder.getDownloadManager().enqueue(info);
-						// 保存数据到数据库
-						item.LevelId = levelId;
-						item.FolderId = folderId;
-						database.docsInsert(item);
+						download(item);
 						v.setBackgroundResource(R.drawable.download_begin);
 					}
 				}

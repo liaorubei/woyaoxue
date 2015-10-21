@@ -92,8 +92,6 @@ public class DownDocsActivity extends Activity implements OnClickListener
 
 		database = new Database(this);
 
-		new MySQLiteOpenHelper(this);
-
 		// 取得传递过来的数据
 		Intent intent = getIntent();
 		levelId = intent.getIntExtra("LevelId", 0);
@@ -170,32 +168,28 @@ public class DownDocsActivity extends Activity implements OnClickListener
 
 	private void loadMore()
 	{
-		new AsyncTask<Integer, Integer, Integer>()
+		new AsyncTask<Integer, Integer, List<Document>>()
 		{
 
 			@Override
-			protected Integer doInBackground(Integer... params)
+			protected List<Document> doInBackground(Integer... params)
 			{
-				List<Document> docs = database.docsSelectListByFolderId(params[0]);
-				for (Document document : docs)
+				return database.docsSelectListByFolderId(params[0]);
+			}
+
+			protected void onPostExecute(java.util.List<Document> result)
+			{
+				for (Document document : result)
 				{
-					ViewHelper object = new ViewHelper(document, false, false);
-					list.add(object);
+					list.add(new ViewHelper(document, false, false));
 				}
-				return docs.size();
-			}
-
-			@Override
-			protected void onPostExecute(Integer result)
-			{
 				adapter.notifyDataSetChanged();
-				contentView.showView(result > 0 ? ViewState.SUCCESS : ViewState.EMPTY);
+				contentView.showView(result.size() > 0 ? ViewState.SUCCESS : ViewState.EMPTY);
 			}
-
 		}.execute(folderId);
 	}
 
-	private class MyAdapter extends BaseAdapter<ViewHelper> implements Observer
+	private class MyAdapter extends BaseAdapter<ViewHelper>
 	{
 
 		public MyAdapter(List<ViewHelper> list)
@@ -240,12 +234,6 @@ public class DownDocsActivity extends Activity implements OnClickListener
 			return convertView;
 		}
 
-		@Override
-		public void update(Observable observable, Object data)
-		{
-			Log.i("update");
-			notifyDataSetChanged();
-		}
 	}
 
 	private class ViewHolder

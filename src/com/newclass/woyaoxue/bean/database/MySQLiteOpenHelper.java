@@ -23,7 +23,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper
 	public void onCreate(SQLiteDatabase db)
 	{
 		Log.i("MySQLiteOpenHelper onCreate");
-		db.execSQL("create table document(Id int primary key,LevelId int,FolderId int,TitleOne varchar,TitleTwo varchar,SoundPath varchar,DownloadPath varchar,Length long,Duration int,Md5 varchar,IsDownload int ,ModifyTime varchar);");
+		db.execSQL("create table document(Id int primary key,LevelId int,FolderId int,Title varchar,SoundPath varchar,IsDownload int,Json varchar);");
 		db.execSQL("create table    level(Id int primary key,Name varchar);");
 		db.execSQL("create table   folder(Id int primary key,Name varchar);");
 		db.execSQL("create table UrlCache(Url varchar primary key,Json text,UpdateAt long);--请求缓存地址");
