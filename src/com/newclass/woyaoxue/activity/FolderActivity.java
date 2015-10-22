@@ -1,9 +1,32 @@
 package com.newclass.woyaoxue.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.bean.Folder;
+import com.newclass.woyaoxue.bean.Level;
+import com.newclass.woyaoxue.bean.database.Database;
+import com.newclass.woyaoxue.bean.database.UrlCache;
+import com.newclass.woyaoxue.fragment.FolderFragment;
+import com.newclass.woyaoxue.service.AutoUpdateService;
+import com.newclass.woyaoxue.util.ConstantsUtil;
+import com.newclass.woyaoxue.util.FolderUtil;
+import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.NetworkUtil;
+import com.newclass.woyaoxue.view.ContentView;
+import com.newclass.woyaoxue.view.ContentView.ViewState;
+import com.voc.woyaoxue.R;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,33 +50,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.newclass.woyaoxue.base.BaseAdapter;
-import com.newclass.woyaoxue.bean.Folder;
-import com.newclass.woyaoxue.bean.Level;
-import com.newclass.woyaoxue.bean.database.Database;
-import com.newclass.woyaoxue.bean.database.UrlCache;
-import com.newclass.woyaoxue.service.AutoUpdateService;
-import com.newclass.woyaoxue.util.ConstantsUtil;
-import com.newclass.woyaoxue.util.Log;
-import com.newclass.woyaoxue.util.NetworkUtil;
-import com.newclass.woyaoxue.view.ContentView;
-import com.newclass.woyaoxue.view.ContentView.ViewState;
-import com.voc.woyaoxue.R;
-
 public class FolderActivity extends FragmentActivity
 {
 	private Database database;
-	private List<Fragment> fragments;
+	private List<FolderFragment> fragments;
 	private LinearLayout ll_levels;
 	private MyFragmentPagerAdapter pagerAdapter;
 	private ViewPager vp_folder;
+	private List<Level> levels;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -72,7 +76,19 @@ public class FolderActivity extends FragmentActivity
 			startActivity(intent);
 			break;
 		case R.id.menu_setting:
-			Toast.makeText(this, "你点击了一个菜单", Toast.LENGTH_LONG).show();
+			File[] files = this.getFilesDir().getParentFile().listFiles();
+			for (File file : files)
+			{
+				if (!file.getName().equals("lib") && file.isDirectory())
+				{
+					File[] listFiles = file.listFiles();
+					for (File file2 : listFiles)
+					{
+						file2.delete();
+					}
+					file.delete();
+				}
+			}
 			break;
 		default:
 			break;
@@ -96,11 +112,15 @@ public class FolderActivity extends FragmentActivity
 			}
 		});
 
-		// ViewPager数据源
+		levels = new ArrayList<Level>();
+		levels.clear();
 		fragments.clear();
 		for (Level level : json)
 		{
-			fragments.add(new MyFragment(level.Id));
+			levels.add(level);
+			FolderFragment myFragment = new FolderFragment(1);
+			myFragment.setLevelId(level.Id);
+			fragments.add(myFragment);
 		}
 		pagerAdapter.notifyDataSetChanged();
 
@@ -148,7 +168,8 @@ public class FolderActivity extends FragmentActivity
 					if (cache != null)
 					{
 						List<Level> fromJson = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
-						{}.getType());
+						{
+						}.getType());
 						showData(fromJson);
 					}
 				}
@@ -157,7 +178,8 @@ public class FolderActivity extends FragmentActivity
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
 					List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-					{}.getType());
+					{
+					}.getType());
 
 					if (fromJson.size() > 0)
 					{
@@ -180,13 +202,13 @@ public class FolderActivity extends FragmentActivity
 				}
 
 			});
-		}
-		else
+		} else
 		{
 			Log.i("使用缓存:" + url);
 
 			List<Level> json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
-			{}.getType());
+			{
+			}.getType());
 
 			if (json.size() > 0)
 			{
@@ -205,7 +227,7 @@ public class FolderActivity extends FragmentActivity
 		ll_levels = (LinearLayout) findViewById(R.id.ll_levels);
 		vp_folder = (ViewPager) findViewById(R.id.vp_folder);
 
-		fragments = new ArrayList<Fragment>();
+		fragments = new ArrayList<FolderFragment>();
 		pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
 		vp_folder.setAdapter(pagerAdapter);
@@ -243,13 +265,17 @@ public class FolderActivity extends FragmentActivity
 		// 自动升级服务
 		Intent service = new Intent(this, AutoUpdateService.class);
 		startService(service);
+
 	}
 
 	@Override
 	protected void onDestroy()
 	{
+		if (database != null)
+		{
+			database.closeConnection();
+		}
 		super.onDestroy();
-		database.closeConnection();
 	}
 
 	private class MyAdapter extends BaseAdapter<Folder>
@@ -279,7 +305,7 @@ public class FolderActivity extends FragmentActivity
 		}
 	}
 
-	private class MyFragment extends Fragment
+	public class MyFragment extends Fragment
 	{
 		private MyAdapter adapter;
 		private ContentView contentView;
@@ -287,9 +313,8 @@ public class FolderActivity extends FragmentActivity
 		private ListView listview;
 		private int mLevelId;
 
-		public MyFragment(int id)
+		public MyFragment()
 		{
-			this.mLevelId = id;
 			contentView = new ContentView(FolderActivity.this)
 			{
 
@@ -321,6 +346,11 @@ public class FolderActivity extends FragmentActivity
 
 		}
 
+		public void setLevelId(int id)
+		{
+			this.mLevelId = id;
+		}
+
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 		{
@@ -338,8 +368,7 @@ public class FolderActivity extends FragmentActivity
 						if (cache != null)
 						{
 							subShowData(cache.Json);
-						}
-						else
+						} else
 						{
 							contentView.showView(ViewState.FAILURE);
 						}
@@ -353,7 +382,8 @@ public class FolderActivity extends FragmentActivity
 
 						// 缓存文件夹
 						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
-						{}.getType());
+						{
+						}.getType());
 						for (Folder folder : folders)
 						{
 							if (!database.folderExists(folder.Id))
@@ -367,8 +397,7 @@ public class FolderActivity extends FragmentActivity
 						database.cacheInsertOrUpdate(urlCache);
 					}
 				});
-			}
-			else
+			} else
 			{
 				Log.i("使用缓存:" + url);
 				subShowData(cache.Json);
@@ -380,14 +409,14 @@ public class FolderActivity extends FragmentActivity
 		private void subShowData(String json)
 		{
 			List<Folder> folders = new Gson().fromJson(json, new TypeToken<List<Folder>>()
-			{}.getType());
+			{
+			}.getType());
 			if (folders.size() > 0)
 			{
 				list.clear();// 因为是在onCreateView中显示数据,有可能会显示多次,然后数据会叠加重复,所以要清除之前的数据
 				list.addAll(folders);
 				contentView.showView(ViewState.SUCCESS);
-			}
-			else
+			} else
 			{
 				contentView.showView(ViewState.EMPTY);
 			}
@@ -412,7 +441,9 @@ public class FolderActivity extends FragmentActivity
 		@Override
 		public Fragment getItem(int position)
 		{
-			return fragments.get(position);
+			FolderFragment folderFragment = new FolderFragment(levels.get(position).Id);
+			// folderFragment.setLevelId(levels.get(position).Id);
+			return folderFragment;
 		}
 	}
 

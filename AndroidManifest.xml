@@ -37,8 +37,7 @@
         <activity android:name="com.newclass.woyaoxue.activity.DocsActivity" />
         <!-- 文件夹界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.FolderActivity" />
-        <!-- 文件夹界面 -->
-        <activity android:name="com.newclass.woyaoxue.activity.FolderActivity" />
+
         <!-- 列表界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.ListActivity" />
         <!-- 我的下载 -->
