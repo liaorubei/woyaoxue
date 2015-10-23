@@ -1,4 +1,4 @@
-package com.newclass.woyaoxue.bean.database;
+package com.newclass.woyaoxue.database;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.DownloadInfo;
 import com.newclass.woyaoxue.bean.Folder;
 import com.newclass.woyaoxue.bean.Level;
+import com.newclass.woyaoxue.bean.UrlCache;
 
 public class Database
 {

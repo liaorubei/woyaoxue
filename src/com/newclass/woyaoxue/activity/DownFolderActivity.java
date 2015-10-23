@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.Folder;
-import com.newclass.woyaoxue.bean.database.Database;
+import com.newclass.woyaoxue.database.Database;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.view.ContentView;

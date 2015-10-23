@@ -1,4 +1,4 @@
-package com.newclass.woyaoxue.bean.database;
+package com.newclass.woyaoxue.bean;
 
 public class UrlCache
 {

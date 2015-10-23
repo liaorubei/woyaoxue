@@ -30,8 +30,8 @@ import android.widget.Toast;
 
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
-import com.newclass.woyaoxue.bean.database.Database;
-import com.newclass.woyaoxue.bean.database.MySQLiteOpenHelper;
+import com.newclass.woyaoxue.database.Database;
+import com.newclass.woyaoxue.database.MySQLiteOpenHelper;
 import com.newclass.woyaoxue.service.DownloadService;
 import com.newclass.woyaoxue.service.DownloadService.MyBinder;
 import com.newclass.woyaoxue.util.FolderUtil;

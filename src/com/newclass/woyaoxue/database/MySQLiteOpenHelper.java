@@ -1,4 +1,4 @@
-package com.newclass.woyaoxue.bean.database;
+package com.newclass.woyaoxue.database;
 
 import com.newclass.woyaoxue.util.Log;
 
