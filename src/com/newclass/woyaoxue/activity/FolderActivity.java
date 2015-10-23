@@ -79,7 +79,7 @@ public class FolderActivity extends FragmentActivity
 			File[] files = this.getFilesDir().getParentFile().listFiles();
 			for (File file : files)
 			{
-				if (!file.getName().equals("lib") && file.isDirectory())
+				if (!"lib".equals(file.getName()) && file.isDirectory())
 				{
 					File[] listFiles = file.listFiles();
 					for (File file2 : listFiles)
@@ -168,8 +168,7 @@ public class FolderActivity extends FragmentActivity
 					if (cache != null)
 					{
 						List<Level> fromJson = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
-						{
-						}.getType());
+						{}.getType());
 						showData(fromJson);
 					}
 				}
@@ -178,8 +177,7 @@ public class FolderActivity extends FragmentActivity
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
 					List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
-					{
-					}.getType());
+					{}.getType());
 
 					if (fromJson.size() > 0)
 					{
@@ -202,13 +200,13 @@ public class FolderActivity extends FragmentActivity
 				}
 
 			});
-		} else
+		}
+		else
 		{
 			Log.i("使用缓存:" + url);
 
 			List<Level> json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
-			{
-			}.getType());
+			{}.getType());
 
 			if (json.size() > 0)
 			{
@@ -368,7 +366,8 @@ public class FolderActivity extends FragmentActivity
 						if (cache != null)
 						{
 							subShowData(cache.Json);
-						} else
+						}
+						else
 						{
 							contentView.showView(ViewState.FAILURE);
 						}
@@ -382,8 +381,7 @@ public class FolderActivity extends FragmentActivity
 
 						// 缓存文件夹
 						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
-						{
-						}.getType());
+						{}.getType());
 						for (Folder folder : folders)
 						{
 							if (!database.folderExists(folder.Id))
@@ -397,7 +395,8 @@ public class FolderActivity extends FragmentActivity
 						database.cacheInsertOrUpdate(urlCache);
 					}
 				});
-			} else
+			}
+			else
 			{
 				Log.i("使用缓存:" + url);
 				subShowData(cache.Json);
@@ -409,14 +408,14 @@ public class FolderActivity extends FragmentActivity
 		private void subShowData(String json)
 		{
 			List<Folder> folders = new Gson().fromJson(json, new TypeToken<List<Folder>>()
-			{
-			}.getType());
+			{}.getType());
 			if (folders.size() > 0)
 			{
 				list.clear();// 因为是在onCreateView中显示数据,有可能会显示多次,然后数据会叠加重复,所以要清除之前的数据
 				list.addAll(folders);
 				contentView.showView(ViewState.SUCCESS);
-			} else
+			}
+			else
 			{
 				contentView.showView(ViewState.EMPTY);
 			}

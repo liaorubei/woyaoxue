@@ -183,7 +183,12 @@ public class DocsActivity extends Activity
 	{
 		super.onDestroy();
 
-		database.closeConnection();
+		if (database != null)
+		{
+			database.closeConnection();
+			database = null;
+		}
+		Log.i("database=" + database);
 
 		// 移除观察者,让下载服务后台自行下载
 		myBinder.getDownloadManager().deleteObserver(adapter);
@@ -220,9 +225,11 @@ public class DocsActivity extends Activity
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
 					showData(responseInfo.result);
-
 					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
-					database.cacheInsertOrUpdate(urlCache);
+					if (database != null)
+					{
+						database.cacheInsertOrUpdate(urlCache);
+					}
 				}
 
 				@Override

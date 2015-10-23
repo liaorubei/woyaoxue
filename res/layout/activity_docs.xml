@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/cpb_download"
-            android:text="全部下载" />
+            android:text="全部下载" android:textColor="@color/color_one"/>
     </RelativeLayout>
 
     <com.newclass.woyaoxue.view.XListView
