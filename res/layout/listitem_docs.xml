@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="45dp"
     android:descendantFocusability="blocksDescendants" >
-
     <RelativeLayout
         android:id="@+id/iv_download"
         android:layout_width="wrap_content"
@@ -81,8 +80,8 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题"
-                android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textColor="#bb000000"
+                android:textSize="17sp" />
         </RelativeLayout>
 
         <TextView
@@ -91,6 +90,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
+			android:textSize="15sp"
             android:text="Study: Head Lice Growing Resistant to Existing Treatments"
             android:textColor="#a0a0a0" />
     </LinearLayout>

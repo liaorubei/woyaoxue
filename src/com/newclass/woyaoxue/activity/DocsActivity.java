@@ -162,7 +162,6 @@ public class DocsActivity extends Activity
 		});
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
 		loadData();
 	}
 
