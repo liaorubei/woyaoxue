@@ -12,16 +12,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract.DataUsageFeedback;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,12 +35,10 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.lidroid.xutils.view.annotation.ViewInject;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.bean.DownloadInfo;
 import com.newclass.woyaoxue.bean.Lyric;
@@ -55,9 +49,12 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.SpecialLyricView;
 import com.voc.woyaoxue.R;
 
-public class PlayActivity extends Activity implements OnClickListener, OnBufferingUpdateListener, OnPreparedListener, OnErrorListener, OnInfoListener
+public class PlayActivity extends Activity implements OnClickListener, OnPreparedListener, OnErrorListener, OnInfoListener
 {
 	protected static final int REFRESH_SEEKBAR = 0;
+	private Database database;
+
+	private int documentId;
 	private Handler handler = new Handler()
 	{
 		public void handleMessage(android.os.Message msg)
@@ -74,102 +71,41 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 
 		};
 	};
-
 	// 是否单句循环
 	private boolean isOneLineLoop = false;
-	@ViewInject(R.id.iv_line)
-	private ImageView iv_line;
-	@ViewInject(R.id.iv_microphone)
-	private ImageView iv_microphone;
-
-	@ViewInject(R.id.iv_next)
-	private ImageView iv_next;
-	@ViewInject(R.id.pb_buffering)
-	private ProgressBar pb_buffering;
-
-	@ViewInject(R.id.iv_paly)
-	private ImageView iv_play;
-
-	@ViewInject(R.id.iv_prev)
-	private ImageView iv_prev;
-
-	@ViewInject(R.id.ll_lyrics)
+	private ImageView iv_line, iv_microphone, iv_next, iv_play, iv_prev;
 	private LinearLayout ll_lyrics;
-
 	private MediaPlayer mediaPlayer;
-
-	@ViewInject(R.id.seekBar)
+	private ProgressBar pb_buffering;
 	private SeekBar seekBar;
+	private ImageView iv_cover;
+	private int sideA = 0, sideB = 0;
 
-	private int sideA = 0;
-
-	private int sideB = 0;
 	private List<SpecialLyricView> specialLyricViews;
-
 	private List<Integer> subTitleIcons;
-
 	private Integer subTitleState = 0;
-	@ViewInject(R.id.sv_lyrics)
+
 	private ScrollView sv_lyrics;
+	private TextView tv_bSide, tv_aSide, tv_title;
 
-	@ViewInject(R.id.tv_aSide)
-	private TextView tv_aSide;
-
-	@ViewInject(R.id.tv_bSide)
-	private TextView tv_bSide;
-	@ViewInject(R.id.tv_title)
-	private TextView tv_title;
-	private int documentId;
-	private Database database;
-
-	/**
-	 * 使用指定的音频路径初始化MediaPlayer
-	 * 
-	 * @param url
-	 *            音频的相对路径
-	 */
-	private void initMediaPlayer(String url)
+	private void initView()
 	{
-		try
-		{
-			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setLooping(true);// 默认开启循环播放
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-			mediaPlayer.setOnBufferingUpdateListener(this);
-			mediaPlayer.setOnPreparedListener(this);
-			mediaPlayer.setOnErrorListener(this);
-			mediaPlayer.setOnInfoListener(this);
-			File file = new File(FolderUtil.rootDir(this), url);
+		iv_line = (ImageView) findViewById(R.id.iv_line);
+		iv_microphone = (ImageView) findViewById(R.id.iv_microphone);
+		iv_next = (ImageView) findViewById(R.id.iv_next);
+		iv_play = (ImageView) findViewById(R.id.iv_paly);
+		iv_prev = (ImageView) findViewById(R.id.iv_prev);
 
-			if (file.exists())
-			{
-				mediaPlayer.setDataSource(file.getAbsolutePath());
-				mediaPlayer.prepare();
-			}
-			else
-			{
-				mediaPlayer.setDataSource(NetworkUtil.getFullPath(url));
-				mediaPlayer.prepareAsync();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+		ll_lyrics = (LinearLayout) findViewById(R.id.ll_lyrics);
+		pb_buffering = (ProgressBar) findViewById(R.id.pb_buffering);
+		sv_lyrics = (ScrollView) findViewById(R.id.sv_lyrics);
+		tv_aSide = (TextView) findViewById(R.id.tv_aSide);
+		tv_bSide = (TextView) findViewById(R.id.tv_bSide);
+		tv_title = (TextView) findViewById(R.id.tv_title);
 
-	protected String millisecondsFormat(int milliseconds)
-	{
-		long minutes = (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
-		long seconds = (milliseconds % (1000 * 60)) / 1000;
-		return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-	}
+		seekBar = (SeekBar) findViewById(R.id.seekBar);
+		iv_cover = (ImageView) findViewById(R.id.iv_cover);
 
-	@Override
-	public void onBufferingUpdate(MediaPlayer mp, int percent)
-	{
-		// Log.i("logi", "onBufferingUpdate Position:" + mp.getCurrentPosition() + " Duration:" + mp.getDuration() + " percent:" + percent + "%");
-		// seekBar.setSecondaryProgress((int) (mp.getDuration() * percent * 0.01));
 	}
 
 	@Override
@@ -214,196 +150,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		}
 	}
 
-	private void getNextLine()
-	{
-		int index = getCurrentIndex();
-
-		if (index + 2 < specialLyricViews.size())
-		{
-			SpecialLyricView next = specialLyricViews.get(index + 1);
-			SpecialLyricView nextNext = specialLyricViews.get(index + 2);
-			sideA = next.getTimeLabel();
-			sideB = nextNext.getTimeLabel();
-			mediaPlayer.seekTo(sideA);
-		}
-		Log.i("logi", "isPlay=" + mediaPlayer.isPlaying());
-
-	}
-
-	private void getPrevLine()
-	{
-		int index = getCurrentIndex();
-		if (index > 0)
-		{
-			SpecialLyricView prev = specialLyricViews.get(index - 1);
-			SpecialLyricView curr = specialLyricViews.get(index);
-			sideA = prev.getTimeLabel();
-			sideB = curr.getTimeLabel();
-			mediaPlayer.seekTo(sideA);
-		}
-
-	}
-
-	private int getCurrentIndex()
-	{
-
-		if (specialLyricViews != null && mediaPlayer != null && mediaPlayer.getDuration() > 0)
-		{
-			int current = mediaPlayer.getCurrentPosition();
-			for (int i = 0; i < specialLyricViews.size(); i++)
-			{
-				Integer timeA = specialLyricViews.get(i).getTimeLabel();
-				Integer timeB = i == (specialLyricViews.size() - 1) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
-				// 含头不含尾,因为当暂停之后再seekto时,current会等于sideA,所以要含头不含尾
-				if (timeA <= current && current < timeB)
-				{
-					return i;
-				}
-			}
-		}
-		return -1;
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_play);
-		ViewUtils.inject(this);
-
-		subTitleIcons = new ArrayList<Integer>();
-		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_none);
-		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_cn);
-		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_encn);
-
-		tv_aSide.setText("");
-		tv_bSide.setText("");
-		tv_title.setText("");
-
-		Intent intent = getIntent();
-		documentId = intent.getIntExtra("Id", 429);
-
-		// 从数据库读取缓存,如果时间超过10分钟
-
-		iv_line.setOnClickListener(this);
-		iv_prev.setOnClickListener(this);
-		iv_play.setOnClickListener(this);
-		iv_next.setOnClickListener(this);
-		iv_microphone.setOnClickListener(this);
-
-		ActionBar actionBar = getActionBar();
-		// 返回按钮
-		actionBar.setDisplayHomeAsUpEnabled(true);
-
-		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
-		{
-
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
-			{
-				// 如果由用户手动拖动则更改左右两边的时间标签内容
-				if (fromUser)
-				{
-					tv_aSide.setText(millisecondsFormat(mediaPlayer.getCurrentPosition()));
-				}
-
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar)
-			{
-
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar sb)
-			{
-
-				mediaPlayer.seekTo(sb.getProgress());
-
-			}
-		});
-		database = new Database(this);
-		initData();
-	}
-
-	private void initData()
-	{
-		// 如果已经下载,那么直接使用下载的数据
-		DownloadInfo info = database.docsSelectById(documentId);
-		if (info != null && info.IsDownload == 1 && !TextUtils.isEmpty(info.Json))
-		{
-			Document document = new Gson().fromJson(info.Json, Document.class);
-			fillData(document);
-			return;
-		}
-
-		String url = NetworkUtil.getDocById(documentId);
-
-		UrlCache cache = database.cacheSelectByUrl(url);
-		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 6000000))// 60分钟
-		{
-			Log.i("logi", "使用网络:" + url);
-			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
-			{
-
-				@Override
-				public void onFailure(HttpException error, String msg)
-				{
-
-				}
-
-				@Override
-				public void onSuccess(ResponseInfo<String> responseInfo)
-				{
-					Document document = new Gson().fromJson(responseInfo.result, Document.class);
-					fillData(document);
-
-					UrlCache urlCache = new UrlCache();
-					urlCache.Url = this.getRequestUrl();
-					urlCache.Json = responseInfo.result;
-					urlCache.UpdateAt = System.currentTimeMillis();
-					database.cacheInsertOrUpdate(urlCache);
-				}
-
-			});
-		}
-		else
-		{
-			Log.i("logi", "使用缓存:" + url);
-			Document document = new Gson().fromJson(cache.Json, Document.class);
-			fillData(document);
-		}
-
-	}
-
-	private void fillData(Document document)
-	{
-		tv_aSide.setText("00:00");
-		tv_bSide.setText(document.LengthString);
-		tv_title.setText(document.Title);
-
-		specialLyricViews = new ArrayList<SpecialLyricView>();
-
-		for (Lyric lyric : document.Lyrics)
-		{
-			SpecialLyricView specialLyricView = new SpecialLyricView(PlayActivity.this, lyric);
-			specialLyricViews.add(specialLyricView);
-		}
-
-		Collections.sort(specialLyricViews);
-
-		for (SpecialLyricView specialLyricView : specialLyricViews)
-		{
-			// 在刚开始的时候,显示中文字幕的
-			specialLyricView.showEnCn(SpecialLyricView.SHOW_NONE);
-			ll_lyrics.addView(specialLyricView);
-		}
-
-		// 因为使用的是相对路径,但是在实际请求时要加上域名
-		initMediaPlayer(document.SoundPath);
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
@@ -413,23 +159,60 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 	}
 
 	@Override
-	protected void onDestroy()
-	{
-		handler.removeCallbacksAndMessages(null);
-		if (mediaPlayer != null)
-		{
-			mediaPlayer.release();
-			mediaPlayer = null;
-		}
-		database.closeConnection();
-		super.onDestroy();
-	}
-
-	@Override
 	public boolean onError(MediaPlayer mp, int what, int extra)
 	{
 		Log.i("logi", "onError:" + " what=" + what + " extra=" + extra);
 		return false;
+	}
+
+	@Override
+	public boolean onInfo(MediaPlayer mp, int what, int extra)
+	{
+		// MEDIA_INFO_UNKNOWN
+		// MEDIA_INFO_VIDEO_TRACK_LAGGING
+		// MEDIA_INFO_VIDEO_RENDERING_START
+		// MEDIA_INFO_BUFFERING_START
+		// MEDIA_INFO_BUFFERING_END
+		// MEDIA_INFO_BAD_INTERLEAVING
+		// MEDIA_INFO_NOT_SEEKABLE
+		// MEDIA_INFO_METADATA_UPDATE
+		// MEDIA_INFO_UNSUPPORTED_SUBTITLE
+		// MEDIA_INFO_SUBTITLE_TIMED_OUT
+
+		switch (what)
+		{
+		case MediaPlayer.MEDIA_INFO_UNKNOWN:
+			Log.i("logi", "INFO=MEDIA_INFO_UNKNOWN" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
+			Log.i("logi", "INFO=MEDIA_INFO_VIDEO_TRACK_LAGGING" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+			Log.i("logi", "INFO=MEDIA_INFO_VIDEO_RENDERING_START" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+			Log.i("logi", "INFO=MEDIA_INFO_BUFFERING_START" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+			Log.i("logi", "INFO=MEDIA_INFO_BUFFERING_END" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
+			Log.i("logi", "INFO=MEDIA_INFO_BAD_INTERLEAVING" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
+			Log.i("logi", "INFO=MEDIA_INFO_METADATA_UPDATE" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
+			Log.i("logi", "INFO=MEDIA_INFO_NOT_SEEKABLE" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
+			Log.i("logi", "INFO=MEDIA_INFO_UNSUPPORTED_SUBTITLE" + what);
+			break;
+		case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
+			Log.i("logi", "INFO=MEDIA_INFO_SUBTITLE_TIMED_OUT" + what);
+			break;
+		}
+		return true;
 	}
 
 	@Override
@@ -501,6 +284,307 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 		}, 0, 100);
 	}
 
+	private void fillData(Document document)
+	{
+		tv_aSide.setText("00:00");
+		tv_bSide.setText(document.LengthString);
+		tv_title.setText(document.Title);
+
+		specialLyricViews = new ArrayList<SpecialLyricView>();
+
+		for (Lyric lyric : document.Lyrics)
+		{
+			SpecialLyricView specialLyricView = new SpecialLyricView(PlayActivity.this, lyric);
+			specialLyricViews.add(specialLyricView);
+		}
+
+		Collections.sort(specialLyricViews);
+
+		for (SpecialLyricView specialLyricView : specialLyricViews)
+		{
+			// 在刚开始的时候,显示中文字幕的
+			specialLyricView.showEnCn(SpecialLyricView.SHOW_NONE);
+			ll_lyrics.addView(specialLyricView);
+		}
+
+		// 因为使用的是相对路径,但是在实际请求时要加上域名
+		initMediaPlayer(document.SoundPath);
+	}
+
+	private int getCurrentIndex()
+	{
+
+		if (specialLyricViews != null && mediaPlayer != null && mediaPlayer.getDuration() > 0)
+		{
+			int current = mediaPlayer.getCurrentPosition();
+			for (int i = 0; i < specialLyricViews.size(); i++)
+			{
+				Integer timeA = specialLyricViews.get(i).getTimeLabel();
+				Integer timeB = i == (specialLyricViews.size() - 1) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
+				// 含头不含尾,因为当暂停之后再seekto时,current会等于sideA,所以要含头不含尾
+				if (timeA <= current && current < timeB)
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
+	private void getNextLine()
+	{
+		int index = getCurrentIndex();
+
+		if (index + 2 < specialLyricViews.size())
+		{
+			SpecialLyricView next = specialLyricViews.get(index + 1);
+			SpecialLyricView nextNext = specialLyricViews.get(index + 2);
+			sideA = next.getTimeLabel();
+			sideB = nextNext.getTimeLabel();
+			mediaPlayer.seekTo(sideA);
+		}
+		Log.i("logi", "isPlay=" + mediaPlayer.isPlaying());
+
+	}
+
+	private void getPrevLine()
+	{
+		int index = getCurrentIndex();
+		if (index > 0)
+		{
+			SpecialLyricView prev = specialLyricViews.get(index - 1);
+			SpecialLyricView curr = specialLyricViews.get(index);
+			sideA = prev.getTimeLabel();
+			sideB = curr.getTimeLabel();
+			mediaPlayer.seekTo(sideA);
+		}
+
+	}
+
+	private void initData()
+	{
+		// 如果已经下载,那么直接使用下载的数据
+		DownloadInfo info = database.docsSelectById(documentId);
+		if (info != null && info.IsDownload == 1 && !TextUtils.isEmpty(info.Json))
+		{
+			Document document = new Gson().fromJson(info.Json, Document.class);
+			fillData(document);
+			return;
+		}
+
+		String url = NetworkUtil.getDocById(documentId);
+
+		UrlCache cache = database.cacheSelectByUrl(url);
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 6000000))// 60分钟
+		{
+			Log.i("logi", "使用网络:" + url);
+			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
+			{
+
+				@Override
+				public void onFailure(HttpException error, String msg)
+				{
+
+				}
+
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
+				{
+					Document document = new Gson().fromJson(responseInfo.result, Document.class);
+					fillData(document);
+
+					UrlCache urlCache = new UrlCache();
+					urlCache.Url = this.getRequestUrl();
+					urlCache.Json = responseInfo.result;
+					urlCache.UpdateAt = System.currentTimeMillis();
+					database.cacheInsertOrUpdate(urlCache);
+				}
+
+			});
+		}
+		else
+		{
+			Log.i("logi", "使用缓存:" + url);
+			Document document = new Gson().fromJson(cache.Json, Document.class);
+			fillData(document);
+		}
+
+	}
+
+	/**
+	 * 使用指定的音频路径初始化MediaPlayer
+	 * 
+	 * @param url
+	 *            音频的相对路径
+	 */
+	private void initMediaPlayer(String url)
+	{
+		try
+		{
+			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setLooping(true);// 默认开启循环播放
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			mediaPlayer.setOnPreparedListener(this);
+			mediaPlayer.setOnErrorListener(this);
+			mediaPlayer.setOnInfoListener(this);
+			File file = new File(FolderUtil.rootDir(this), url);
+
+			if (file.exists())
+			{
+				mediaPlayer.setDataSource(file.getAbsolutePath());
+				mediaPlayer.prepare();
+			}
+			else
+			{
+				mediaPlayer.setDataSource(NetworkUtil.getFullPath(url));
+				mediaPlayer.prepareAsync();
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private void setSideASideB()
+	{
+		if (specialLyricViews != null && mediaPlayer != null && mediaPlayer.getDuration() > 0)
+		{
+			int currentPosition = mediaPlayer.getCurrentPosition();
+			for (int i = 0; i < specialLyricViews.size(); i++)
+			{
+				Integer timeA = specialLyricViews.get(i).getTimeLabel();
+				Integer timeB = i == (specialLyricViews.size() - 1) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
+				if (timeA < currentPosition && currentPosition < timeB)
+				{
+					sideA = timeA;
+					sideB = timeB;
+				}
+			}
+		}
+	}
+
+	private void showOrHideSubtitle(int state)
+	{
+		Integer integer = subTitleIcons.get(state);
+		switch (integer)
+		{
+		case R.drawable.ico_actionbar_subtitle_none:
+			for (SpecialLyricView view : specialLyricViews)
+			{
+				view.showEnCn(SpecialLyricView.SHOW_NONE);
+				iv_cover.setVisibility(View.VISIBLE);
+
+				// ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+				// scaleAnimation.setDuration(1000);
+				// scaleAnimation.setFillAfter(true);
+				// iv_cover.startAnimation(scaleAnimation);
+
+			}
+			break;
+		case R.drawable.ico_actionbar_subtitle_cn:
+			for (SpecialLyricView view : specialLyricViews)
+			{
+				view.showEnCn(SpecialLyricView.SHOW_CN);
+				iv_cover.setVisibility(View.INVISIBLE);
+			}
+			break;
+		case R.drawable.ico_actionbar_subtitle_encn:
+			for (SpecialLyricView view : specialLyricViews)
+			{
+				view.showEnCn(SpecialLyricView.SHOW_ENCN);
+				iv_cover.setVisibility(View.INVISIBLE);
+			}
+			break;
+		}
+
+	}
+
+	protected String millisecondsFormat(int milliseconds)
+	{
+		long minutes = (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
+		long seconds = (milliseconds % (1000 * 60)) / 1000;
+		return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_play);
+		initView();
+
+		subTitleIcons = new ArrayList<Integer>();
+		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_none);
+		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_cn);
+		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_encn);
+
+		tv_title = (TextView) findViewById(R.id.tv_title);
+
+		tv_aSide.setText("");
+		tv_bSide.setText("");
+		tv_title.setText("");
+
+		Intent intent = getIntent();
+		documentId = intent.getIntExtra("Id", 429);
+
+		// 从数据库读取缓存,如果时间超过10分钟
+
+		iv_line.setOnClickListener(this);
+		iv_prev.setOnClickListener(this);
+		iv_play.setOnClickListener(this);
+		iv_next.setOnClickListener(this);
+		iv_microphone.setOnClickListener(this);
+
+		ActionBar actionBar = getActionBar();
+		// 返回按钮
+		actionBar.setDisplayHomeAsUpEnabled(true);
+
+		seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+		{
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+			{
+				// 如果由用户手动拖动则更改左右两边的时间标签内容
+				if (fromUser)
+				{
+					tv_aSide.setText(millisecondsFormat(mediaPlayer.getCurrentPosition()));
+				}
+
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar)
+			{
+
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar sb)
+			{
+
+				mediaPlayer.seekTo(sb.getProgress());
+
+			}
+		});
+		database = new Database(this);
+		initData();
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		handler.removeCallbacksAndMessages(null);
+		if (mediaPlayer != null)
+		{
+			mediaPlayer.release();
+			mediaPlayer = null;
+		}
+		database.closeConnection();
+		super.onDestroy();
+	}
+
 	protected void refresh_seekbar()
 	{
 
@@ -558,100 +642,5 @@ public class PlayActivity extends Activity implements OnClickListener, OnBufferi
 			}
 		}
 
-	}
-
-	private void setSideASideB()
-	{
-		if (specialLyricViews != null && mediaPlayer != null && mediaPlayer.getDuration() > 0)
-		{
-			int currentPosition = mediaPlayer.getCurrentPosition();
-			for (int i = 0; i < specialLyricViews.size(); i++)
-			{
-				Integer timeA = specialLyricViews.get(i).getTimeLabel();
-				Integer timeB = i == (specialLyricViews.size() - 1) ? mediaPlayer.getDuration() : specialLyricViews.get(i + 1).getTimeLabel();
-				if (timeA < currentPosition && currentPosition < timeB)
-				{
-					sideA = timeA;
-					sideB = timeB;
-				}
-			}
-		}
-	}
-
-	private void showOrHideSubtitle(int state)
-	{
-		Integer integer = subTitleIcons.get(state);
-		switch (integer)
-		{
-		case R.drawable.ico_actionbar_subtitle_none:
-			for (SpecialLyricView view : specialLyricViews)
-			{
-				view.showEnCn(SpecialLyricView.SHOW_NONE);
-			}
-			break;
-		case R.drawable.ico_actionbar_subtitle_cn:
-			for (SpecialLyricView view : specialLyricViews)
-			{
-				view.showEnCn(SpecialLyricView.SHOW_CN);
-			}
-			break;
-		case R.drawable.ico_actionbar_subtitle_encn:
-			for (SpecialLyricView view : specialLyricViews)
-			{
-				view.showEnCn(SpecialLyricView.SHOW_ENCN);
-			}
-			break;
-		}
-
-	}
-
-	@Override
-	public boolean onInfo(MediaPlayer mp, int what, int extra)
-	{
-		// MEDIA_INFO_UNKNOWN
-		// MEDIA_INFO_VIDEO_TRACK_LAGGING
-		// MEDIA_INFO_VIDEO_RENDERING_START
-		// MEDIA_INFO_BUFFERING_START
-		// MEDIA_INFO_BUFFERING_END
-		// MEDIA_INFO_BAD_INTERLEAVING
-		// MEDIA_INFO_NOT_SEEKABLE
-		// MEDIA_INFO_METADATA_UPDATE
-		// MEDIA_INFO_UNSUPPORTED_SUBTITLE
-		// MEDIA_INFO_SUBTITLE_TIMED_OUT
-
-		switch (what)
-		{
-		case MediaPlayer.MEDIA_INFO_UNKNOWN:
-			Log.i("logi", "INFO=MEDIA_INFO_UNKNOWN" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
-			Log.i("logi", "INFO=MEDIA_INFO_VIDEO_TRACK_LAGGING" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
-			Log.i("logi", "INFO=MEDIA_INFO_VIDEO_RENDERING_START" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-			Log.i("logi", "INFO=MEDIA_INFO_BUFFERING_START" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-			Log.i("logi", "INFO=MEDIA_INFO_BUFFERING_END" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-			Log.i("logi", "INFO=MEDIA_INFO_BAD_INTERLEAVING" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-			Log.i("logi", "INFO=MEDIA_INFO_METADATA_UPDATE" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
-			Log.i("logi", "INFO=MEDIA_INFO_NOT_SEEKABLE" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
-			Log.i("logi", "INFO=MEDIA_INFO_UNSUPPORTED_SUBTITLE" + what);
-			break;
-		case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
-			Log.i("logi", "INFO=MEDIA_INFO_SUBTITLE_TIMED_OUT" + what);
-			break;
-		}
-		return true;
 	}
 }

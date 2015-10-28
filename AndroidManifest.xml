@@ -38,8 +38,6 @@
         <!-- 文件夹界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.FolderActivity" />
 
-        <!-- 列表界面 -->
-        <activity android:name="com.newclass.woyaoxue.activity.ListActivity" />
         <!-- 我的下载 -->
         <activity android:name="com.newclass.woyaoxue.activity.DownFolderActivity" />
         <!-- 播放界面 -->

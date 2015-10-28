@@ -94,22 +94,6 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp" >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <ProgressBar
-                android:id="@+id/pb_buffering"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:indeterminateDrawable="@drawable/my_progresspar"
-                android:maxHeight="50dp"
-                android:maxWidth="50dp"
-                android:minHeight="50dp"
-                android:minWidth="50dp" />
-        </RelativeLayout>
-
         <ScrollView
             android:id="@+id/sv_lyrics"
             android:layout_width="match_parent"
@@ -143,6 +127,31 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ProgressBar
+                android:id="@+id/pb_buffering"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:indeterminateDrawable="@drawable/my_progresspar"
+                android:maxHeight="50dp"
+                android:maxWidth="50dp"
+                android:minHeight="50dp"
+                android:minWidth="50dp" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="25dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/background"
+           />
     </FrameLayout>
 
 </RelativeLayout>

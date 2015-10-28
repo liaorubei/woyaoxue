@@ -10,8 +10,6 @@ import com.voc.woyaoxue.R;
 
 public class MainActivity extends Activity
 {
-	// #3498db #95a5a6
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -24,7 +22,6 @@ public class MainActivity extends Activity
 		Intent intent = new Intent(this, FolderActivity.class);
 		// Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
-		this.finish();
+		this.finish();		
 	}
-
 }

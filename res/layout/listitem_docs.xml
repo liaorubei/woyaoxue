@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="45dp"
     android:descendantFocusability="blocksDescendants" >
+
     <RelativeLayout
         android:id="@+id/iv_download"
         android:layout_width="wrap_content"
@@ -46,7 +47,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:text="59:59"
-                android:textColor="#a0a0a0"
+                android:textColor="@color/color_two"
                 android:textSize="12sp" />
 
             <TextView
@@ -57,7 +58,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_toLeftOf="@id/tv_time"
                 android:text="56.00MB"
-                android:textColor="#a0a0a0"
+                android:textColor="@color/color_two"
                 android:textSize="12sp" />
 
             <TextView
@@ -68,7 +69,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_toLeftOf="@id/tv_size"
                 android:text="2012-12-12"
-                android:textColor="#a0a0a0"
+                android:textColor="@color/color_two"
                 android:textSize="12sp" />
 
             <TextView
@@ -80,7 +81,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="第一标题第一标题第一标题第一标题第一标题第一标题第一标题第一标题"
-                android:textColor="#bb000000"
+                android:textColor="@color/main_dark"
                 android:textSize="17sp" />
         </RelativeLayout>
 
@@ -90,9 +91,9 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-			android:textSize="15sp"
             android:text="Study: Head Lice Growing Resistant to Existing Treatments"
-            android:textColor="#a0a0a0" />
+            android:textColor="@color/color_two"
+            android:textSize="15sp" />
     </LinearLayout>
 
 </RelativeLayout>
