@@ -6,6 +6,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -19,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -161,6 +164,41 @@ public class DocsActivity extends Activity
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		loadData();
+		
+		
+		
+		
+		
+		Builder builder = new AlertDialog.Builder(this);
+		//填充并找出控件
+		View view = View.inflate(this, 1, null);
+		Button btOk = (Button) view.findViewById(R.id.bt_menu);
+		Button bt_cancel=(Button) view.findViewById(R.id.bt_menu);
+		
+		//给控件添加监听		
+		btOk.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				//处理代码
+			}
+		});
+		
+		bt_cancel.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+		//处理代码	
+			}
+		});
+		
+		builder.setView(view);//自定义dialog最重要的方法
+		AlertDialog alertDialog = builder.create();//创建
+		alertDialog.show();//显示
 	}
 
 	@Override
