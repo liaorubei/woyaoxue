@@ -13,6 +13,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:padding="5dp"
             android:text="00:00" />
 
@@ -21,12 +22,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:padding="5dp"
             android:text="00:00" />
+        <!-- style="@style/Widget.SeekBar.Normal" -->
 
         <SeekBar
             android:id="@+id/seekBar"
-            style="@style/Widget.SeekBar.Normal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/tv_aSide"
@@ -45,60 +47,66 @@
             android:id="@+id/ll_record"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#f00"
+            android:background="#fff"
             android:orientation="horizontal" >
 
             <ImageView
-                android:layout_width="match_parent"
+                android:id="@+id/iv_play_origin"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="单句循环"
                 android:src="@drawable/selector_line_loop_disable" />
 
             <ImageView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="前一句"
                 android:src="@drawable/selector_prev" />
 
             <ImageView
-                android:layout_width="match_parent"
+                android:id="@+id/iv_record"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:contentDescription="播放暂停"
-                android:src="@drawable/selector_play_enable" />
+                android:src="@drawable/record_disable" />
 
             <ImageView
                 android:id="@+id/iv_renext"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="后一句"
                 android:src="@drawable/selector_next" />
 
             <ImageView
-                android:id="@+id/iv_back"
-                android:layout_width="match_parent"
+                android:id="@+id/iv_play_record"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="待定"
-                android:src="@drawable/microphone_disable" />
+                android:src="@drawable/selector_play_enable" />
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:src="@drawable/selector_micro_enable" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/ll_play"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#0f0"
-            android:orientation="horizontal" >
+            android:background="#fff"
+            android:orientation="horizontal"
+            android:visibility="invisible" >
 
             <ImageView
                 android:id="@+id/iv_line"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="单句循环"
                 android:src="@drawable/selector_line_loop_disable" />
 
             <ImageView
@@ -106,7 +114,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="前一句"
                 android:src="@drawable/selector_prev" />
 
             <ImageView
@@ -114,7 +121,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="播放暂停"
                 android:src="@drawable/selector_play_enable" />
 
             <ImageView
@@ -122,7 +128,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="后一句"
                 android:src="@drawable/selector_next" />
 
             <ImageView
@@ -130,7 +135,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:contentDescription="待定"
                 android:src="@drawable/microphone_disable" />
         </LinearLayout>
     </FrameLayout>

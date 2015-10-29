@@ -26,6 +26,7 @@ import com.newclass.woyaoxue.view.SpecialLyricView;
 import com.voc.woyaoxue.R;
 
 import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.ActionBar;
