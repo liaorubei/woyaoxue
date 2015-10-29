@@ -1,9 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activity.PlayActivity" >
+    android:layout_height="match_parent" >
 
     <RelativeLayout
         android:id="@+id/rl_seekbar"
@@ -38,58 +35,110 @@
             android:layout_toStartOf="@id/tv_bSide" />
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_control"
+    <FrameLayout
+        android:id="@+id/fl_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal" >
+        android:layout_alignParentBottom="true" >
 
-        <ImageView
-            android:id="@+id/iv_line"
+        <LinearLayout
+            android:id="@+id/ll_record"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:contentDescription="单句循环"
-            android:src="@drawable/selector_line_loop_disable" />
+            android:background="#f00"
+            android:orientation="horizontal" >
 
-        <ImageView
-            android:id="@+id/iv_prev"
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="单句循环"
+                android:src="@drawable/selector_line_loop_disable" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="前一句"
+                android:src="@drawable/selector_prev" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="播放暂停"
+                android:src="@drawable/selector_play_enable" />
+
+            <ImageView
+                android:id="@+id/iv_renext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="后一句"
+                android:src="@drawable/selector_next" />
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="待定"
+                android:src="@drawable/microphone_disable" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_play"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:contentDescription="前一句"
-            android:src="@drawable/selector_prev" />
+            android:background="#0f0"
+            android:orientation="horizontal" >
 
-        <ImageView
-            android:id="@+id/iv_paly"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:contentDescription="播放暂停"
-            android:src="@drawable/selector_play_enable" />
+            <ImageView
+                android:id="@+id/iv_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="单句循环"
+                android:src="@drawable/selector_line_loop_disable" />
 
-        <ImageView
-            android:id="@+id/iv_next"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:contentDescription="后一句"
-            android:src="@drawable/selector_next" />
+            <ImageView
+                android:id="@+id/iv_prev"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="前一句"
+                android:src="@drawable/selector_prev" />
 
-        <ImageView
-            android:id="@+id/iv_microphone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:contentDescription="待定"
-            android:src="@drawable/microphone_disable" />
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/iv_paly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="播放暂停"
+                android:src="@drawable/selector_play_enable" />
+
+            <ImageView
+                android:id="@+id/iv_next"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="后一句"
+                android:src="@drawable/selector_next" />
+
+            <ImageView
+                android:id="@+id/iv_microphone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:contentDescription="待定"
+                android:src="@drawable/microphone_disable" />
+        </LinearLayout>
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/ll_control"
+        android:layout_above="@id/fl_control"
         android:layout_below="@id/rl_seekbar"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp" >
@@ -150,8 +199,7 @@
             android:layout_height="match_parent"
             android:layout_margin="25dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/background"
-           />
+            android:src="@drawable/background" />
     </FrameLayout>
 
 </RelativeLayout>

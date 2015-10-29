@@ -49,8 +49,7 @@
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />
-        <!-- 批量下载服务 -->
-        <service android:name="com.newclass.woyaoxue.service.BatchDownloadService" />
+
         <!-- 批量下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.DownloadService" />
     </application>

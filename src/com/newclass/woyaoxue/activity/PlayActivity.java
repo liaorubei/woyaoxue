@@ -1,37 +1,12 @@
 package com.newclass.woyaoxue.activity;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnInfoListener;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.os.Bundle;
-import android.os.Handler;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
@@ -45,9 +20,42 @@ import com.newclass.woyaoxue.bean.Lyric;
 import com.newclass.woyaoxue.bean.UrlCache;
 import com.newclass.woyaoxue.database.Database;
 import com.newclass.woyaoxue.util.FolderUtil;
+import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.SpecialLyricView;
 import com.voc.woyaoxue.R;
+
+import android.animation.Animator;
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnInfoListener;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaRecorder;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
 public class PlayActivity extends Activity implements OnClickListener, OnPreparedListener, OnErrorListener, OnInfoListener
 {
@@ -74,8 +82,9 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	// 是否单句循环
 	private boolean isOneLineLoop = false;
 	private ImageView iv_line, iv_microphone, iv_next, iv_play, iv_prev;
-	private LinearLayout ll_lyrics;
+	private LinearLayout ll_lyrics, ll_play, ll_record;
 	private MediaPlayer mediaPlayer;
+	private MediaRecorder mediaRecorder;
 	private ProgressBar pb_buffering;
 	private SeekBar seekBar;
 	private ImageView iv_cover;
@@ -87,6 +96,9 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 
 	private ScrollView sv_lyrics;
 	private TextView tv_bSide, tv_aSide, tv_title;
+	private View fl_control;
+	private View iv_renext;
+	private ImageView iv_back;
 
 	private void initView()
 	{
@@ -95,6 +107,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		iv_next = (ImageView) findViewById(R.id.iv_next);
 		iv_play = (ImageView) findViewById(R.id.iv_paly);
 		iv_prev = (ImageView) findViewById(R.id.iv_prev);
+		iv_renext = findViewById(R.id.iv_renext);
 
 		ll_lyrics = (LinearLayout) findViewById(R.id.ll_lyrics);
 		pb_buffering = (ProgressBar) findViewById(R.id.pb_buffering);
@@ -106,6 +119,11 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		seekBar = (SeekBar) findViewById(R.id.seekBar);
 		iv_cover = (ImageView) findViewById(R.id.iv_cover);
 
+		ll_play = (LinearLayout) findViewById(R.id.ll_play);
+		ll_record = (LinearLayout) findViewById(R.id.ll_record);
+		fl_control = findViewById(R.id.fl_control);
+
+		iv_back = (ImageView) findViewById(R.id.iv_back);
 	}
 
 	@Override
@@ -129,8 +147,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			if (mediaPlayer.isPlaying())
 			{
 				mediaPlayer.pause();
-			}
-			else
+			} else
 			{
 				mediaPlayer.start();
 			}
@@ -142,11 +159,70 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		case R.id.iv_next:
 			getNextLine();
 			break;
-
 		case R.id.iv_microphone:
-			Toast.makeText(this, "功能待定", Toast.LENGTH_LONG).show();
+		{
+			ValueAnimator a = ValueAnimator.ofInt(0, 320);
+			a.addUpdateListener(new AnimatorUpdateListener()
+			{
+
+				@Override
+				public void onAnimationUpdate(ValueAnimator animation)
+				{
+					int value = (Integer) animation.getAnimatedValue();
+					Log.i("value=" + value);
+
+					FrameLayout.LayoutParams layoutParams1 = (android.widget.FrameLayout.LayoutParams) ll_play.getLayoutParams();
+					layoutParams1.width = 320;
+					layoutParams1.leftMargin = -value;
+					ll_play.setLayoutParams(layoutParams1);
+
+					FrameLayout.LayoutParams layoutParams2 = (android.widget.FrameLayout.LayoutParams) ll_record.getLayoutParams();
+					layoutParams2.width = 320;
+					layoutParams2.leftMargin = 320 - value;
+					ll_record.setLayoutParams(layoutParams2);
+				}
+			});
+
+			a.setDuration(1000);
+			a.start();
+
+		}
 			break;
 
+		case R.id.iv_renext:
+			Log.i("点击了iv_renext");
+			break;
+		case R.id.iv_back:
+		{
+			ValueAnimator a = ValueAnimator.ofInt(0, 320);
+			a.addUpdateListener(new AnimatorUpdateListener()
+			{
+
+				@Override
+				public void onAnimationUpdate(ValueAnimator animation)
+				{
+					int value = (Integer) animation.getAnimatedValue();
+					Log.i("value=" + value);
+
+					FrameLayout.LayoutParams layoutParams1 = (android.widget.FrameLayout.LayoutParams) ll_play.getLayoutParams();
+					layoutParams1.width = 320;
+					layoutParams1.leftMargin = value - 320;
+					ll_play.setLayoutParams(layoutParams1);
+
+					FrameLayout.LayoutParams layoutParams2 = (android.widget.FrameLayout.LayoutParams) ll_record.getLayoutParams();
+					layoutParams2.width = 320;
+					layoutParams2.leftMargin = value;
+					ll_record.setLayoutParams(layoutParams2);
+				}
+			});
+
+			a.setDuration(1000);
+			a.start();
+		}
+
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -274,7 +350,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			public void run()
 			{
 
-				if (mediaPlayer != null)// && mediaPlayer.isPlaying())
+				if (mediaPlayer != null) // && mediaPlayer.isPlaying())
 				{
 					handler.sendEmptyMessage(REFRESH_SEEKBAR);
 
@@ -334,7 +410,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	private void getNextLine()
 	{
 		int index = getCurrentIndex();
-
 		if (index + 2 < specialLyricViews.size())
 		{
 			SpecialLyricView next = specialLyricViews.get(index + 1);
@@ -343,8 +418,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			sideB = nextNext.getTimeLabel();
 			mediaPlayer.seekTo(sideA);
 		}
-		Log.i("logi", "isPlay=" + mediaPlayer.isPlaying());
-
 	}
 
 	private void getPrevLine()
@@ -375,7 +448,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		String url = NetworkUtil.getDocById(documentId);
 
 		UrlCache cache = database.cacheSelectByUrl(url);
-		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 6000000))// 60分钟
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 6000000)) // 60分钟
 		{
 			Log.i("logi", "使用网络:" + url);
 			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
@@ -401,8 +474,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 				}
 
 			});
-		}
-		else
+		} else
 		{
 			Log.i("logi", "使用缓存:" + url);
 			Document document = new Gson().fromJson(cache.Json, Document.class);
@@ -414,10 +486,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	/**
 	 * 使用指定的音频路径初始化MediaPlayer
 	 * 
-	 * @param url
+	 * @param path
 	 *            音频的相对路径
 	 */
-	private void initMediaPlayer(String url)
+	private void initMediaPlayer(String path)
 	{
 		try
 		{
@@ -427,20 +499,34 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			mediaPlayer.setOnPreparedListener(this);
 			mediaPlayer.setOnErrorListener(this);
 			mediaPlayer.setOnInfoListener(this);
-			File file = new File(FolderUtil.rootDir(this), url);
 
+			File file = new File(FolderUtil.rootDir(this), path);
 			if (file.exists())
 			{
 				mediaPlayer.setDataSource(file.getAbsolutePath());
 				mediaPlayer.prepare();
-			}
-			else
+			} else
 			{
-				mediaPlayer.setDataSource(NetworkUtil.getFullPath(url));
+				mediaPlayer.setDataSource(NetworkUtil.getFullPath(path));
 				mediaPlayer.prepareAsync();
 			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
 		}
-		catch (Exception e)
+	}
+
+	private void initMediaRecorder(FileDescriptor path)
+	{
+		try
+		{
+			mediaRecorder = new MediaRecorder();
+			mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+			mediaRecorder.setOutputFile(path);
+			mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+			mediaRecorder.prepare();
+		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -475,7 +561,9 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 				view.showEnCn(SpecialLyricView.SHOW_NONE);
 				iv_cover.setVisibility(View.VISIBLE);
 
-				// ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0, 1, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+				// ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 0,
+				// 1, Animation.RELATIVE_TO_SELF, 0.5f,
+				// Animation.RELATIVE_TO_SELF, 0.5f);
 				// scaleAnimation.setDuration(1000);
 				// scaleAnimation.setFillAfter(true);
 				// iv_cover.startAnimation(scaleAnimation);
@@ -535,6 +623,8 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		iv_play.setOnClickListener(this);
 		iv_next.setOnClickListener(this);
 		iv_microphone.setOnClickListener(this);
+		iv_renext.setOnClickListener(this);
+		iv_back.setOnClickListener(this);
 
 		ActionBar actionBar = getActionBar();
 		// 返回按钮
@@ -575,14 +665,24 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	@Override
 	protected void onDestroy()
 	{
+		super.onDestroy();
 		handler.removeCallbacksAndMessages(null);
 		if (mediaPlayer != null)
 		{
 			mediaPlayer.release();
 			mediaPlayer = null;
 		}
-		database.closeConnection();
-		super.onDestroy();
+
+		if (mediaRecorder != null)
+		{
+			mediaRecorder.release();
+			mediaRecorder = null;
+		}
+		if (database != null)
+		{
+			database.closeConnection();
+			database = null;
+		}
 	}
 
 	protected void refresh_seekbar()
@@ -621,14 +721,12 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 				if (sv_lyrics.getScrollY() < view.getTop() && view.getTop() < sv_lyrics.getScrollY() + 800)
 				{
 					// Log.i("logi", "不用跳");
-				}
-				else
+				} else
 				{
 					sv_lyrics.scrollTo(0, view.getTop());
 				}
 
-			}
-			else
+			} else
 			{
 				view.resetColor();
 			}
