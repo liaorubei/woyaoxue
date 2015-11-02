@@ -51,6 +51,14 @@
             android:orientation="horizontal" >
 
             <ImageView
+                android:id="@+id/iv_rec_pause"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:src="@drawable/selector_pause_disable" />
+
+            <ImageView
                 android:id="@+id/iv_rec_origin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -100,7 +108,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#fff"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:visibility="visible" >
 
             <ImageView
                 android:id="@+id/iv_line"
@@ -206,18 +215,16 @@
             android:src="@drawable/background" />
     </FrameLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+    <TextView
+        android:id="@+id/tv_play_record_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_above="@id/fl_control"
-        android:background="#8000" >
-
-        <TextView android:id="@+id/tv_play_record_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="00:00"
-            android:textColor="#fff" />
-    </RelativeLayout>
+        android:layout_centerInParent="true"
+        android:background="#8000"
+        android:padding="15dp"
+        android:text="00:00"
+        android:textColor="#fff"
+        android:visibility="invisible" />
 
 </RelativeLayout>
