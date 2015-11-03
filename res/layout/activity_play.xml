@@ -50,57 +50,56 @@
             android:background="#fff"
             android:orientation="horizontal" >
 
-            <ImageView
+            <CheckBox
                 android:id="@+id/iv_rec_pause"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/selector_pause_disable" />
+                android:background="@drawable/selector_pause"
+                android:button="@null" />
 
             <ImageView
                 android:id="@+id/iv_rec_origin"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ico_play_org_off" />
+                android:background="@drawable/selector_p_origin" />
 
             <ImageView
                 android:id="@+id/iv_rec_prev"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/selector_prev" />
+                android:background="@drawable/selector_prev" />
 
-            <ImageView
-                android:id="@+id/iv_record"
+            <CheckBox
+                android:id="@+id/iv_rec_button"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/selector_rec_disable" />
+                android:background="@drawable/selector_record"
+                android:button="@null" />
 
             <ImageView
                 android:id="@+id/iv_rec_next"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/selector_next" />
+                android:background="@drawable/selector_next" />
 
             <ImageView
                 android:id="@+id/iv_rec_record"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ico_play_rec_off" />
+                android:background="@drawable/selector_p_record" />
 
             <ImageView
                 android:id="@+id/iv_rec_back"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/selector_micro_enable" />
+                android:background="@drawable/selector_back" />
         </LinearLayout>
 
         <LinearLayout
@@ -112,48 +111,41 @@
             android:visibility="visible" >
 
             <CheckBox
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/selector_pause_disable"
-                android:button="@null" /> 
-                
-            
-
-            <ImageView
                 android:id="@+id/iv_line"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/selector_line_loop_disable" />
+                android:background="@drawable/selector_pause_disable"
+                android:button="@null" />
 
             <ImageView
                 android:id="@+id/iv_prev"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/selector_prev" />
+                android:background="@drawable/selector_prev" />
 
-            <ImageView
+            <CheckBox
                 android:id="@+id/iv_paly"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/selector_play_enable" />
+                android:background="@drawable/selector_play"
+                android:button="@null" />
 
             <ImageView
                 android:id="@+id/iv_next"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/selector_next" />
+                android:background="@drawable/selector_next" />
 
             <ImageView
                 android:id="@+id/iv_microphone"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/microphone_disable" />
+                android:background="@drawable/selector_micro" />
         </LinearLayout>
     </FrameLayout>
 

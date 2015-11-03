@@ -27,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -79,9 +80,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	// 是否单句循环
 	private boolean isOneLineLoop = false;
 	private boolean isRecord = false;// 是否正在录音
+	private CheckBox iv_line, iv_play, iv_rec_pause, iv_rec_button;
 	private ImageView iv_cover;
-	private ImageView iv_line, iv_microphone, iv_next, iv_play, iv_prev;
-	private ImageView iv_rec_origin, iv_rec_prev, iv_record, iv_rec_next, iv_rec_record, iv_rec_back;
+	private ImageView iv_microphone, iv_next, iv_prev;
+	private ImageView iv_rec_origin, iv_rec_prev, iv_rec_next, iv_rec_record, iv_rec_back;
 	private LinearLayout ll_lyrics, ll_play, ll_record;
 	private MediaRecorder mediaRecorder;// 音频录音对象
 	private MediaPlayer originPlayer, recordPlayer;// 原音,录音播放对象
@@ -104,7 +106,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	private ValueAnimator toRAnimator, toLAnimator;// 控制按钮布局的向右向左属性动画
 	private TextView tv_bSide, tv_aSide, tv_title;
 	private TextView tv_play_record_time;
-	private ImageView iv_rec_pause;
 
 	@Override
 	public void onClick(View v)
@@ -114,7 +115,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 
 		case R.id.iv_line:
 			isOneLineLoop = !isOneLineLoop;
-			iv_line.setImageResource(isOneLineLoop ? R.drawable.selector_line_loop_enable : R.drawable.selector_line_loop_disable);
+
 			if (isOneLineLoop)
 			{
 				setSideASideB();
@@ -134,7 +135,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			}
 
 			Log.i("logi", "isPlaying=" + originPlayer.isPlaying());
-			iv_play.setImageResource(originPlayer.isPlaying() ? R.drawable.selector_play_enable : R.drawable.selector_play_disable);
+
 			break;
 
 		case R.id.iv_next:
@@ -189,7 +190,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			{
 				mediaRecorder.stop();
 				isRecord = false;
-				iv_record.setImageResource(isRecord ? R.drawable.selector_rec_enable : R.drawable.selector_rec_disable);
+
 			}
 
 			break;
@@ -206,13 +207,12 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			{
 				mediaRecorder.stop();
 				isRecord = false;
-				iv_record.setImageResource(isRecord ? R.drawable.selector_rec_enable : R.drawable.selector_rec_disable);
+
 			}
 			break;
-		case R.id.iv_record:
+		case R.id.iv_rec_button:
 			elapsedTime = 0;// 每次点击都归零时间计数
 			isRecord = !isRecord;// 每次都要更改状态,然后根据已经更改的状态去调整录音和播放对象的暂停或开始
-			iv_record.setImageResource(isRecord ? R.drawable.selector_rec_enable : R.drawable.selector_rec_disable);
 
 			if (originPlayer.isPlaying())
 			{
@@ -249,7 +249,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			{
 				mediaRecorder.stop();
 				isRecord = false;
-				iv_record.setImageResource(isRecord ? R.drawable.selector_rec_enable : R.drawable.selector_rec_disable);
+
 			}
 			break;
 		case R.id.iv_rec_record:
@@ -260,7 +260,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			{
 				mediaRecorder.stop();
 				isRecord = false;
-				iv_record.setImageResource(isRecord ? R.drawable.selector_rec_enable : R.drawable.selector_rec_disable);
+
 			}
 
 			if (originPlayer.isPlaying())
@@ -285,7 +285,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			{
 				mediaRecorder.stop();
 				isRecord = false;
-				iv_record.setImageResource(isRecord ? R.drawable.selector_rec_enable : R.drawable.selector_rec_disable);
+
 			}
 			break;
 
@@ -619,15 +619,15 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	private void initView()
 	{
 		// 控制栏的按钮初始化并添加监听
-		iv_line = (ImageView) findViewById(R.id.iv_line);
+		iv_line = (CheckBox) findViewById(R.id.iv_line);
 		iv_prev = (ImageView) findViewById(R.id.iv_prev);
-		iv_play = (ImageView) findViewById(R.id.iv_paly);
+		iv_play = (CheckBox) findViewById(R.id.iv_paly);
 		iv_next = (ImageView) findViewById(R.id.iv_next);
 		iv_microphone = (ImageView) findViewById(R.id.iv_microphone);
-		iv_rec_pause = (ImageView) findViewById(R.id.iv_rec_pause);
+		iv_rec_pause = (CheckBox) findViewById(R.id.iv_rec_pause);
 		iv_rec_origin = (ImageView) findViewById(R.id.iv_rec_origin);
 		iv_rec_prev = (ImageView) findViewById(R.id.iv_rec_prev);
-		iv_record = (ImageView) findViewById(R.id.iv_record);
+		iv_rec_button = (CheckBox) findViewById(R.id.iv_rec_button);
 		iv_rec_next = (ImageView) findViewById(R.id.iv_rec_next);
 		iv_rec_record = (ImageView) findViewById(R.id.iv_rec_record);
 		iv_rec_back = (ImageView) findViewById(R.id.iv_rec_back);
@@ -640,7 +640,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		iv_rec_pause.setOnClickListener(this);
 		iv_rec_origin.setOnClickListener(this);
 		iv_rec_prev.setOnClickListener(this);
-		iv_record.setOnClickListener(this);
+		iv_rec_button.setOnClickListener(this);
 		iv_rec_next.setOnClickListener(this);
 		iv_rec_record.setOnClickListener(this);
 		iv_rec_back.setOnClickListener(this);
