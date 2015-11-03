@@ -111,37 +111,46 @@
             android:orientation="horizontal"
             android:visibility="visible" >
 
+            <CheckBox
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/selector_pause_disable"
+                android:button="@null" /> 
+                
+            
+
             <ImageView
                 android:id="@+id/iv_line"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/selector_line_loop_disable" />
 
             <ImageView
                 android:id="@+id/iv_prev"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/selector_prev" />
 
             <ImageView
                 android:id="@+id/iv_paly"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/selector_play_enable" />
 
             <ImageView
                 android:id="@+id/iv_next"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/selector_next" />
 
             <ImageView
                 android:id="@+id/iv_microphone"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/microphone_disable" />
