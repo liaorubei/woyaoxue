@@ -10,6 +10,8 @@ import com.voc.woyaoxue.R;
 
 public class MainActivity extends Activity
 {
+	// Monkey测试代码
+	// adb shell monkey -p com.voc.woyaoxue -s 500 --ignore-crashes --ignore-timeouts --monitor-native-crashes -v -v 10000 > E:\log.txt
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -22,6 +24,6 @@ public class MainActivity extends Activity
 		Intent intent = new Intent(this, FolderActivity.class);
 		// Intent intent = new Intent(this, TestActivity.class);
 		startActivity(intent);
-		this.finish();		
+		this.finish();
 	}
 }

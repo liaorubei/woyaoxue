@@ -238,7 +238,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		elapsedTime = 0;
 		iv_rec_pause.setChecked(pause);
 		iv_rec_button.setChecked(record);
-		if (currentState == MediaState.播放原音)
+		if (currentState == MediaState.播放原音 && originPlayer != null)
 		{
 			originPlayer.pause();
 		}
@@ -621,11 +621,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
 			{
 				// 如果由用户手动拖动则更改左右两边的时间标签内容
-				if (fromUser)
+				if (fromUser && originPlayer != null)
 				{
 					tv_aSide.setText(millisecondsFormat(originPlayer.getCurrentPosition()));
 				}
-
 			}
 
 			@Override
