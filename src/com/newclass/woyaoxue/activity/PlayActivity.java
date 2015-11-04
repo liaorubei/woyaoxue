@@ -122,10 +122,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			break;
 		case R.id.iv_prev:
 			seekToPrevLine();
-			if (!originPlayer.isPlaying())
-			{
-				originPlayer.start();
-			}
 			break;
 		case R.id.iv_paly:
 			if (originPlayer.isPlaying())
@@ -139,11 +135,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			break;
 		case R.id.iv_next:
 			seekToNextLine();
-			if (!originPlayer.isPlaying())
-			{
-				originPlayer.start();
-			}
-			break;
 		case R.id.iv_microphone:
 			// 控制栏左移动,切换到录音模式
 			toLAnimator.start();
