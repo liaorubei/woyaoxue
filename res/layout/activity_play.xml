@@ -225,8 +225,7 @@
         android:layout_centerInParent="true"
         android:background="@drawable/shape_rounded_rectangle"
         android:padding="15dp"
-        android:text="00:00"
         android:textColor="#fff"
-        android:visibility="visible" />
+        android:visibility="invisible" />
 
 </RelativeLayout>
