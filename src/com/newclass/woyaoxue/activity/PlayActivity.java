@@ -114,8 +114,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		{
 
 		case R.id.iv_line:
-			isOneLineLoop = !isOneLineLoop;
-
+			isOneLineLoop = iv_line.isChecked();
 			if (isOneLineLoop)
 			{
 				setSideASideB();
@@ -123,6 +122,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			break;
 		case R.id.iv_prev:
 			seekToPrevLine();
+			if (!originPlayer.isPlaying())
+			{
+				originPlayer.start();
+			}
 			break;
 		case R.id.iv_paly:
 			if (originPlayer.isPlaying())
@@ -133,13 +136,13 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			{
 				originPlayer.start();
 			}
-
-			Log.i("logi", "isPlaying=" + originPlayer.isPlaying());
-
 			break;
-
 		case R.id.iv_next:
 			seekToNextLine();
+			if (!originPlayer.isPlaying())
+			{
+				originPlayer.start();
+			}
 			break;
 		case R.id.iv_microphone:
 			// 控制栏左移动,切换到录音模式
@@ -207,7 +210,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			{
 				mediaRecorder.stop();
 				isRecord = false;
-
 			}
 			break;
 		case R.id.iv_rec_button:

@@ -108,7 +108,7 @@
             android:layout_height="match_parent"
             android:background="#fff"
             android:orientation="horizontal"
-            android:visibility="invisible" >
+            android:visibility="visible" >
 
             <CheckBox
                 android:id="@+id/iv_line"
@@ -131,7 +131,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/selector_play"
-                android:button="@null" />
+                android:button="@null"
+                android:checked="true" />
 
             <ImageView
                 android:id="@+id/iv_next"
