@@ -79,7 +79,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	};
 	// 是否单句循环
 	private boolean isOneLineLoop = false;
-	private boolean isRecord = false;// 是否正在录音
 	private CheckBox iv_line, iv_play, iv_rec_pause, iv_rec_button;
 	private ImageView iv_cover;
 	private ImageView iv_microphone, iv_next, iv_prev;
@@ -102,7 +101,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	private Integer subTitleState = 0;
 
 	private ScrollView sv_lyrics;
-	private String tipText;
 	private ValueAnimator toRAnimator, toLAnimator;// 控制按钮布局的向右向左属性动画
 	private TextView tv_bSide, tv_aSide, tv_title;
 	private TextView tv_play_record_time;
@@ -135,6 +133,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			break;
 		case R.id.iv_next:
 			seekToNextLine();
+			break;
 		case R.id.iv_microphone:
 			// 控制栏左移动,切换到录音模式
 			toLAnimator.start();
@@ -148,7 +147,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			}
 			if (recordPlayer == null)
 			{
-				initRecordPlayer(recordFile.getAbsolutePath());
+				initRecordPlayer(recordFile.getAbsolutePath(), recordFile.length() > 0);
 			}
 			if (mediaRecorder == null)
 			{
@@ -157,133 +156,99 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 
 			// 播放当前的原音单句
 			elapsedTime = 0;
-			tipText = "播放原音->";
 			seekToCurrentLine();
 			break;
 		case R.id.iv_rec_pause:
-			if (originPlayer.isPlaying())
-			{
-				originPlayer.pause();
-			}
-			if (recordPlayer.isPlaying())
-			{
-				recordPlayer.pause();
-			}
-			mediaRecorder.reset();
+			stopOrPauseMedia(iv_rec_pause.isChecked(), false);
+			currentState = MediaState.全部暂停;
 			break;
 		case R.id.iv_rec_origin:
-			elapsedTime = 0;
-			tipText = "播放原音->";
+			stopOrPauseMedia(false, false);
 			seekToCurrentLine();
-			if (!originPlayer.isPlaying())
-			{
-				originPlayer.start();
-			}
-			// 如果正在录音阶段,则停止录音,并把录音变量设为false,说明目前已经停止了录音
-			if (isRecord)
-			{
-				mediaRecorder.stop();
-				isRecord = false;
-
-			}
-
+			originPlayer.start();
+			currentState = MediaState.播放原音;
 			break;
 		case R.id.iv_rec_prev:
-			elapsedTime = 0;
-			tipText = "播放原音->";
+			stopOrPauseMedia(false, false);
 			seekToPrevLine();
-			if (!originPlayer.isPlaying())
-			{
-				originPlayer.start();
-			}
-			// 如果正在录音阶段,则停止录音,并把录音变量设为false,说明目前已经停止了录音
-			if (isRecord)
-			{
-				mediaRecorder.stop();
-				isRecord = false;
-			}
+			originPlayer.start();
+			currentState = MediaState.播放原音;
+
 			break;
 		case R.id.iv_rec_button:
-			elapsedTime = 0;// 每次点击都归零时间计数
-			isRecord = !isRecord;// 每次都要更改状态,然后根据已经更改的状态去调整录音和播放对象的暂停或开始
+			stopOrPauseMedia(false, iv_rec_button.isChecked());
 
-			if (originPlayer.isPlaying())
+			if (iv_rec_button.isChecked())
 			{
-				originPlayer.pause();
-			}
-
-			if (isRecord)
-			{
-				recordPlayer.stop();
 				mediaRecorder.reset();
 				initMediaRecorder(recordFile.getAbsolutePath());
 				mediaRecorder.start();
-				tipText = "正在录音";
+				currentState = MediaState.正在录音;
 			}
 			else
 			{
-				mediaRecorder.stop();
-				recordPlayer.reset();
-				initRecordPlayer(recordFile.getAbsolutePath());
-				recordPlayer.start();
-				tipText = "播放录音";
+				if (recordFile.exists() && recordFile.length() > 0)
+				{
+					recordPlayer.reset();
+					initRecordPlayer(recordFile.getAbsolutePath(), true);
+					recordPlayer.start();
+					currentState = MediaState.播放录音;
+				}
 			}
 			break;
 		case R.id.iv_rec_next:
-			elapsedTime = 0;
-			tipText = "播放原音->";
+			stopOrPauseMedia(false, false);
 			seekToNextLine();
-			if (!originPlayer.isPlaying())
-			{
-				originPlayer.start();
-			}
-			// 如果正在录音阶段,则停止录音,并把录音变量设为false,说明目前已经停止了录音
-			if (isRecord)
-			{
-				mediaRecorder.stop();
-				isRecord = false;
+			originPlayer.start();
+			currentState = MediaState.播放原音;
 
-			}
 			break;
 		case R.id.iv_rec_record:
-			elapsedTime = 0;
-			tipText = "播放录音->";
-			// 如果正在录音阶段,则停止录音,并把录音变量设为false,说明目前已经停止了录音
-			if (isRecord)
-			{
-				mediaRecorder.stop();
-				isRecord = false;
-
-			}
-
-			if (originPlayer.isPlaying())
-			{
-				originPlayer.pause();
-			}
-
+			stopOrPauseMedia(false, false);
+			if (recordFile.exists() && recordFile.length() > 0)
 			{
 				recordPlayer.reset();
-				initRecordPlayer(recordFile.getAbsolutePath());
+				initRecordPlayer(recordFile.getAbsolutePath(), true);
 				recordPlayer.start();
+				currentState = MediaState.播放录音;
 			}
 			break;
 		case R.id.iv_rec_back:
+			stopOrPauseMedia(false, false);
 			// 控制栏右移动,切换到正常模式,同时把录音播放和录音的对象停止
 			toRAnimator.start();
-			recordPlayer.stop();
 			tv_play_record_time.setVisibility(View.INVISIBLE);
-
-			// 如果正在录音阶段,则停止录音,并把录音变量设为false,说明目前已经停止了录音
-			if (isRecord)
-			{
-				mediaRecorder.stop();
-				isRecord = false;
-
-			}
+			originPlayer.start();
+			currentState = MediaState.播放原音;
 			break;
 
 		default:
 			break;
+		}
+	}
+
+	/**
+	 * 暂停或停止相关多媒体对象的工作,并把(录音/暂停)按钮重置为对应的值
+	 * 
+	 * @param pause 暂停按钮的状态
+	 * @param record 录音按钮的状态
+	 */
+	private void stopOrPauseMedia(boolean pause, boolean record)
+	{
+		elapsedTime = 0;
+		iv_rec_pause.setChecked(pause);
+		iv_rec_button.setChecked(record);
+		if (currentState == MediaState.播放原音)
+		{
+			originPlayer.pause();
+		}
+		else if (currentState == MediaState.播放录音)
+		{
+			recordPlayer.pause();
+		}
+		else if (currentState == MediaState.正在录音)
+		{
+			mediaRecorder.stop();
 		}
 	}
 
@@ -571,7 +536,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		}
 	}
 
-	private void initRecordPlayer(String path)
+	private void initRecordPlayer(String path, boolean prepare)
 	{
 		try
 		{
@@ -585,23 +550,20 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 					@Override
 					public void onCompletion(MediaPlayer mp)
 					{
-
-						Log.i("onCompletion isRecord=" + isRecord);
-						if (!isRecord)
+						if (currentState == MediaState.播放录音)
 						{
-							tipText = "原音播放->";
-							elapsedTime = 0;
 							seekToCurrentLine();
-							if (!originPlayer.isPlaying())
-							{
-								originPlayer.start();
-							}
+							originPlayer.start();
+							currentState = MediaState.播放原音;
 						}
 					}
 				});
 			}
-			recordPlayer.setDataSource(path);
-			recordPlayer.prepare();
+			if (prepare)
+			{
+				recordPlayer.setDataSource(path);
+				recordPlayer.prepare();
+			}
 		}
 		catch (Exception e)
 		{
@@ -730,7 +692,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			sideB = curr.getTimeLabel();
 			originPlayer.seekTo(sideA);
 		}
-
 	}
 
 	private void setSideASideB()
@@ -753,7 +714,10 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 
 	private void setTipsTextView()
 	{
-		tv_play_record_time.setText(tipText + ":" + millisecondsFormat(elapsedTime));
+		if (!iv_rec_pause.isChecked())
+		{
+			tv_play_record_time.setText(currentState + ":" + millisecondsFormat(elapsedTime));
+		}
 	}
 
 	private void showOrHideSubtitle(int state)
@@ -941,5 +905,12 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 			}
 		}
 
+	}
+
+	private MediaState currentState = MediaState.播放原音;
+
+	private enum MediaState
+	{
+		正在录音, 播放录音, 播放原音, 全部暂停
 	}
 }

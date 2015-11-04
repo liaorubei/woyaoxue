@@ -223,10 +223,10 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/fl_control"
         android:layout_centerInParent="true"
-        android:background="#8000"
+        android:background="@drawable/shape_rounded_rectangle"
         android:padding="15dp"
         android:text="00:00"
         android:textColor="#fff"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
 </RelativeLayout>
