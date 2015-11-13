@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -12,6 +13,7 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.Formatter;
@@ -160,7 +162,6 @@ public class DocsActivity extends Activity
 				}
 			}
 		});
-
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		loadData();
 	}

@@ -6,7 +6,7 @@
     android:versionName="3.1" >
 
     <uses-sdk
-        android:minSdkVersion="15"
+        android:minSdkVersion="18"
         android:targetSdkVersion="22" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -20,11 +20,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-        <activity
-            android:name="com.newclass.woyaoxue.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppBaseTheme" >
+        android:theme="@android:style/Theme.Holo.Light" >
+        <activity android:name="com.newclass.woyaoxue.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,16 +30,22 @@
         </activity>
 
         <!-- 文件夹界面 -->
-        <activity android:name="com.newclass.woyaoxue.activity.DownDocsActivity" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.DownDocsActivity"
+            android:theme="@style/CustomHomeAsUpIndicator" />
         <!-- 文件夹界面 -->
-        <activity android:name="com.newclass.woyaoxue.activity.DocsActivity" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.DocsActivity"
+            android:theme="@style/CustomHomeAsUpIndicator" />
         <!-- 文件夹界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.FolderActivity" />
 
         <!-- 我的下载 -->
         <activity android:name="com.newclass.woyaoxue.activity.DownFolderActivity" />
         <!-- 播放界面 -->
-        <activity android:name="com.newclass.woyaoxue.activity.PlayActivity" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.PlayActivity"
+            android:theme="@style/CustomHomeAsUpIndicator" />
         <!-- 更多界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.MoreActivity" />
         <!-- 测试界面 -->

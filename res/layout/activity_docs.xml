@@ -7,7 +7,8 @@
     <RelativeLayout
         android:id="@+id/rl_download"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="35dp"
+        android:background="#100f" >
 
         <TextView
             android:id="@+id/tv_folder"
@@ -36,7 +37,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/cpb_download"
-            android:text="全部下载" android:textColor="@color/color_one"/>
+            android:text="全部下载"
+            android:textColor="@color/color_one" />
     </RelativeLayout>
 
     <com.newclass.woyaoxue.view.XListView

@@ -5,8 +5,9 @@
     <RelativeLayout
         android:id="@+id/rl_seekbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" >
+        android:layout_height="35dp"
+        android:layout_alignParentTop="true"
+        android:background="#40000000" >
 
         <TextView
             android:id="@+id/tv_aSide"
@@ -25,7 +26,6 @@
             android:layout_centerVertical="true"
             android:padding="5dp"
             android:text="00:00" />
-        <!-- style="@style/Widget.SeekBar.Normal" -->
 
         <SeekBar
             android:id="@+id/seekBar"
@@ -212,7 +212,10 @@
             android:id="@+id/iv_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="25dp"
+            android:layout_marginBottom="100dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="100dp"
             android:scaleType="centerCrop"
             android:src="@drawable/background" />
     </FrameLayout>

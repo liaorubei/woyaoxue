@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">我要学</string>
+    <string name="app_name">中文之音</string>
     <string name="action_settings">Settings</string>
 
     <!-- MainActivity更新对话框 -->
@@ -20,8 +20,8 @@
     <string name="xlistview_footer_hint_nomore">到底儿了</string>
     <string name="xlistview_footer_hint_errors">加载失败</string>
     <string name="xlistview_footer_hint_ready">松开载入更多</string>
-    
-    
+
     <!-- 菜单项 -->
-<string name="batch_remove">批量删除</string>
+    <string name="batch_remove">批量删除</string>
+
 </resources>
