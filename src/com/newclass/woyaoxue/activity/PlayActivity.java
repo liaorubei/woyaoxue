@@ -11,6 +11,7 @@ import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -538,6 +539,9 @@ public class PlayActivity extends Activity
 		tv_aSide = (TextView) findViewById(R.id.tv_aSide);
 		tv_bSide = (TextView) findViewById(R.id.tv_bSide);
 		tv_title = (TextView) findViewById(R.id.tv_title);
+		tv_aSide.setTypeface(font);
+		tv_bSide.setTypeface(font);
+		tv_title.setTypeface(font);
 
 		iv_cover = (ImageView) findViewById(R.id.iv_cover);
 		ll_play = (LinearLayout) findViewById(R.id.ll_play);
@@ -666,14 +670,15 @@ public class PlayActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_play);
+
+		font = Typeface.createFromAsset(getAssets(), "fonts/xiyuan.ttf");
+
 		initView();
 
 		subTitleIcons = new ArrayList<Integer>();
 		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_none);
 		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_cn);
 		subTitleIcons.add(R.drawable.ico_actionbar_subtitle_encn);
-
-		tv_title = (TextView) findViewById(R.id.tv_title);
 
 		tv_aSide.setText("");
 		tv_bSide.setText("");
@@ -793,6 +798,7 @@ public class PlayActivity extends Activity
 	}
 
 	private MediaState currentState = MediaState.播放原音;
+	private Typeface font;
 
 	private enum MediaState {
 		正在录音, 播放录音, 播放原音, 全部暂停

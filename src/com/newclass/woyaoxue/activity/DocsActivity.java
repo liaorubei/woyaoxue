@@ -14,6 +14,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.Formatter;
@@ -51,8 +52,7 @@ import com.newclass.woyaoxue.view.XListView.IXListViewListener;
 import com.newclass.woyaoxue.view.XListViewFooter;
 import com.voc.woyaoxue.R;
 
-public class DocsActivity extends Activity
-{
+public class DocsActivity extends Activity {
 	private List<Document> list;
 	private int folderId;
 	private ContentView contentView;
@@ -62,22 +62,24 @@ public class DocsActivity extends Activity
 	private Database database;
 	private XListView listview;
 	private View cpb_download;
-	private TextView tv_folder;
+	private TextView tv_folder, tv_down;
 	protected int pageSize = 15;
 	private int levelId;
+	private Typeface font;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		contentView = new ContentView(this)
-		{
+		font = Typeface.createFromAsset(getAssets(), "fonts/xiyuan.ttf");
+		contentView = new ContentView(this) {
 
 			@Override
-			public View onCreateSuccessView()
-			{
+			public View onCreateSuccessView() {
 				View view = View.inflate(DocsActivity.this, R.layout.activity_docs, null);
 				tv_folder = (TextView) view.findViewById(R.id.tv_folder);
+				tv_down = (TextView) view.findViewById(R.id.tv_down);
+				tv_folder.setTypeface(font);
+				tv_down.setTypeface(font);
 				cpb_download = view.findViewById(R.id.cpb_download);
 				listview = (XListView) view.findViewById(R.id.listview);
 				return view;
@@ -97,18 +99,15 @@ public class DocsActivity extends Activity
 		list = new ArrayList<Document>();
 		adapter = new MyAdapter(list);
 
-		conn = new ServiceConnection()
-		{
+		conn = new ServiceConnection() {
 
 			@Override
-			public void onServiceDisconnected(ComponentName name)
-			{
+			public void onServiceDisconnected(ComponentName name) {
 
 			}
 
 			@Override
-			public void onServiceConnected(ComponentName name, IBinder service)
-			{
+			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.i("onServiceConnected");
 				myBinder = (MyBinder) service;
 				myBinder.getDownloadManager().addObserver(adapter);
@@ -120,57 +119,49 @@ public class DocsActivity extends Activity
 		// 其他设置
 		listview.setPullDownEnable(false);
 		listview.setPullupEnable(true);
-		listview.setOnItemClickListener(new OnItemClickListener()
-		{
+		listview.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-			{
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent play = new Intent(DocsActivity.this, PlayActivity.class);
 				play.putExtra("Id", list.get(position - 1).Id);
 				startActivity(play);
 			}
 		});
-		listview.setXListViewListener(new IXListViewListener()
-		{
+		listview.setXListViewListener(new IXListViewListener() {
 
 			@Override
-			public void onRefresh()
-			{}
+			public void onRefresh() {
+			}
 
 			@Override
-			public void onLoadMore()
-			{
+			public void onLoadMore() {
 				loadData();
 			}
 		});
 
-		cpb_download.setOnClickListener(new OnClickListener()
-		{
+		cpb_download.setOnClickListener(new OnClickListener() {
 
 			@Override
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				// 添加到下载列表中,添加到数据库中,提示数据适配器更新
-				for (Document i : list)
-				{
-					if (!database.docsExists(i.Id))
-					{
+				for (Document i : list) {
+					if (!database.docsExists(i.Id)) {
 						download(i);
 					}
 					adapter.notifyDataSetChanged();
 				}
 			}
 		});
+
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		loadData();
+
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch (item.getItemId())
-		{
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 		case android.R.id.home:
 			this.finish();
 			break;
@@ -182,12 +173,10 @@ public class DocsActivity extends Activity
 	}
 
 	@Override
-	protected void onDestroy()
-	{
+	protected void onDestroy() {
 		super.onDestroy();
 
-		if (database != null)
-		{
+		if (database != null) {
 			database.closeConnection();
 			database = null;
 		}
@@ -200,8 +189,7 @@ public class DocsActivity extends Activity
 		unbindService(conn);
 	}
 
-	private void download(Document doc)
-	{
+	private void download(Document doc) {
 		DownloadInfo info = new DownloadInfo();
 		info.Id = doc.Id;
 		info.Title = doc.Title;
@@ -213,82 +201,65 @@ public class DocsActivity extends Activity
 		database.docsInsert(doc);
 	}
 
-	private void loadData()
-	{
+	private void loadData() {
 		String url = NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + "");
 		final UrlCache cache = database.cacheSelectByUrl(url);
 
-		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
-		{
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000)) {
 			Log.i("使用网络:" + url);
-			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + ""), new RequestCallBack<String>()
-			{
+			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getDocs(folderId + "", list.size() + "", pageSize + ""),
+					new RequestCallBack<String>() {
 
-				@Override
-				public void onSuccess(ResponseInfo<String> responseInfo)
-				{
-					showData(responseInfo.result);
-					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
-					if (database != null)
-					{
-						database.cacheInsertOrUpdate(urlCache);
-					}
-				}
+						@Override
+						public void onSuccess(ResponseInfo<String> responseInfo) {
+							showData(responseInfo.result);
+							UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result,
+									System.currentTimeMillis());
+							if (database != null) {
+								database.cacheInsertOrUpdate(urlCache);
+							}
+						}
 
-				@Override
-				public void onFailure(HttpException error, String msg)
-				{
-					if (cache != null)
-					{
-						showData(cache.Json);
-					}
-					else
-					{
-						contentView.showView(ViewState.FAILURE);
-					}
-				}
-			});
-		}
-		else
-		{
+						@Override
+						public void onFailure(HttpException error, String msg) {
+							if (cache != null) {
+								showData(cache.Json);
+							} else {
+								contentView.showView(ViewState.FAILURE);
+							}
+						}
+					});
+		} else {
 			Log.i("使用缓存:" + url);
 			showData(cache.Json);
 		}
 
 	}
 
-	private void showData(String result)
-	{
-		List<Document> json = new Gson().fromJson(result, new TypeToken<List<Document>>()
-		{}.getType());
-		if (json.size() > 0)
-		{
+	private void showData(String result) {
+		List<Document> json = new Gson().fromJson(result, new TypeToken<List<Document>>() {
+		}.getType());
+		if (json.size() > 0) {
 			list.addAll(json);
 			adapter.notifyDataSetChanged();
 			contentView.showView(ViewState.SUCCESS);
-		}
-		else
-		{
+		} else {
 			contentView.showView(list.size() > 0 ? ViewState.SUCCESS : ViewState.EMPTY);
 		}
 
 		listview.stopLoadMore(json.size() < pageSize ? XListViewFooter.STATE_NOMORE : XListViewFooter.STATE_NORMAL);
 	}
 
-	private class MyAdapter extends BaseAdapter<Document> implements Observer
-	{
+	private class MyAdapter extends BaseAdapter<Document> implements Observer {
 
-		public MyAdapter(List<Document> list)
-		{
+		public MyAdapter(List<Document> list) {
 			super(list);
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
+		public View getView(int position, View convertView, ViewGroup parent) {
 			final Document item = getItem(position);
-			if (convertView == null)
-			{
+			if (convertView == null) {
 				convertView = View.inflate(DocsActivity.this, R.layout.listitem_docs, null);
 				ViewHolder holder = new ViewHolder();
 				holder.tv_title_one = (TextView) convertView.findViewById(R.id.tv_title_one);
@@ -296,6 +267,13 @@ public class DocsActivity extends Activity
 				holder.tv_date = (TextView) convertView.findViewById(R.id.tv_date);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
+				// 设置字体
+				holder.tv_title_one.setTypeface(font);
+				holder.tv_title_two.setTypeface(font);
+				holder.tv_date.setTypeface(font);
+				holder.tv_size.setTypeface(font);
+				holder.tv_time.setTypeface(font);
+
 				holder.cpb = (CircularProgressBar) convertView.findViewById(R.id.cpb);
 				convertView.setTag(holder);
 			}
@@ -307,40 +285,29 @@ public class DocsActivity extends Activity
 			holder.tv_time.setText(item.LengthString);
 
 			DownloadInfo ssss = database.docsSelectById(item.Id);
-			if (ssss != null)
-			{
-				if (ssss.IsDownload == 1)
-				{
+			if (ssss != null) {
+				if (ssss.IsDownload == 1) {
 					holder.cpb.setMax(100);
 					holder.cpb.setProgress(100);
 					holder.cpb.setBackgroundResource(R.drawable.download_finish);
-				}
-				else
-				{
+				} else {
 					DownloadInfo info = myBinder.getDownloadManager().get(item.Id);
 					holder.cpb.setMax((int) info.Total);
 					holder.cpb.setProgress((int) info.Current);
 					holder.cpb.setBackgroundResource(R.drawable.download_begin);
 				}
-			}
-			else
-			{
+			} else {
 				holder.cpb.setMax(100);
 				holder.cpb.setProgress(0);
 				holder.cpb.setBackgroundResource(R.drawable.download_notyet);
 			}
 
-			holder.cpb.setOnClickListener(new OnClickListener()
-			{
+			holder.cpb.setOnClickListener(new OnClickListener() {
 				@Override
-				public void onClick(View v)
-				{
-					if (database.docsExists(item.Id))
-					{
+				public void onClick(View v) {
+					if (database.docsExists(item.Id)) {
 						Toast.makeText(DocsActivity.this, "请不要重复下载", Toast.LENGTH_SHORT).show();
-					}
-					else
-					{
+					} else {
 						download(item);
 						v.setBackgroundResource(R.drawable.download_begin);
 					}
@@ -351,15 +318,13 @@ public class DocsActivity extends Activity
 		}
 
 		@Override
-		public void update(Observable observable, Object data)
-		{
+		public void update(Observable observable, Object data) {
 			Log.i("update");
 			notifyDataSetChanged();
 		}
 	}
 
-	private class ViewHolder
-	{
+	private class ViewHolder {
 		public TextView tv_title_one;
 		public TextView tv_title_two;
 		public TextView tv_date;

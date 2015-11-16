@@ -24,6 +24,7 @@ import com.newclass.woyaoxue.bean.Folder;
 import com.newclass.woyaoxue.database.Database;
 import com.newclass.woyaoxue.util.FolderUtil;
 import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.TypeFaceUtil;
 import com.newclass.woyaoxue.view.ContentView;
 import com.newclass.woyaoxue.view.ContentView.ViewState;
 import com.voc.woyaoxue.R;
@@ -34,8 +35,7 @@ import com.voc.woyaoxue.R;
  * @author liaorubei
  *
  */
-public class DownFolderActivity extends Activity implements OnClickListener
-{
+public class DownFolderActivity extends Activity implements OnClickListener {
 
 	private MyAdapter adapter;
 	private ContentView contentView;
@@ -49,15 +49,12 @@ public class DownFolderActivity extends Activity implements OnClickListener
 	private Database database;
 
 	@Override
-	public void onClick(View v)
-	{
+	public void onClick(View v) {
 
-		switch (v.getId())
-		{
+		switch (v.getId()) {
 		case R.id.cb_select:
 			cb_Invert.setChecked(false);
-			for (ViewHelper i : list)
-			{
+			for (ViewHelper i : list) {
 				i.isChecked = cb_select.isChecked();
 				i.isVisible = true;
 			}
@@ -68,8 +65,7 @@ public class DownFolderActivity extends Activity implements OnClickListener
 		case R.id.cb_Invert:
 			cb_Invert.setChecked(true);
 			cb_select.setChecked(false);
-			for (ViewHelper i : list)
-			{
+			for (ViewHelper i : list) {
 				i.isChecked = !i.isChecked;
 				i.isVisible = true;
 			}
@@ -80,10 +76,8 @@ public class DownFolderActivity extends Activity implements OnClickListener
 		case R.id.tv_delete:
 			List<ViewHelper> removeList = new ArrayList<ViewHelper>();// 被删除的集合
 
-			for (ViewHelper viewHelper : list)
-			{
-				if (viewHelper.isChecked)
-				{
+			for (ViewHelper viewHelper : list) {
+				if (viewHelper.isChecked) {
 					removeList.add(viewHelper);// 把被删除的对象收集到一个集合中
 				}
 			}
@@ -91,16 +85,13 @@ public class DownFolderActivity extends Activity implements OnClickListener
 			list.removeAll(removeList);
 
 			// 清除数据库及文件夹里面的数据
-			for (ViewHelper viewHelper : removeList)
-			{
+			for (ViewHelper viewHelper : removeList) {
 				// 从数据库移除
 				List<Document> docs = database.docsSelectListByFolderId(viewHelper.folder.Id);
-				for (Document doc : docs)
-				{
+				for (Document doc : docs) {
 					database.docsDeleteById(doc.Id);
 					File file = new File(FolderUtil.rootDir(DownFolderActivity.this), doc.SoundPath);
-					if (file.exists() && file.isFile())
-					{
+					if (file.exists() && file.isFile()) {
 						file.delete();
 					}
 				}
@@ -115,8 +106,7 @@ public class DownFolderActivity extends Activity implements OnClickListener
 			cb_Invert.setChecked(false);
 			ll_ctrl.setVisibility(View.GONE);
 
-			for (ViewHelper i : list)
-			{
+			for (ViewHelper i : list) {
 				i.isChecked = false;
 				i.isVisible = false;
 			}
@@ -127,25 +117,21 @@ public class DownFolderActivity extends Activity implements OnClickListener
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
+	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_downfolder, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		switch (item.getItemId())
-		{
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
 		case android.R.id.home:
 			this.finish();
 			return true;
 
 		case R.id.menu_delete:
 			ll_ctrl.setVisibility(View.VISIBLE);
-			for (ViewHelper i : list)
-			{
+			for (ViewHelper i : list) {
 				i.isVisible = true;
 				i.isChecked = false;
 			}
@@ -159,17 +145,14 @@ public class DownFolderActivity extends Activity implements OnClickListener
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		Log.i("FolderDownActivity.onCreate");
 		super.onCreate(savedInstanceState);
 
-		contentView = new ContentView(this)
-		{
+		contentView = new ContentView(this) {
 
 			@Override
-			public View onCreateSuccessView()
-			{
+			public View onCreateSuccessView() {
 				View view = View.inflate(DownFolderActivity.this, R.layout.activity_down, null);
 				listview = (ListView) view.findViewById(R.id.listview);
 
@@ -188,10 +171,8 @@ public class DownFolderActivity extends Activity implements OnClickListener
 		List<Folder> folders = database.folderSelectListWithDocsCount();
 
 		list = new ArrayList<ViewHelper>();
-		for (Folder folder : folders)
-		{
-			if (folder.DocsCount > 0)
-			{
+		for (Folder folder : folders) {
+			if (folder.DocsCount > 0) {
 				list.add(new ViewHelper(folder, false, false));
 			}
 		}
@@ -200,12 +181,10 @@ public class DownFolderActivity extends Activity implements OnClickListener
 
 		adapter = new MyAdapter(list);
 		listview.setAdapter(adapter);
-		listview.setOnItemClickListener(new OnItemClickListener()
-		{
+		listview.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-			{
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Log.i("点击了");
 				Intent intent = new Intent(DownFolderActivity.this, DownDocsActivity.class);
 				intent.putExtra("FolderId", list.get(position).folder.Id);
@@ -226,43 +205,38 @@ public class DownFolderActivity extends Activity implements OnClickListener
 	}
 
 	@Override
-	protected void onDestroy()
-	{
+	protected void onDestroy() {
 
 		super.onDestroy();
 		database.closeConnection();
 	}
 
-	private class MyAdapter extends BaseAdapter<ViewHelper>
-	{
+	private class MyAdapter extends BaseAdapter<ViewHelper> {
 
-		public MyAdapter(List<ViewHelper> list)
-		{
+		public MyAdapter(List<ViewHelper> list) {
 			super(list);
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
+		public View getView(int position, View convertView, ViewGroup parent) {
 			final ViewHelper item = getItem(position);
-			if (convertView == null)
-			{
+			if (convertView == null) {
 				convertView = View.inflate(DownFolderActivity.this, R.layout.listitem_folder, null);
 				ViewHolder holder = new ViewHolder();
 				holder.cb_delete = (CheckBox) convertView.findViewById(R.id.cb_delete);
 				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
 				holder.tv_counts = (TextView) convertView.findViewById(R.id.tv_counts);
+				holder.tv_folder.setTypeface(TypeFaceUtil.get(DownFolderActivity.this));
+				holder.tv_counts.setTypeface(TypeFaceUtil.get(DownFolderActivity.this)); 
 				convertView.setTag(holder);
 			}
 			ViewHolder holder = (ViewHolder) convertView.getTag();
 			holder.cb_delete.setVisibility(item.isVisible ? View.VISIBLE : View.GONE);
 			holder.cb_delete.setChecked(item.isChecked);
-			holder.cb_delete.setOnClickListener(new OnClickListener()
-			{
+			holder.cb_delete.setOnClickListener(new OnClickListener() {
 
 				@Override
-				public void onClick(View v)
-				{
+				public void onClick(View v) {
 					item.isChecked = ((CheckBox) v).isChecked();
 				}
 			});
@@ -272,22 +246,19 @@ public class DownFolderActivity extends Activity implements OnClickListener
 		}
 	}
 
-	private class ViewHelper
-	{
+	private class ViewHelper {
 		public Folder folder;
 		public boolean isChecked;
 		public boolean isVisible;
 
-		public ViewHelper(Folder pFolder, boolean checked, boolean visible)
-		{
+		public ViewHelper(Folder pFolder, boolean checked, boolean visible) {
 			this.folder = pFolder;
 			this.isChecked = checked;
 			this.isVisible = visible;
 		}
 	}
 
-	private class ViewHolder
-	{
+	private class ViewHolder {
 		public CheckBox cb_delete;
 		public TextView tv_counts;
 		public TextView tv_folder;
