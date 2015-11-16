@@ -2,43 +2,35 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fylx="http://schemas.android.com/apk/res/com.voc.woyaoxue"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants" >
 
-    <RelativeLayout
-        android:id="@+id/iv_download"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+    <com.newclass.woyaoxue.view.CircularProgressBar
+        android:id="@+id/cpb"
+        fylx:style="STROKE"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="5dp" >
-
-        <com.newclass.woyaoxue.view.CircularProgressBar
-            android:id="@+id/cpb"
-            fylx:style="STROKE"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerInParent="true"
-            android:background="@drawable/download_notyet"
-            fylx:roundColor="@color/color_two"
-            fylx:roundProgressColor="@color/download_green"
-            fylx:roundWidth="2dp"
-            fylx:textIsDisplayable="false" />
-    </RelativeLayout>
+        android:layout_marginRight="5dp"
+        android:background="@drawable/download_notyet"
+        fylx:roundColor="@color/color_two"
+        fylx:roundProgressColor="@color/download_green"
+        fylx:roundWidth="2dp"
+        fylx:textIsDisplayable="false" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="40dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_toLeftOf="@id/iv_download"
-        android:layout_toStartOf="@id/iv_download"
+        android:layout_toLeftOf="@id/cpb"
         android:orientation="vertical" >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp" >
 
             <TextView
                 android:id="@+id/tv_time"

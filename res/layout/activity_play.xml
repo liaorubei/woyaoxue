@@ -5,9 +5,9 @@
     <RelativeLayout
         android:id="@+id/rl_seekbar"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_height="40dp"
         android:layout_alignParentTop="true"
-        android:background="#40000000" >
+        android:background="#100f" >
 
         <TextView
             android:id="@+id/tv_aSide"
@@ -31,6 +31,7 @@
             android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_toEndOf="@id/tv_aSide"
             android:layout_toLeftOf="@id/tv_bSide"
             android:layout_toRightOf="@id/tv_aSide"
@@ -70,7 +71,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/selector_prev" />
+                android:background="@drawable/selector_prev_s" />
 
             <CheckBox
                 android:id="@+id/iv_rec_button"
@@ -85,7 +86,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/selector_next" />
+                android:background="@drawable/selector_next_s" />
 
             <ImageView
                 android:id="@+id/iv_rec_record"
@@ -99,7 +100,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/selector_micro" />
+                android:background="@drawable/selector_micro_s" />
         </LinearLayout>
 
         <LinearLayout
@@ -123,7 +124,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/selector_prev" />
+                android:background="@drawable/selector_prev_s" />
 
             <CheckBox
                 android:id="@+id/iv_paly"
@@ -139,14 +140,14 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/selector_next" />
+                android:background="@drawable/selector_next_s" />
 
             <ImageView
                 android:id="@+id/iv_microphone"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/selector_micro" />
+                android:background="@drawable/selector_micro_s" />
         </LinearLayout>
     </FrameLayout>
 
@@ -154,14 +155,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/fl_control"
-        android:layout_below="@id/rl_seekbar"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" >
+        android:layout_below="@id/rl_seekbar" >
 
         <ScrollView
             android:id="@+id/sv_lyrics"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -177,7 +178,7 @@
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="1px"
                     android:background="#000" />
 
                 <LinearLayout
