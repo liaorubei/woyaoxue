@@ -13,6 +13,7 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -28,6 +29,7 @@ import android.widget.Toast;
  */
 public class SignUpActivity extends Activity
 {
+	public static final int SignUp = 0;
 	private EditText et_username, et_password, et_repassword;
 	private Button bt_signup;
 
@@ -88,16 +90,17 @@ public class SignUpActivity extends Activity
 						{
 							Toast.makeText(SignUpActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
 
-							// 登录
-							SignInActivity.signIn(json.info.username, json.info.password);
-
+							// 返回注册信息
+							Intent data = new Intent();
+							data.putExtra("username", et_username.getText().toString().trim());
+							data.putExtra("password", et_password.getText().toString().trim());
+							setResult(SignUp, data);
 							finish();
 						}
 						else
 						{
 							Toast.makeText(SignUpActivity.this, json.desc, Toast.LENGTH_SHORT).show();
 						}
-
 					}
 
 					@Override
