@@ -13,4 +13,5 @@ public class ConstantsUtil
 	 * 正常颜色
 	 */
 	public static final int ColorTwo = Color.parseColor("#95a5a6");
+	public static final String NimAppKey = "db75c3901c1a2029d0dd668975b580e0";
 }

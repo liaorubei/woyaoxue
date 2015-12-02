@@ -42,8 +42,7 @@ public class NetworkUtil
 	/**
 	 * 
 	 * 
-	 * @param levelId
-	 *            取得指定LevelId下文件夹内文档的个数, 如果不大于0,表示取得所有数据
+	 * @param levelId 取得指定LevelId下文件夹内文档的个数, 如果不大于0,表示取得所有数据
 	 * @return domain + "/NewClass/Folders?levelId=" + levelId
 	 */
 	public static String getFolders(int levelId)
@@ -78,5 +77,8 @@ public class NetworkUtil
 	{
 		return domain + "/NewClass/levels";
 	}
+
+	public static String userLogin = domain + "/api/user/login";
+	public static String userCreate = domain + "/api/user/create";
 
 }

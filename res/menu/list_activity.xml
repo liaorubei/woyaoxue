@@ -11,5 +11,10 @@
         android:icon="@drawable/ic_launcher"
         android:showAsAction="never"
         android:title="清除缓存"/>
+    <item
+        android:id="@+id/menu_speak"
+        android:icon="@drawable/ic_launcher"
+        android:showAsAction="never"
+        android:title="中文对话"/>
 
 </menu>

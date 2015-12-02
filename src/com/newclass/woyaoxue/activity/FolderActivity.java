@@ -49,7 +49,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class FolderActivity extends FragmentActivity {
+public class FolderActivity extends FragmentActivity
+{
 	private Database database;
 	private List<FolderFragment> fragments;
 	private LinearLayout ll_levels;
@@ -59,29 +60,38 @@ public class FolderActivity extends FragmentActivity {
 	private Typeface font;
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
 		getMenuInflater().inflate(R.menu.list_activity, menu);
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
 		case R.id.menu_download:
 			Intent intent = new Intent(this, DownFolderActivity.class);
 			startActivity(intent);
 			break;
 		case R.id.menu_setting:
 			File[] files = this.getFilesDir().getParentFile().listFiles();
-			for (File file : files) {
-				if (!"lib".equals(file.getName()) && file.isDirectory()) {
+			for (File file : files)
+			{
+				if (!"lib".equals(file.getName()) && file.isDirectory())
+				{
 					File[] listFiles = file.listFiles();
-					for (File file2 : listFiles) {
+					for (File file2 : listFiles)
+					{
 						file2.delete();
 					}
 					file.delete();
 				}
 			}
+			break;
+		case R.id.menu_speak:
+			startActivity(new Intent(FolderActivity.this, SignInActivity.class));
 			break;
 		default:
 			break;
@@ -92,12 +102,15 @@ public class FolderActivity extends FragmentActivity {
 	/**
 	 * @param json
 	 */
-	private void showData(List<Level> json) {
+	private void showData(List<Level> json)
+	{
 		// 排序
-		Collections.sort(json, new Comparator<Level>() {
+		Collections.sort(json, new Comparator<Level>()
+		{
 
 			@Override
-			public int compare(Level lhs, Level rhs) {
+			public int compare(Level lhs, Level rhs)
+			{
 				return Integer.valueOf(rhs.Sort).compareTo(lhs.Sort);
 			}
 		});
@@ -105,7 +118,8 @@ public class FolderActivity extends FragmentActivity {
 		levels = new ArrayList<Level>();
 		levels.clear();
 		fragments.clear();
-		for (Level level : json) {
+		for (Level level : json)
+		{
 			levels.add(level);
 			FolderFragment myFragment = new FolderFragment(1);
 			myFragment.setLevelId(level.Id);
@@ -116,7 +130,8 @@ public class FolderActivity extends FragmentActivity {
 		// tabs数据源
 		ll_levels.removeAllViews();
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1);
-		for (int i = 0; i < json.size(); i++) {
+		for (int i = 0; i < json.size(); i++)
+		{
 			final int item = i;
 			TextView child = new TextView(FolderActivity.this);
 			child.setTypeface(font);
@@ -125,10 +140,12 @@ public class FolderActivity extends FragmentActivity {
 			child.setBackgroundResource(R.drawable.selector_levels);
 			child.setTextColor(i == 0 ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
 
-			child.setOnClickListener(new OnClickListener() {
+			child.setOnClickListener(new OnClickListener()
+			{
 
 				@Override
-				public void onClick(View v) {
+				public void onClick(View v)
+				{
 					vp_folder.setCurrentItem(item);
 				}
 			});
@@ -138,54 +155,68 @@ public class FolderActivity extends FragmentActivity {
 
 	}
 
-	private void loadData() {
+	private void loadData()
+	{
 		String url = NetworkUtil.getLevels();
 		final UrlCache cache = database.cacheSelectByUrl(url);
 
-		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000)) {
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
+		{
 			Log.i("使用网络:" + url);
-			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>() {
+			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
+			{
 
 				@Override
-				public void onFailure(HttpException error, String msg) {
-					if (cache != null) {
-						List<Level> fromJson = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>() {
+				public void onFailure(HttpException error, String msg)
+				{
+					if (cache != null)
+					{
+						List<Level> fromJson = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
+						{
 						}.getType());
 						showData(fromJson);
 					}
 				}
 
 				@Override
-				public void onSuccess(ResponseInfo<String> responseInfo) {
-					List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>() {
+				public void onSuccess(ResponseInfo<String> responseInfo)
+				{
+					List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
+					{
 					}.getType());
 
-					if (fromJson.size() > 0) {
+					if (fromJson.size() > 0)
+					{
 						// 显示数据
 						showData(fromJson);
 
 						// 保存等级信息
-						for (Level level : fromJson) {
-							if (!database.levelExists(level.Id)) {
+						for (Level level : fromJson)
+						{
+							if (!database.levelExists(level.Id))
+							{
 								database.levelInsert(level);
 							}
 						}
 					}
 
 					// 把数据缓存到数据库里面
-					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result,
-							System.currentTimeMillis());
+					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
 					database.cacheInsertOrUpdate(urlCache);
 				}
 
 			});
-		} else {
+		}
+		else
+		{
 			Log.i("使用缓存:" + url);
 
-			List<Level> json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>() {
+			List<Level> json = new Gson().fromJson(cache.Json, new TypeToken<List<Level>>()
+			{
 			}.getType());
 
-			if (json.size() > 0) {
+			if (json.size() > 0)
+			{
 				showData(json);
 			}
 		}
@@ -194,7 +225,8 @@ public class FolderActivity extends FragmentActivity {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		font = Typeface.createFromAsset(getAssets(), "fonts/xiyuan.ttf");
@@ -205,21 +237,26 @@ public class FolderActivity extends FragmentActivity {
 		pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
 		vp_folder.setAdapter(pagerAdapter);
-		vp_folder.setOnPageChangeListener(new OnPageChangeListener() {
+		vp_folder.setOnPageChangeListener(new OnPageChangeListener()
+		{
 
 			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			public void onPageScrolled(int arg0, float arg1, int arg2)
+			{
 
 			}
 
 			@Override
-			public void onPageScrollStateChanged(int arg0) {
+			public void onPageScrollStateChanged(int arg0)
+			{
 
 			}
 
 			@Override
-			public void onPageSelected(int arg0) {
-				for (int i = 0; i < ll_levels.getChildCount(); i++) {
+			public void onPageSelected(int arg0)
+			{
+				for (int i = 0; i < ll_levels.getChildCount(); i++)
+				{
 					TextView childAt = (TextView) ll_levels.getChildAt(i);
 					childAt.setTextColor(i == arg0 ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
 				}
@@ -238,23 +275,29 @@ public class FolderActivity extends FragmentActivity {
 	}
 
 	@Override
-	protected void onDestroy() {
-		if (database != null) {
+	protected void onDestroy()
+	{
+		if (database != null)
+		{
 			database.closeConnection();
 		}
 		super.onDestroy();
 	}
 
-	private class MyAdapter extends BaseAdapter<Folder> {
+	private class MyAdapter extends BaseAdapter<Folder>
+	{
 
-		public MyAdapter(List<Folder> list) {
+		public MyAdapter(List<Folder> list)
+		{
 			super(list);
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
 			Folder item = getItem(position);
-			if (convertView == null) {
+			if (convertView == null)
+			{
 				convertView = View.inflate(FolderActivity.this, R.layout.listitem_folder, null);
 				ViewHolder holder = new ViewHolder();
 				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
@@ -268,27 +311,33 @@ public class FolderActivity extends FragmentActivity {
 		}
 	}
 
-	public class MyFragment extends Fragment {
+	public class MyFragment extends Fragment
+	{
 		private MyAdapter adapter;
 		private ContentView contentView;
 		private List<Folder> list;
 		private ListView listview;
 		private int mLevelId;
 
-		public MyFragment() {
-			contentView = new ContentView(FolderActivity.this) {
+		public MyFragment()
+		{
+			contentView = new ContentView(FolderActivity.this)
+			{
 
 				@Override
-				public View onCreateSuccessView() {
+				public View onCreateSuccessView()
+				{
 					View view = View.inflate(FolderActivity.this, R.layout.fragment_folder, null);
 					listview = (ListView) view.findViewById(R.id.listview);
 					list = new ArrayList<Folder>();
 					adapter = new MyAdapter(list);
 					listview.setAdapter(adapter);
-					listview.setOnItemClickListener(new OnItemClickListener() {
+					listview.setOnItemClickListener(new OnItemClickListener()
+					{
 
 						@Override
-						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+						{
 							Folder folder = list.get(position);
 
 							Intent intent = new Intent(FolderActivity.this, DocsActivity.class);
@@ -303,48 +352,61 @@ public class FolderActivity extends FragmentActivity {
 
 		}
 
-		public void setLevelId(int id) {
+		public void setLevelId(int id)
+		{
 			this.mLevelId = id;
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+		{
 			String url = NetworkUtil.getFolders(mLevelId);
 			final UrlCache cache = database.cacheSelectByUrl(url);
-			if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000)) {
+			if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
+			{
 				Log.i("请求网络:" + url);
-				new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>() {
+				new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
+				{
 
 					@Override
-					public void onFailure(HttpException error, String msg) {
-						if (cache != null) {
+					public void onFailure(HttpException error, String msg)
+					{
+						if (cache != null)
+						{
 							subShowData(cache.Json);
-						} else {
+						}
+						else
+						{
 							contentView.showView(ViewState.FAILURE);
 						}
 					}
 
 					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
+					public void onSuccess(ResponseInfo<String> responseInfo)
+					{
 						// 填充数据
 						subShowData(responseInfo.result);
 
 						// 缓存文件夹
-						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>() {
+						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
+						{
 						}.getType());
-						for (Folder folder : folders) {
-							if (!database.folderExists(folder.Id)) {
+						for (Folder folder : folders)
+						{
+							if (!database.folderExists(folder.Id))
+							{
 								database.folderInsert(folder);
 							}
 						}
 
 						// 缓存数据
-						UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result,
-								System.currentTimeMillis());
+						UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
 						database.cacheInsertOrUpdate(urlCache);
 					}
 				});
-			} else {
+			}
+			else
+			{
 				Log.i("使用缓存:" + url);
 				subShowData(cache.Json);
 			}
@@ -352,40 +414,50 @@ public class FolderActivity extends FragmentActivity {
 			return contentView;
 		}
 
-		private void subShowData(String json) {
-			List<Folder> folders = new Gson().fromJson(json, new TypeToken<List<Folder>>() {
+		private void subShowData(String json)
+		{
+			List<Folder> folders = new Gson().fromJson(json, new TypeToken<List<Folder>>()
+			{
 			}.getType());
-			if (folders.size() > 0) {
+			if (folders.size() > 0)
+			{
 				list.clear();// 因为是在onCreateView中显示数据,有可能会显示多次,然后数据会叠加重复,所以要清除之前的数据
 				list.addAll(folders);
 				contentView.showView(ViewState.SUCCESS);
-			} else {
+			}
+			else
+			{
 				contentView.showView(ViewState.EMPTY);
 			}
 			adapter.notifyDataSetChanged();
 		}
 	}
 
-	private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
+	private class MyFragmentPagerAdapter extends FragmentPagerAdapter
+	{
 
-		public MyFragmentPagerAdapter(FragmentManager fm) {
+		public MyFragmentPagerAdapter(FragmentManager fm)
+		{
 			super(fm);
 		}
 
 		@Override
-		public int getCount() {
+		public int getCount()
+		{
 			return fragments.size();
 		}
 
 		@Override
-		public Fragment getItem(int position) {
+		public Fragment getItem(int position)
+		{
 			FolderFragment folderFragment = new FolderFragment(levels.get(position).Id);
 			// folderFragment.setLevelId(levels.get(position).Id);
 			return folderFragment;
 		}
 	}
 
-	private class ViewHolder {
+	private class ViewHolder
+	{
 		public TextView tv_counts;
 		public TextView tv_folder;
 	}
