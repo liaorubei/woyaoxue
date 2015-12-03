@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.newclass.woyaoxue.activity.FolderActivity;
+import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.service.DownloadService;
 import com.voc.woyaoxue.R;
 

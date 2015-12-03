@@ -1,13 +1,18 @@
 package com.newclass.woyaoxue;
 
 import com.netease.nimlib.sdk.NIMClient;
+import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.SDKOptions;
 import com.netease.nimlib.sdk.StatusBarNotificationConfig;
 import com.netease.nimlib.sdk.auth.LoginInfo;
+import com.netease.nimlib.sdk.avchat.AVChatManager;
+import com.netease.nimlib.sdk.avchat.model.AVChatData;
+import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.uinfo.UserInfoProvider;
 import com.newclass.woyaoxue.activity.MessageActivity;
 import com.newclass.woyaoxue.util.ConstantsUtil;
+import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 import android.app.Application;
@@ -32,6 +37,40 @@ public class MyApplication extends Application
 		SDKOptions options = getOptions();
 		LoginInfo loginInfo = getLoginInfo();
 		NIMClient.init(this, loginInfo, options);
+
+		Log.i("NIMClient.getStatus()=" + NIMClient.getStatus());
+
+		// 监听音频视频实时交流来电
+		//enableAVChat();
+	}
+
+	private void enableAVChat()
+	{
+		setupAVChat();
+		registerAVChatIncomingCallObserver(true);
+	}
+
+	private void setupAVChat()
+	{
+		AVChatRingerConfig config = new AVChatRingerConfig();
+		config.res_connecting = R.raw.avchat_connecting;
+		config.res_no_response = R.raw.avchat_no_response;
+		config.res_peer_busy = R.raw.avchat_peer_busy;
+		config.res_peer_reject = R.raw.avchat_peer_reject;
+		config.res_ring = R.raw.avchat_ring;
+		AVChatManager.getInstance().setRingerConfig(config); // 铃声配置
+	}
+
+	private void registerAVChatIncomingCallObserver(boolean register)
+	{
+		AVChatManager.getInstance().observeIncomingCall(new Observer<AVChatData>()
+		{
+			@Override
+			public void onEvent(AVChatData chatData)
+			{
+				Log.i("logi", "实时音频视频情况:" + chatData);
+			}
+		}, register);
 	}
 
 	private SDKOptions getOptions()
@@ -102,6 +141,7 @@ public class MyApplication extends Application
 		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
 		String accid = sp.getString("accid", "");
 		String token = sp.getString("token", "");
+		Log.i("logi", "accid:"+accid+" token:"+token);
 		if (TextUtils.isEmpty(accid) || TextUtils.isEmpty(token))
 		{
 			return null;

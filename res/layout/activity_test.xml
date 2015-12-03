@@ -3,10 +3,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <com.newclass.woyaoxue.view.FylxListView
-        android:id="@+id/listview"
+    <CheckBox
+        android:id="@+id/checkbox"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-    </com.newclass.woyaoxue.view.FylxListView>
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

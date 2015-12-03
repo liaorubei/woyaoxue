@@ -14,6 +14,12 @@ import com.netease.nimlib.sdk.StatusCode;
 import com.netease.nimlib.sdk.auth.AuthService;
 import com.netease.nimlib.sdk.auth.AuthServiceObserver;
 import com.netease.nimlib.sdk.auth.LoginInfo;
+import com.netease.nimlib.sdk.avchat.AVChatManager;
+import com.netease.nimlib.sdk.avchat.constant.AVChatEventType;
+import com.netease.nimlib.sdk.avchat.model.AVChatCalleeAckEvent;
+import com.netease.nimlib.sdk.avchat.model.AVChatCommonEvent;
+import com.netease.nimlib.sdk.avchat.model.AVChatData;
+import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
 import com.newclass.woyaoxue.MyApplication;
 import com.newclass.woyaoxue.bean.Answer;
 import com.newclass.woyaoxue.util.Log;
@@ -42,7 +48,7 @@ public class SignInActivity extends Activity implements OnClickListener
 {
 	public static final int SignUp = 0;
 
-	public void signIn(String username, String password)
+	public void signIn(final String username, final String password)
 	{
 		RequestParams params = new RequestParams();
 		params.addBodyParameter("username", username);
@@ -60,16 +66,15 @@ public class SignInActivity extends Activity implements OnClickListener
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
 				Answer answer = new Gson().fromJson(responseInfo.result, Answer.class);
-				Log.i("logi", "" + answer.toString());
+				Log.i("logi", "应用登录成功:" + answer.toString());
 				if (answer.code == 200)
 				{
 					// 登录云信
-					signinNim(answer);
-
+					signInNim(answer.info.accid, answer.info.token);
 					// 保护登录信息
-					Editor editor = MyApplication.getContext().getSharedPreferences("user", MODE_PRIVATE).edit();
-					editor.putString("username", answer.info.username);
-					editor.putString("password", answer.info.password);
+					Editor editor = SignInActivity.this.getSharedPreferences("user", MODE_PRIVATE).edit();
+					editor.putString("username", username);
+					editor.putString("password", password);
 					editor.commit();
 				}
 				else
@@ -81,12 +86,11 @@ public class SignInActivity extends Activity implements OnClickListener
 		});
 	}
 
-	private void signinNim(Answer answer)
+	private void signInNim(String accid, String token)
 	{
-		LoginInfo loginInfo = new LoginInfo(answer.info.accid, answer.info.token);
+		LoginInfo loginInfo = new LoginInfo(accid, token);
 		RequestCallback<LoginInfo> callBack = new RequestCallback<LoginInfo>()
 		{
-
 			@Override
 			public void onException(Throwable arg0)
 			{
@@ -105,10 +109,74 @@ public class SignInActivity extends Activity implements OnClickListener
 			{
 				Log.i("logi", "云信登录成功");
 				// 保护登录信息
-				Editor editor = MyApplication.getContext().getSharedPreferences("user", MODE_PRIVATE).edit();
+				Editor editor = SignInActivity.this.getSharedPreferences("user", MODE_PRIVATE).edit();
 				editor.putString("accid", info.getAccount());
 				editor.putString("token", info.getToken());
 				editor.commit();
+
+				AVChatRingerConfig config = new AVChatRingerConfig();
+				config.res_connecting = R.raw.avchat_connecting;
+				config.res_no_response = R.raw.avchat_no_response;
+				config.res_peer_busy = R.raw.avchat_peer_busy;
+				config.res_peer_reject = R.raw.avchat_peer_reject;
+				config.res_ring = R.raw.avchat_ring;
+				AVChatManager.getInstance().setRingerConfig(config); // 铃声配置
+
+				// 监听来电
+				AVChatManager.getInstance().observeIncomingCall(new Observer<AVChatData>()
+				{
+
+					@Override
+					public void onEvent(AVChatData chatData)
+					{
+						Log.i("来电了:" + chatData.getAccount());
+						Intent intent = new Intent(SignInActivity.this, LiveChatActivity.class);
+						startActivity(intent);
+					}
+				}, true);
+
+				// 监听挂断
+				AVChatManager.getInstance().observeHangUpNotification(new Observer<AVChatCommonEvent>()
+				{
+
+					@Override
+					public void onEvent(AVChatCommonEvent arg0)
+					{
+						Log.i("对方挂断了:" + arg0.getAccount());
+
+					}
+				}, true);
+
+				// 监听回应
+				AVChatManager.getInstance().observeCalleeAckNotification(new Observer<AVChatCalleeAckEvent>()
+				{
+
+					@Override
+					public void onEvent(AVChatCalleeAckEvent ackInfo)
+					{
+						if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_BUSY)
+						{
+							// 对方正在忙
+						}
+						else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_REJECT)
+						{
+							// 对方拒绝接听
+						}
+						else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_AGREE)
+						{
+							// 对方同意接听
+							if (ackInfo.isDeviceReady())
+							{
+								// 设备初始化成功，开始通话
+							}
+							else
+							{
+								// 设备初始化失败，无法进行通话
+							}
+						}
+
+					}
+				}, true);
 
 				startActivity(new Intent(SignInActivity.this, MessageActivity.class));
 				finish();
@@ -213,6 +281,8 @@ public class SignInActivity extends Activity implements OnClickListener
 		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
 		String username = sp.getString("username", "");
 		String password = sp.getString("password", "");
+
+		Log.i("logi", "username=" + username + " password=" + password);
 
 		if (!(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)))
 		{

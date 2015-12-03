@@ -10,16 +10,18 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/bt_text"
+            android:id="@+id/bt_accept"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="发送文字" />
+            android:layout_weight="1"
+            android:text="接听" />
 
         <Button
-            android:id="@+id/bt_video"
+            android:id="@+id/bt_hangup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="发送视频" />
+            android:layout_weight="1"
+            android:text="挂断" />
     </LinearLayout>
 
     <SurfaceView

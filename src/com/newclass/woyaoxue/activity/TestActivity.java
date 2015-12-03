@@ -6,17 +6,29 @@ import java.util.Observable;
 import java.util.Observer;
 
 import android.app.Service;
+import android.app.LauncherActivity.ListItem;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.PopupWindow;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,117 +50,13 @@ import com.voc.woyaoxue.R;
 
 public class TestActivity extends FragmentActivity
 {
-
-	private MyAdapter adapter;
-	private ServiceConnection conn;
-	private List<Document> list;
-	private FylxListView listview;
-	private DownloadService.MyBinder myBinder;
+	private CheckBox cb;
+	private PopupWindow window;
+	private boolean isShow = false;
+	private boolean isDown = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_test);
-
-		conn = new MyServiceConnection();
-		bindService(new Intent(this, DownloadService.class), conn, Service.BIND_AUTO_CREATE);
-
-		listview = (FylxListView) findViewById(R.id.listview);
-		list = new ArrayList<Document>();
-		adapter = new MyAdapter(list);
-		listview.setAdapter(adapter);
-		
-
-		new HttpUtils().send(HttpMethod.GET, "http://voc2015.azurewebsites.net/NewClass/GetDocs?skip=0&take=5", new RequestCallBack<String>()
-		{
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-
-			}
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				List<Document> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Document>>()
-				{}.getType());
-
-				if (fromJson.size() > 0)
-				{
-					list.addAll(fromJson);
-					adapter.notifyDataSetChanged();
-				}
-			}
-		});
-
-	}
-
-	@Override
-	protected void onDestroy()
-	{
-
-		super.onDestroy();
-		unbindService(conn);
-	}
-
-	private class MyAdapter extends BaseAdapter<Document> implements Observer
-	{
-		public MyAdapter(List<Document> list)
-		{
-			super(list);
-
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
-			final Document document = list.get(position);
-			if (convertView == null)
-			{
-				convertView = View.inflate(TestActivity.this, R.layout.listitem_docslist, null);
-				ViewHolder holder = new ViewHolder();
-				holder.tv_title_one = (TextView) convertView.findViewById(R.id.tv_title_one);
-
-				convertView.setTag(holder);
-			}
-
-			ViewHolder holder = (ViewHolder) convertView.getTag();
-			holder.tv_title_one.setText(document.Title);
-
-			return convertView;
-		}
-
-		@Override
-		public void update(Observable observable, Object data)
-		{
-			notifyDataSetChanged();
-		}
-	}
-
-	private class MyServiceConnection implements ServiceConnection
-	{
-
-		@Override
-		public void onServiceConnected(ComponentName name, IBinder service)
-		{
-			Log.i("onServiceConnected");
-			myBinder = (MyBinder) service;
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName name)
-		{
-
-		}
-	}
-
-	private class ViewHolder
-	{
-
-		public TextView tv_title_one;
-
-	}
+	{}
 
 }
