@@ -24,17 +24,21 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class MessageActivity extends Activity implements OnClickListener
 {
 	private Button bt_text, bt_video;
 	private SurfaceView sv_video;
+	private LinearLayout ll_text;
 	private Observer<List<IMMessage>> messageObserver;// 消息监听
+	private String target;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Log.i("");
+		target = getIntent().getStringExtra("target");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_message);
 
@@ -52,14 +56,16 @@ public class MessageActivity extends Activity implements OnClickListener
 				{
 					if (imMessage.getMsgType() == MsgTypeEnum.text)
 					{
-
+						TextView textView = new TextView(MessageActivity.this);
+						textView.setText(imMessage.getFromAccount() + " " + imMessage.getContent());
+						ll_text.addView(textView);
 					}
 					Log.i("logi", "来信息了:" + imMessage.getContent() + " 消息类型:" + imMessage.getMsgType());
 				}
 			}
 		};
 
-		// 消息监听注册
+		// 消息监听注册 
 		NIMClient.getService(MsgServiceObserve.class).observeReceiveMessage(messageObserver, true);
 	}
 
@@ -67,6 +73,7 @@ public class MessageActivity extends Activity implements OnClickListener
 	{
 		bt_text = (Button) findViewById(R.id.bt_text);
 		bt_video = (Button) findViewById(R.id.bt_video);
+		ll_text = (LinearLayout) findViewById(R.id.ll_text);
 		sv_video = (SurfaceView) findViewById(R.id.sv_video);
 
 		bt_text.setOnClickListener(this);
@@ -76,7 +83,6 @@ public class MessageActivity extends Activity implements OnClickListener
 	@Override
 	protected void onDestroy()
 	{
-		Log.i("");
 		super.onDestroy();
 
 		// 消息监听注销
@@ -89,23 +95,22 @@ public class MessageActivity extends Activity implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.bt_text:
-			IMMessage message = MessageBuilder.createTextMessage("06162625606043d5bcd7b33d38a8b5e6", SessionTypeEnum.P2P, "文本内容1");
+			IMMessage message = MessageBuilder.createTextMessage(target, SessionTypeEnum.P2P, "文本内容1");
 			NIMClient.getService(MsgService.class).sendMessage(message, false);
 
 			break;
 
 		case R.id.bt_video:
-			String account = "06162625606043d5bcd7b33d38a8b5e6";
 			AVChatType callType = AVChatType.VIDEO;
-
 			VideoChatParam videoParam = new VideoChatParam(sv_video, 0);// 视频显示Surface,角度
-			AVChatManager.getInstance().call(account, callType, videoParam, new AVChatCallback<AVChatData>()
+			AVChatManager.getInstance().call(target, callType, null, new AVChatCallback<AVChatData>()
 			{
 
 				@Override
 				public void onException(Throwable arg0)
 				{
 					Log.i("call onException");
+					System.currentTimeMillis();
 
 				}
 
@@ -122,9 +127,7 @@ public class MessageActivity extends Activity implements OnClickListener
 					Log.i("call onSuccess");
 				}
 			});
-			
-			
-			
+
 			break;
 
 		default:

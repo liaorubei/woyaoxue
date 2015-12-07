@@ -81,5 +81,6 @@ public class NetworkUtil
 	public static String userLogin = domain + "/api/user/login";
 	public static String userLogout = domain + "/api/user/logout";
 	public static String userCreate = domain + "/api/user/create";
+	public static String userSearch = domain + "/api/user/search";
 
 }

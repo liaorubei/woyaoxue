@@ -1,5 +1,7 @@
 package com.newclass.woyaoxue.bean;
 
+import java.util.List;
+
 public class Answer
 {
 	public String desc;
@@ -17,7 +19,9 @@ public class Answer
 		public String toString()
 		{
 			return "Info [accid=" + accid + ", token=" + token + ", name=" + name + ", username=" + username + ", password=" + password + "]";
-		}		
+		}	
+		
+		public List<People> others;
 	}
 
 	@Override
@@ -26,4 +30,9 @@ public class Answer
 		return "Answer [desc=" + desc + ", code=" + code + ", info=" + info + "]";
 	}
 	
+	public class People{
+		
+		public String AccId;
+		public String NickName;
+	}
 }

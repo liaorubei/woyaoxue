@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="3.2" >
+    android:versionName="3.3" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -135,6 +135,7 @@
         <activity android:name="com.newclass.woyaoxue.activity.SignUpActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.MessageActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.LiveChatActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.ContactActivity" />
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />

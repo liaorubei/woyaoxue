@@ -19,13 +19,15 @@
         android:id="@+id/et_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="手机/邮箱" />
+        android:hint="手机/邮箱"
+        android:text="13512345678" />
 
     <EditText
         android:id="@+id/et_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="密码" android:inputType="textPassword"/>
+        android:hint="密码"
+        android:text="111111" />
 
     <Button
         android:id="@+id/bt_login"

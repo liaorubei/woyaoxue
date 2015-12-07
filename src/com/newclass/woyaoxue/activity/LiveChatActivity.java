@@ -46,7 +46,7 @@ public class LiveChatActivity extends Activity implements OnClickListener
 		{
 		case R.id.bt_accept:
 			VideoChatParam videoParam = new VideoChatParam(sv_video, 0);
-			AVChatManager.getInstance().toggleLocalVideo(true, null);
+			// AVChatManager.getInstance().toggleLocalVideo(true, null);
 			AVChatManager.getInstance().accept(videoParam, new AVChatCallback<Void>()
 			{
 

@@ -31,17 +31,13 @@ public class MyApplication extends Application
 	@Override
 	public void onCreate()
 	{
-		mContext = this;
 		super.onCreate();
-
+		mContext = this;
 		SDKOptions options = getOptions();
 		LoginInfo loginInfo = getLoginInfo();
 		NIMClient.init(this, loginInfo, options);
-
-		Log.i("NIMClient.getStatus()=" + NIMClient.getStatus());
-
 		// 监听音频视频实时交流来电
-		//enableAVChat();
+		// enableAVChat();
 	}
 
 	private void enableAVChat()
@@ -141,14 +137,13 @@ public class MyApplication extends Application
 		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
 		String accid = sp.getString("accid", "");
 		String token = sp.getString("token", "");
-		Log.i("logi", "accid:"+accid+" token:"+token);
 		if (TextUtils.isEmpty(accid) || TextUtils.isEmpty(token))
 		{
 			return null;
 		}
 		else
 		{
-			return new LoginInfo(accid, token);
+			return null;// new LoginInfo(accid, token);
 		}
 	}
 

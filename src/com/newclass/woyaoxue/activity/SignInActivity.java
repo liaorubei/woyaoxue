@@ -48,6 +48,84 @@ public class SignInActivity extends Activity implements OnClickListener
 {
 	public static final int SignUp = 0;
 
+	private EditText et_username, et_password;
+
+	private Button bt_login;
+
+	private TextView tv_signup;
+
+	private void initView()
+	{
+		et_username = (EditText) findViewById(R.id.et_username);
+		et_password = (EditText) findViewById(R.id.et_password);
+		bt_login = (Button) findViewById(R.id.bt_login);
+		tv_signup = (TextView) findViewById(R.id.tv_signup);
+
+		bt_login.setOnClickListener(this);
+		tv_signup.setOnClickListener(this);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == SignUp && resultCode == SignUpActivity.SignUp && data != null)
+		{
+			String username = data.getStringExtra("username");
+			String password = data.getStringExtra("password");
+			signIn(username, password);
+		}
+	}
+
+	@Override
+	public void onClick(View v)
+	{
+		switch (v.getId())
+		{
+		case R.id.bt_login:
+
+			String account = et_username.getText().toString().trim();
+			String password = et_password.getText().toString().trim();
+
+			if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password))
+			{
+				Toast.makeText(SignInActivity.this, "帐号或密码不能为空", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			// 开始登录
+			signIn(account, password);
+
+			break;
+
+		case R.id.tv_signup:
+			startActivityForResult(new Intent(SignInActivity.this, SignUpActivity.class), SignUp);
+			break;
+		default:
+			break;
+		}
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		
+		
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_signin);
+
+		// 取出保存的用户数据,如果存在就直接登录
+		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+		String username = sp.getString("username", "");
+		String password = sp.getString("password", "");
+		if (!(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)))
+		{
+			// signIn(username, password);
+		}
+
+		initView();
+	}
+
 	public void signIn(final String username, final String password)
 	{
 		RequestParams params = new RequestParams();
@@ -107,7 +185,7 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onSuccess(LoginInfo info)
 			{
-				Log.i("logi", "云信登录成功");
+				Log.i("logi", "云信登录成功:" + info.getAccount() + " token=" + info.getToken());
 				// 保护登录信息
 				Editor editor = SignInActivity.this.getSharedPreferences("user", MODE_PRIVATE).edit();
 				editor.putString("accid", info.getAccount());
@@ -178,7 +256,9 @@ public class SignInActivity extends Activity implements OnClickListener
 					}
 				}, true);
 
-				startActivity(new Intent(SignInActivity.this, MessageActivity.class));
+				Intent intent = new Intent(SignInActivity.this, ContactActivity.class);
+				intent.putExtra("accid", info.getAccount());
+				startActivity(intent);
 				finish();
 			}
 		};
@@ -211,84 +291,5 @@ public class SignInActivity extends Activity implements OnClickListener
 				}
 			}
 		}, true);//
-	}
-
-	private EditText et_username, et_password;
-
-	private Button bt_login;
-
-	private TextView tv_signup;
-
-	private void initView()
-	{
-		et_username = (EditText) findViewById(R.id.et_username);
-		et_password = (EditText) findViewById(R.id.et_password);
-		bt_login = (Button) findViewById(R.id.bt_login);
-		tv_signup = (TextView) findViewById(R.id.tv_signup);
-
-		bt_login.setOnClickListener(this);
-		tv_signup.setOnClickListener(this);
-	}
-
-	@Override
-	public void onClick(View v)
-	{
-		switch (v.getId())
-		{
-		case R.id.bt_login:
-
-			String account = et_username.getText().toString().trim();
-			String password = et_password.getText().toString().trim();
-
-			if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password))
-			{
-				Toast.makeText(SignInActivity.this, "帐号或密码不能为空", Toast.LENGTH_SHORT).show();
-				return;
-			}
-
-			// 开始登录
-			signIn(account, password);
-
-			break;
-
-		case R.id.tv_signup:
-			startActivityForResult(new Intent(SignInActivity.this, SignUpActivity.class), SignUp);
-			break;
-		default:
-			break;
-		}
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
-		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == SignUp && resultCode == SignUpActivity.SignUp)
-		{
-			String username = data.getStringExtra("username");
-			String password = data.getStringExtra("password");
-			signIn(username, password);
-		}
-	}
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_signin);
-
-		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-		String username = sp.getString("username", "");
-		String password = sp.getString("password", "");
-
-		Log.i("logi", "username=" + username + " password=" + password);
-
-		if (!(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)))
-		{
-			signIn(username, password);
-		}
-
-		initView();
 	}
 }
