@@ -104,7 +104,18 @@
             android:name="com.netease.cosine.target.receiver"
             android:value="com.netease.nimlib.service.NimReceiver" />
 
-        <activity android:name="com.newclass.woyaoxue.MainActivity" >
+        <activity
+            android:name="com.newclass.woyaoxue.MainActivity"
+            android:label="ChineseChat" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.newclass.woyaoxue.teacher.TeacherActivity"
+            android:label="教师端" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -131,11 +142,13 @@
         <activity android:name="com.newclass.woyaoxue.activity.MoreActivity" />
         <!-- 测试界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.TestActivity" />
-        <activity android:name="com.newclass.woyaoxue.activity.SignInActivity" />
+        <activity android:name="com.newclass.woyaoxue.student.SignInActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.SignUpActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.MessageActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.LiveChatActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.ContactActivity" />
+        <activity android:name="com.newclass.woyaoxue.teacher.QueueActivity" />
+        <activity android:name="com.newclass.woyaoxue.student.StudentActivity" />
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />

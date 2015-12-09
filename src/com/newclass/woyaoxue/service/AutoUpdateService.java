@@ -4,6 +4,7 @@ import java.io.File;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -13,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.view.WindowManager;
 
 import com.google.gson.Gson;
@@ -67,24 +69,48 @@ public class AutoUpdateService extends Service
 					// 如果还没有下载最新安装包,则开始下载最新安装包
 					new HttpUtils().download(NetworkUtil.getFullPath(upgradePatch.PackagePath), installPack.getAbsolutePath(), true, true, new RequestCallBack<File>()
 					{
+						private NotificationManager notificationManager;
+						private NotificationCompat.Builder builder;
 
 						@Override
 						public void onFailure(HttpException error, String msg)
 						{
-							Log.i("logi", "更新包下载失败");
+							if (installPack.exists())
+							{
+								installPack.delete();// 如果更新抱下载失败则删除下载不完全的包
+							}
+							builder.setContentText("下载失败");
+							notificationManager.notify(0, builder.build());
 						}
 
 						@Override
 						public void onSuccess(ResponseInfo<File> responseInfo)
 						{
-							Log.i("logi", "更新包下载成功");
 							// 下载完毕,询问是否同在安装
 							if (isNowSetupDialog == null)
 							{
 								builderNowSetupDialog();
 							}
 							isNowSetupDialog.show();
+							builder.setContentText("下载成功");
+							notificationManager.notify(0, builder.build());
+						}
 
+						public void onLoading(long total, long current, boolean isUploading)
+						{
+							builder.setProgress((int) total, (int) current, false);
+							notificationManager.notify(0, builder.build());
+						}
+
+						public void onStart()
+						{
+							notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+							builder = new NotificationCompat.Builder(AutoUpdateService.this);
+							builder.setSmallIcon(R.drawable.ic_launcher);
+							builder.setContentTitle("中文之音");
+							builder.setContentText("应用更新");
+							builder.setProgress(100, 0, false);
+							notificationManager.notify(0, builder.build());
 						}
 					});
 				}
@@ -158,7 +184,7 @@ public class AutoUpdateService extends Service
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{
-				Log.i("logi", "连网失败");
+				Log.i("logi", "连网失败,查询更新失败");
 			}
 
 			@Override
@@ -171,7 +197,7 @@ public class AutoUpdateService extends Service
 					installPack = new File(Environment.getExternalStorageDirectory(), "Download/" + packageInfo.packageName + "_" + upgradePatch.VersionName + ".apk");
 					if (!installPack.getParentFile().exists())
 					{
-						Log.i("logi", "创建下载目录");
+						Log.i("logi", "创建更新下载目录");
 						installPack.getParentFile().mkdirs();
 					}
 

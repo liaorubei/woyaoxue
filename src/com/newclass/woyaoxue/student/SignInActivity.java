@@ -1,4 +1,4 @@
-package com.newclass.woyaoxue.activity;
+package com.newclass.woyaoxue.student;
 
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
@@ -21,7 +21,10 @@ import com.netease.nimlib.sdk.avchat.model.AVChatCommonEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
 import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
 import com.newclass.woyaoxue.MyApplication;
+import com.newclass.woyaoxue.activity.ContactActivity;
+import com.newclass.woyaoxue.activity.SignUpActivity;
 import com.newclass.woyaoxue.bean.Answer;
+import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
@@ -47,11 +50,8 @@ import android.widget.Toast;
 public class SignInActivity extends Activity implements OnClickListener
 {
 	public static final int SignUp = 0;
-
-	private EditText et_username, et_password;
-
 	private Button bt_login;
-
+	private EditText et_username, et_password;
 	private TextView tv_signup;
 
 	private void initView()
@@ -83,6 +83,7 @@ public class SignInActivity extends Activity implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.bt_login:
+			bt_login.setEnabled(false);
 
 			String account = et_username.getText().toString().trim();
 			String password = et_password.getText().toString().trim();
@@ -109,8 +110,6 @@ public class SignInActivity extends Activity implements OnClickListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		
-		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_signin);
 
@@ -132,17 +131,19 @@ public class SignInActivity extends Activity implements OnClickListener
 		params.addBodyParameter("username", username);
 		params.addBodyParameter("password", password);
 
-		new HttpUtils().send(HttpMethod.POST, NetworkUtil.userLogin, params, new RequestCallBack<String>()
+		new HttpUtils().send(HttpMethod.POST, NetworkUtil.userSignIn, params, new RequestCallBack<String>()
 		{
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{
+				bt_login.setEnabled(true);
 				Toast.makeText(MyApplication.getContext(), "网络异常,请稍后重试", Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
+				bt_login.setEnabled(true);
 				Answer answer = new Gson().fromJson(responseInfo.result, Answer.class);
 				Log.i("logi", "应用登录成功:" + answer.toString());
 				if (answer.code == 200)
@@ -164,22 +165,23 @@ public class SignInActivity extends Activity implements OnClickListener
 		});
 	}
 
+	@SuppressWarnings("unchecked")
 	private void signInNim(String accid, String token)
 	{
-		LoginInfo loginInfo = new LoginInfo(accid, token);
-		RequestCallback<LoginInfo> callBack = new RequestCallback<LoginInfo>()
+		NIMClient.getService(AuthService.class).login(new LoginInfo(accid, token)).setCallback(new RequestCallback<LoginInfo>()
 		{
 			@Override
 			public void onException(Throwable arg0)
 			{
-				Toast.makeText(MyApplication.getContext(), "网络异常,即时聊天功能暂时不可用", Toast.LENGTH_SHORT).show();
+				Log.i("logi", "云集登录异常" + arg0);
+				CommonUtil.toast("网络异常,登录失败");
 			}
 
 			@Override
 			public void onFailed(int arg0)
 			{
 				Log.i("logi", "云集登录失败" + arg0);
-				Toast.makeText(MyApplication.getContext(), "网络异常,即时聊天功能暂时不可用", Toast.LENGTH_SHORT).show();
+				CommonUtil.toast("网络异常,登录失败");
 			}
 
 			@Override
@@ -192,77 +194,14 @@ public class SignInActivity extends Activity implements OnClickListener
 				editor.putString("token", info.getToken());
 				editor.commit();
 
-				AVChatRingerConfig config = new AVChatRingerConfig();
-				config.res_connecting = R.raw.avchat_connecting;
-				config.res_no_response = R.raw.avchat_no_response;
-				config.res_peer_busy = R.raw.avchat_peer_busy;
-				config.res_peer_reject = R.raw.avchat_peer_reject;
-				config.res_ring = R.raw.avchat_ring;
-				AVChatManager.getInstance().setRingerConfig(config); // 铃声配置
+				initAVChatManager();
 
-				// 监听来电
-				AVChatManager.getInstance().observeIncomingCall(new Observer<AVChatData>()
-				{
-
-					@Override
-					public void onEvent(AVChatData chatData)
-					{
-						Log.i("来电了:" + chatData.getAccount());
-						Intent intent = new Intent(SignInActivity.this, LiveChatActivity.class);
-						startActivity(intent);
-					}
-				}, true);
-
-				// 监听挂断
-				AVChatManager.getInstance().observeHangUpNotification(new Observer<AVChatCommonEvent>()
-				{
-
-					@Override
-					public void onEvent(AVChatCommonEvent arg0)
-					{
-						Log.i("对方挂断了:" + arg0.getAccount());
-
-					}
-				}, true);
-
-				// 监听回应
-				AVChatManager.getInstance().observeCalleeAckNotification(new Observer<AVChatCalleeAckEvent>()
-				{
-
-					@Override
-					public void onEvent(AVChatCalleeAckEvent ackInfo)
-					{
-						if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_BUSY)
-						{
-							// 对方正在忙
-						}
-						else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_REJECT)
-						{
-							// 对方拒绝接听
-						}
-						else if (ackInfo.getEvent() == AVChatEventType.CALLEE_ACK_AGREE)
-						{
-							// 对方同意接听
-							if (ackInfo.isDeviceReady())
-							{
-								// 设备初始化成功，开始通话
-							}
-							else
-							{
-								// 设备初始化失败，无法进行通话
-							}
-						}
-
-					}
-				}, true);
-
-				Intent intent = new Intent(SignInActivity.this, ContactActivity.class);
+				Intent intent = new Intent(SignInActivity.this, StudentActivity.class);
 				intent.putExtra("accid", info.getAccount());
 				startActivity(intent);
 				finish();
 			}
-		};
-		NIMClient.getService(AuthService.class).login(loginInfo).setCallback(callBack);
+		});
 
 		// 监听用户在线状态
 		NIMClient.getService(AuthServiceObserver.class).observeOnlineStatus(new Observer<StatusCode>()
@@ -290,6 +229,67 @@ public class SignInActivity extends Activity implements OnClickListener
 
 				}
 			}
-		}, true);//
+		}, true);
+	}
+
+	protected void initAVChatManager()
+	{
+		AVChatRingerConfig config = new AVChatRingerConfig();
+		config.res_connecting = R.raw.avchat_connecting;
+		config.res_no_response = R.raw.avchat_no_response;
+		config.res_peer_busy = R.raw.avchat_peer_busy;
+		config.res_peer_reject = R.raw.avchat_peer_reject;
+		config.res_ring = R.raw.avchat_ring;
+		AVChatManager.getInstance().setRingerConfig(config); // 铃声配置
+
+		// 监听网络通话被叫方的响应（接听、拒绝、忙）
+		AVChatManager.getInstance().observeCalleeAckNotification(new Observer<AVChatCalleeAckEvent>()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onEvent(AVChatCalleeAckEvent ackEvent)
+			{
+				AVChatEventType event = ackEvent.getEvent();
+
+				switch (event)
+				{
+				case CALLEE_ACK_AGREE:// 被叫方同意接听
+					if (ackEvent.isDeviceReady())
+					{
+						CommonUtil.toast("设备正常,开始通话");
+					}
+					else
+					{
+						CommonUtil.toast("设备异常,无法通话");
+					}
+					break;
+
+				case CALLEE_ACK_REJECT:
+
+					break;
+
+				case CALLEE_ACK_BUSY:
+					break;
+
+				default:
+					break;
+				}
+
+			}
+		}, true);
+
+		// 监听网络通话对方挂断的通知
+		AVChatManager.getInstance().observeHangUpNotification(new Observer<AVChatCommonEvent>()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onEvent(AVChatCommonEvent event)
+			{
+				Log.i("logi", "对方已挂断");
+			}
+		}, true);
+
 	}
 }

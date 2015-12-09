@@ -34,87 +34,119 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class FolderFragment extends Fragment {
+public class FolderFragment extends Fragment
+{
 	private MyAdapter adapter;
 	private ContentView contentView;
+	private Database database;
+	private Typeface font;
 	private List<Folder> list;
 	private ListView listview;
 	private int mLevelId = -1;
-	private Database database;
-	private Typeface font;
 
-	private class MyAdapter extends BaseAdapter<Folder> {
-
-		public MyAdapter(List<Folder> list) {
-			super(list);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			Folder item = getItem(position);
-			if (convertView == null) {
-				convertView = View.inflate(getActivity(), R.layout.listitem_folder, null);
-				ViewHolder holder = new ViewHolder();
-				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
-				holder.tv_counts = (TextView) convertView.findViewById(R.id.tv_counts);
-				holder.tv_folder.setTypeface(font);
-				holder.tv_counts.setTypeface(font);
-				convertView.setTag(holder);
-			}
-			ViewHolder holder = (ViewHolder) convertView.getTag();
-			holder.tv_folder.setText(item.Name);
-			holder.tv_counts.setText("课程:" + item.DocsCount);
-			return convertView;
-		}
+	public FolderFragment()
+	{
 	}
 
-	private class ViewHolder {
-		public TextView tv_counts;
-		public TextView tv_folder;
-	}
-
-	public FolderFragment(int i) {
+	public FolderFragment(int i)
+	{
 		this.mLevelId = i;
 	}
 
+	private void loadData()
+	{
+		String url = NetworkUtil.getFolders(mLevelId);
+		final UrlCache cache = database.cacheSelectByUrl(url);
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
+		{
+			Log.i("请求网络:" + url);
+			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()
+			{
+
+				@Override
+				public void onFailure(HttpException error, String msg)
+				{
+					if (cache != null)
+					{
+						subShowData(cache.Json);
+					}
+					else
+					{
+						contentView.showView(ViewState.FAILURE);
+					}
+				}
+
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
+				{
+					// 填充数据
+					subShowData(responseInfo.result);
+
+					// 缓存文件夹
+					List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
+					{
+					}.getType());
+					for (Folder folder : folders)
+					{
+						if (!database.folderExists(folder.Id))
+						{
+							database.folderInsert(folder);
+						}
+					}
+
+					// 缓存数据
+					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result, System.currentTimeMillis());
+					database.cacheInsertOrUpdate(urlCache);
+				}
+			});
+		}
+		else
+		{
+			Log.i("使用缓存:" + url);
+			subShowData(cache.Json);
+		}
+	}
+
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt("LevelId", this.mLevelId);
-	}
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);
 
-	public FolderFragment() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public void setLevelId(int id) {
-		this.mLevelId = id;
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
-		if (bundle != null) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle)
+	{
+		if (bundle != null)
+		{
 			this.mLevelId = bundle.getInt("LevelId");
 		}
-		if (database == null) {
+		if (database == null)
+		{
 			database = new Database(getActivity());
 		}
 
 		font = TypeFaceUtil.get(getActivity());
 
-		if (contentView == null) {
-			contentView = new ContentView(getActivity()) {
+		if (contentView == null)
+		{
+			contentView = new ContentView(getActivity())
+			{
 
 				@Override
-				public View onCreateSuccessView() {
+				public View onCreateSuccessView()
+				{
 					View view = View.inflate(getActivity(), R.layout.fragment_folder, null);
 					listview = (ListView) view.findViewById(R.id.listview);
 					list = new ArrayList<Folder>();
 					adapter = new MyAdapter(list);
 					listview.setAdapter(adapter);
-					listview.setOnItemClickListener(new OnItemClickListener() {
+					listview.setOnItemClickListener(new OnItemClickListener()
+					{
 
 						@Override
-						public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+						{
 							Folder folder = list.get(position);
 
 							Intent intent = new Intent(getActivity(), DocsActivity.class);
@@ -133,79 +165,84 @@ public class FolderFragment extends Fragment {
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-
-	}
-
-	private void loadData() {
-		// Log.i("LevelId=" + this.mLevelId);
-		String url = NetworkUtil.getFolders(mLevelId);
-		final UrlCache cache = database.cacheSelectByUrl(url);
-		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000)) {
-			Log.i("请求网络:" + url);
-			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>() {
-
-				@Override
-				public void onFailure(HttpException error, String msg) {
-					if (cache != null) {
-						subShowData(cache.Json);
-					} else {
-						contentView.showView(ViewState.FAILURE);
-					}
-				}
-
-				@Override
-				public void onSuccess(ResponseInfo<String> responseInfo) {
-					// 填充数据
-					subShowData(responseInfo.result);
-
-					// 缓存文件夹
-					List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>() {
-					}.getType());
-					for (Folder folder : folders) {
-						if (!database.folderExists(folder.Id)) {
-							database.folderInsert(folder);
-						}
-					}
-
-					// 缓存数据
-					UrlCache urlCache = new UrlCache(this.getRequestUrl(), responseInfo.result,
-							System.currentTimeMillis());
-					database.cacheInsertOrUpdate(urlCache);
-				}
-			});
-		} else {
-			Log.i("使用缓存:" + url);
-			subShowData(cache.Json);
+	public void onDestroy()
+	{
+		if (database != null)
+		{
+			database.closeConnection();
 		}
+		super.onDestroy();
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 
 		super.onResume();
 		loadData();
 	}
 
-	private void subShowData(String json) {
-		List<Folder> folders = new Gson().fromJson(json, new TypeToken<List<Folder>>() {
+	@Override
+	public void onSaveInstanceState(Bundle outState)
+	{
+		outState.putInt("LevelId", this.mLevelId);
+	}
+
+	public void setLevelId(int id)
+	{
+		this.mLevelId = id;
+	}
+
+	private void subShowData(String json)
+	{
+		List<Folder> folders = new Gson().fromJson(json, new TypeToken<List<Folder>>()
+		{
 		}.getType());
-		if (folders.size() > 0) {
+		if (folders.size() > 0)
+		{
 			list.clear();// 因为是在onCreateView中显示数据,有可能会显示多次,然后数据会叠加重复,所以要清除之前的数据
 			list.addAll(folders);
 			contentView.showView(ViewState.SUCCESS);
-		} else {
+		}
+		else
+		{
 			contentView.showView(ViewState.EMPTY);
 		}
 		adapter.notifyDataSetChanged();
 	}
 
-	@Override
-	public void onDestroy() {
-		if (database != null) {
-			database.closeConnection();
+	private class MyAdapter extends BaseAdapter<Folder>
+	{
+
+		public MyAdapter(List<Folder> list)
+		{
+			super(list);
 		}
-		super.onDestroy();
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			Folder item = getItem(position);
+			if (convertView == null)
+			{
+				convertView = View.inflate(getActivity(), R.layout.listitem_folder, null);
+				ViewHolder holder = new ViewHolder();
+				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
+				holder.tv_counts = (TextView) convertView.findViewById(R.id.tv_counts);
+				holder.tv_folder.setTypeface(font);
+				holder.tv_counts.setTypeface(font);
+				convertView.setTag(holder);
+			}
+			ViewHolder holder = (ViewHolder) convertView.getTag();
+			holder.tv_folder.setText(item.Name);
+			holder.tv_counts.setText("课程:" + item.DocsCount);
+			return convertView;
+		}
+	}
+
+	private class ViewHolder
+	{
+		public TextView tv_counts;
+		public TextView tv_folder;
 	}
 }

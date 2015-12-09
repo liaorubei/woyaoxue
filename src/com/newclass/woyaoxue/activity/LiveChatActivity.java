@@ -1,5 +1,7 @@
 package com.newclass.woyaoxue.activity;
 
+import java.io.Serializable;
+
 import com.netease.nimlib.sdk.avchat.AVChatCallback;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
@@ -8,6 +10,7 @@ import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.View;
@@ -22,7 +25,7 @@ public class LiveChatActivity extends Activity implements OnClickListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Log.i("");
+		AVChatData chatData = (AVChatData) getIntent().getSerializableExtra("chatData");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_livechat);
 
@@ -46,7 +49,7 @@ public class LiveChatActivity extends Activity implements OnClickListener
 		{
 		case R.id.bt_accept:
 			VideoChatParam videoParam = new VideoChatParam(sv_video, 0);
-			// AVChatManager.getInstance().toggleLocalVideo(true, null);
+			AVChatManager.getInstance().toggleLocalVideo(true, null);
 			AVChatManager.getInstance().accept(videoParam, new AVChatCallback<Void>()
 			{
 
@@ -54,21 +57,18 @@ public class LiveChatActivity extends Activity implements OnClickListener
 				public void onException(Throwable arg0)
 				{
 					Log.i("");
-
 				}
 
 				@Override
 				public void onFailed(int arg0)
 				{
 					Log.i("");
-
 				}
 
 				@Override
 				public void onSuccess(Void arg0)
 				{
 					Log.i("");
-
 				}
 			});
 			break;

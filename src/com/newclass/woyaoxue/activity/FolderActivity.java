@@ -20,6 +20,7 @@ import com.newclass.woyaoxue.bean.UrlCache;
 import com.newclass.woyaoxue.database.Database;
 import com.newclass.woyaoxue.fragment.FolderFragment;
 import com.newclass.woyaoxue.service.AutoUpdateService;
+import com.newclass.woyaoxue.student.SignInActivity;
 import com.newclass.woyaoxue.util.ConstantsUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
