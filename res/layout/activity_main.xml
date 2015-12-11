@@ -2,43 +2,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
-        android:id="@+id/ll_ctrl"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/bt_chat"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal" >
+        android:layout_centerInParent="true"
+        android:text="chat" />
 
-        <RadioGroup
-            android:id="@+id/rg_levels"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:orientation="horizontal" >
+    <Button
+        android:id="@+id/bt_listen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bt_chat"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:text="listen" />
 
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/selector_levels"
-                android:button="@null"
-                android:gravity="center"
-                android:text="55555" />
-        </RadioGroup>
-
-        <Button
-            android:id="@+id/bt_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/selector_levels"
-            android:gravity="center"
-            android:text="..."
-            android:textSize="12sp" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/fl_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/ll_ctrl" />
-</RelativeLayout>
+</RelativeLayout>

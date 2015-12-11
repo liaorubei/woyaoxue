@@ -20,12 +20,13 @@ import com.newclass.woyaoxue.bean.UrlCache;
 import com.newclass.woyaoxue.database.Database;
 import com.newclass.woyaoxue.fragment.FolderFragment;
 import com.newclass.woyaoxue.service.AutoUpdateService;
-import com.newclass.woyaoxue.student.SignInActivity;
 import com.newclass.woyaoxue.util.ConstantsUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.ContentView;
 import com.newclass.woyaoxue.view.ContentView.ViewState;
+import com.newclass.woyaoxue.view.LazyViewPager;
+import com.newclass.woyaoxue.view.LazyViewPager.OnPageChangeListener;
 import com.voc.woyaoxue.R;
 
 import android.content.Intent;
@@ -35,8 +36,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,7 +55,7 @@ public class FolderActivity extends FragmentActivity
 	private List<FolderFragment> fragments;
 	private LinearLayout ll_levels;
 	private MyFragmentPagerAdapter pagerAdapter;
-	private ViewPager vp_folder;
+	private LazyViewPager vp_folder;
 	private List<Level> levels;
 	private Typeface font;
 
@@ -90,9 +89,6 @@ public class FolderActivity extends FragmentActivity
 					file.delete();
 				}
 			}
-			break;
-		case R.id.menu_speak:
-			startActivity(new Intent(FolderActivity.this, SignInActivity.class));
 			break;
 		default:
 			break;
@@ -224,7 +220,6 @@ public class FolderActivity extends FragmentActivity
 
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -232,7 +227,7 @@ public class FolderActivity extends FragmentActivity
 		setContentView(R.layout.activity_home);
 		font = Typeface.createFromAsset(getAssets(), "fonts/xiyuan.ttf");
 		ll_levels = (LinearLayout) findViewById(R.id.ll_levels);
-		vp_folder = (ViewPager) findViewById(R.id.vp_folder);
+		vp_folder = (LazyViewPager) findViewById(R.id.vp_folder);
 
 		fragments = new ArrayList<FolderFragment>();
 		pagerAdapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
@@ -392,6 +387,7 @@ public class FolderActivity extends FragmentActivity
 						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
 						{
 						}.getType());
+						
 						for (Folder folder : folders)
 						{
 							if (!database.folderExists(folder.Id))
@@ -452,7 +448,6 @@ public class FolderActivity extends FragmentActivity
 		public Fragment getItem(int position)
 		{
 			FolderFragment folderFragment = new FolderFragment(levels.get(position).Id);
-			// folderFragment.setLevelId(levels.get(position).Id);
 			return folderFragment;
 		}
 	}

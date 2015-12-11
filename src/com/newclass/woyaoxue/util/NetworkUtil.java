@@ -1,7 +1,5 @@
 package com.newclass.woyaoxue.util;
 
-import android.text.TextUtils;
-
 public class NetworkUtil
 {
 	// public static String domain = "http://192.168.3.121:801";
@@ -13,9 +11,8 @@ public class NetworkUtil
 	public static final String userLogout = domain + "/api/user/logout";
 	public static final String userCreate = domain + "/api/user/create";
 	public static final String userSearch = domain + "/api/user/search";
-	public static final String userEnqueue = domain + "/api/user/enqueue";
-
-	public static final String studentCall = domain+"/api/student/call";
+	public static final String teacherEnqueue = domain + "/api/teacher/enqueue";
+	public static final String studentCall = domain + "/api/student/call";
 
 	public static String format(String text, Object... para)
 	{

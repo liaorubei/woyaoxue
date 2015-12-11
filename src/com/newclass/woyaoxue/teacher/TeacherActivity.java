@@ -17,6 +17,7 @@ import com.netease.nimlib.sdk.auth.LoginInfo;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.model.AVChatCommonEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
+import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
 import com.netease.nimlib.sdk.msg.MsgServiceObserve;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
 import com.newclass.woyaoxue.MyApplication;
@@ -138,6 +139,15 @@ public class TeacherActivity extends Activity implements OnClickListener
 			{
 				Toast.makeText(MyApplication.getContext(), "教师登录成功", Toast.LENGTH_SHORT).show();
 				Log.i("logi", "教师登录成功:accid=" + info.getAccount() + " token=" + info.getToken());
+
+				// 铃声配置
+				AVChatRingerConfig config = new AVChatRingerConfig();
+				config.res_connecting = R.raw.avchat_connecting;
+				config.res_no_response = R.raw.avchat_no_response;
+				config.res_peer_busy = R.raw.avchat_peer_busy;
+				config.res_peer_reject = R.raw.avchat_peer_reject;
+				config.res_ring = R.raw.avchat_ring;
+				AVChatManager.getInstance().setRingerConfig(config);
 
 				// 消息监听注册
 				NIMClient.getService(MsgServiceObserve.class).observeReceiveMessage(new Observer<List<IMMessage>>()

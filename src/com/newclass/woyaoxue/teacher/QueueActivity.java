@@ -50,7 +50,7 @@ public class QueueActivity extends Activity implements OnClickListener
 			bt_queue.setEnabled(false);
 			RequestParams pa = new RequestParams();
 			pa.addBodyParameter("accid", accid);
-			new HttpUtils().send(HttpMethod.POST, NetworkUtil.userEnqueue, pa, new RequestCallBack<String>()
+			new HttpUtils().send(HttpMethod.POST, NetworkUtil.teacherEnqueue, pa, new RequestCallBack<String>()
 			{
 
 				@Override

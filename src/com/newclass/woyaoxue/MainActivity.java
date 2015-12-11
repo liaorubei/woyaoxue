@@ -3,13 +3,17 @@ package com.newclass.woyaoxue;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 import com.newclass.woyaoxue.activity.FolderActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.service.DownloadService;
+import com.newclass.woyaoxue.student.StudentActivity;
 import com.voc.woyaoxue.R;
 
-public class MainActivity extends Activity
+public class MainActivity extends Activity implements OnClickListener
 {
 	// Monkey测试代码
 	// adb shell monkey -p com.voc.woyaoxue -s 500 --ignore-crashes --ignore-timeouts --monitor-native-crashes -v -v 10000 > E:\log.txt
@@ -19,12 +23,46 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		initView();
+
 		Intent sIntent = new Intent(this, DownloadService.class);
 		startService(sIntent);
 
-		Intent intent = new Intent(this, FolderActivity.class);
-		// Intent intent = new Intent(this, TestActivity.class);
-		startActivity(intent);
-		this.finish();
+	}
+
+	private Button bt_chat, bt_listen;
+
+	private void initView()
+	{
+		bt_chat = (Button) findViewById(R.id.bt_chat);
+		bt_listen = (Button) findViewById(R.id.bt_listen);
+
+		bt_chat.setOnClickListener(this);
+		bt_listen.setOnClickListener(this);
+	}
+
+	@Override
+	public void onClick(View v)
+	{
+		switch (v.getId())
+		{
+		case R.id.bt_chat:
+		{
+			Intent intent = new Intent(this, StudentActivity.class);
+			startActivity(intent);
+			//this.finish();
+		}
+			break;
+		case R.id.bt_listen:
+		{
+			Intent intent = new Intent(this, FolderActivity.class);
+			// Intent intent = new Intent(this, TestActivity.class);
+			startActivity(intent);
+			//this.finish();
+		}
+			break;
+		default:
+			break;
+		}
 	}
 }

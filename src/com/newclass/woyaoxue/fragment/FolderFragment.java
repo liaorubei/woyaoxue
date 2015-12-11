@@ -57,7 +57,8 @@ public class FolderFragment extends Fragment
 	{
 		String url = NetworkUtil.getFolders(mLevelId);
 		final UrlCache cache = database.cacheSelectByUrl(url);
-		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
+		long expire=10L;// 600000L;
+		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > expire))
 		{
 			Log.i("请求网络:" + url);
 			new HttpUtils().send(HttpMethod.GET, url, new RequestCallBack<String>()

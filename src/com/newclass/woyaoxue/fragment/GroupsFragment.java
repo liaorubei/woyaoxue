@@ -22,8 +22,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
-public class RandomFragment extends Fragment implements OnClickListener
+public class GroupsFragment extends Fragment implements OnClickListener
 {
 
 	private Button bt_call, bt_text;
@@ -32,7 +33,7 @@ public class RandomFragment extends Fragment implements OnClickListener
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		Log.i("logi", "RandomFragment onCreate");
+		Log.i("logi", "GroupsFragment onCreate");
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -40,7 +41,9 @@ public class RandomFragment extends Fragment implements OnClickListener
 		View inflate = inflater.inflate(R.layout.fragment_random, null);
 		initView(inflate);
 
-		return inflate;
+		TextView textView = new TextView(getActivity());
+		textView.setText("群组");
+		return textView;
 	}
 
 	private void initView(View view)
@@ -71,7 +74,7 @@ public class RandomFragment extends Fragment implements OnClickListener
 				public void onSuccess(AVChatData avChatData)
 				{
 					CommonUtil.toast("拨打成功");
-			 	}
+				}
 
 				@Override
 				public void onFailed(int arg0)

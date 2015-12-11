@@ -2,6 +2,7 @@ package com.newclass.woyaoxue.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -9,7 +10,8 @@ import android.widget.TextView;
 import com.newclass.woyaoxue.bean.Lyric;
 import com.newclass.woyaoxue.util.TypeFaceUtil;
 
-public class SpecialLyricView extends LinearLayout implements Comparable<SpecialLyricView> {
+public class SpecialLyricView extends LinearLayout implements Comparable<SpecialLyricView>
+{
 	public static final int SHOW_CN = 1;
 	public static final int SHOW_EN = 2;
 	public static final int SHOW_ENCN = 3;
@@ -19,52 +21,59 @@ public class SpecialLyricView extends LinearLayout implements Comparable<Special
 	private TextView originalTextView;
 	private TextView translateTextView;
 
-	public SpecialLyricView(Context context, Lyric lyric) {
+	public SpecialLyricView(Context context, Lyric lyric)
+	{
 		super(context);
 		this.mLyric = lyric;
 
 		// 因为是放在线性布局中的，所以要使用LinearLayout.LayoutParams
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 		params.setMargins(0, 5, 0, 5);
 		this.setLayoutParams(params);
 		this.setOrientation(LinearLayout.VERTICAL);
 
 		originalTextView = new TextView(context);
+		originalTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
 		originalTextView.setTypeface(TypeFaceUtil.get(context));
 		originalTextView.setText(lyric.Original);
 		this.addView(originalTextView);
 
 		translateTextView = new TextView(context);
+		translateTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
 		translateTextView.setTypeface(TypeFaceUtil.get(context));
 		translateTextView.setText(lyric.Translate);
 		this.addView(translateTextView);
 	}
 
 	@Override
-	public int compareTo(SpecialLyricView another) {
+	public int compareTo(SpecialLyricView another)
+	{
 		return Integer.valueOf(this.mLyric.TimeLabel).compareTo(another.mLyric.TimeLabel);
 	}
 
-	public Integer getTimeLabel() {
+	public Integer getTimeLabel()
+	{
 		return this.mLyric.TimeLabel;
 	}
 
-	public void highlight() {
+	public void highlight()
+	{
 		this.originalTextView.setTextColor(Color.BLUE);
 	}
 
-	public void resetColor() {
+	public void resetColor()
+	{
 		this.originalTextView.setTextColor(Color.BLACK);
 	}
 
 	/**
 	 * 
-	 * @param target
-	 *            SHOW_CN,SHOW_EN,SHOW_CN_EN,SHOW_NONE四个中的一个
+	 * @param target SHOW_CN,SHOW_EN,SHOW_CN_EN,SHOW_NONE四个中的一个
 	 */
-	public void showEnCn(int target) {
-		switch (target) {
+	public void showEnCn(int target)
+	{
+		switch (target)
+		{
 		case SHOW_CN:
 			this.setVisibility(View.VISIBLE);
 			translateTextView.setVisibility(View.GONE);
