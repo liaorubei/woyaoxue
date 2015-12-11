@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="3.4" >
+    android:versionName="20151212" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -12,14 +12,15 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!-- 权限声明 -->
     <!-- 访问网络状态 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <!-- 控制呼吸灯，振动器等，用于新消息提醒 -->
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.VIBRATE" />
+
     <!-- 外置存储存取权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -147,7 +148,6 @@
         <activity android:name="com.newclass.woyaoxue.activity.MessageActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.LiveChatActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.ContactActivity" />
-        <activity android:name="com.newclass.woyaoxue.teacher.QueueActivity" />
         <activity android:name="com.newclass.woyaoxue.student.StudentActivity" />
 
         <!-- 更新下载服务 -->

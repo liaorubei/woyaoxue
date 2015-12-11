@@ -1,5 +1,12 @@
 package com.newclass.woyaoxue.student;
 
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+
+import com.lidroid.xutils.http.RequestParams;
+import com.netease.nimlib.sdk.NIMClient;
+import com.netease.nimlib.sdk.auth.AuthService;
 import com.newclass.woyaoxue.fragment.ChooseFragment;
 import com.newclass.woyaoxue.fragment.FriendFragment;
 import com.newclass.woyaoxue.fragment.GroupsFragment;
@@ -8,16 +15,14 @@ import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.view.LazyViewPager;
 import com.voc.woyaoxue.R;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.view.View.OnClickListener;
 
 public class StudentActivity extends FragmentActivity implements OnClickListener
@@ -32,8 +37,11 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 
 		initView();
 
-		PagerAdapter myPagerAdapter = new MMyPagerAdapter();
+		PagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		viewpager.setAdapter(myPagerAdapter);
+
+		NIMClient.getService(AuthService.class).logout();
+		startActivity(new Intent(this, SignInActivity.class));
 	}
 
 	private void initView()
@@ -55,39 +63,6 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 			break;
 		}
 
-	}
-
-	public class MMyPagerAdapter extends PagerAdapter
-	{
-
-		@Override
-		public int getCount()
-		{
-			return 4;
-		}
-
-		@Override
-		public boolean isViewFromObject(View arg0, Object arg1)
-		{
-			return arg0 == arg1;
-		}
-
-		@Override
-		public Object instantiateItem(ViewGroup container, int position)
-		{
-			Log.i("logi", "instantiateItem:" + position);
-
-			TextView textView = new TextView(StudentActivity.this);
-			textView.setText("textview:" + position);
-			container.addView(textView);
-			return textView;
-		}
-
-		@Override
-		public void destroyItem(ViewGroup container, int position, Object object)
-		{
-			container.removeView((View) object);
-		}
 	}
 
 	public class MyPagerAdapter extends FragmentPagerAdapter

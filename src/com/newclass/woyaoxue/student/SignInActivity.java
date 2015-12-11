@@ -1,5 +1,9 @@
 package com.newclass.woyaoxue.student;
 
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -20,10 +24,14 @@ import com.netease.nimlib.sdk.avchat.model.AVChatCalleeAckEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatCommonEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
 import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
+import com.netease.nimlib.sdk.msg.MsgServiceObserve;
+import com.netease.nimlib.sdk.msg.model.IMMessage;
 import com.newclass.woyaoxue.MyApplication;
 import com.newclass.woyaoxue.activity.ContactActivity;
+import com.newclass.woyaoxue.activity.LiveChatActivity;
 import com.newclass.woyaoxue.activity.SignUpActivity;
 import com.newclass.woyaoxue.bean.Answer;
+import com.newclass.woyaoxue.teacher.TeacherActivity;
 import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
@@ -123,6 +131,7 @@ public class SignInActivity extends Activity implements OnClickListener
 		}
 
 		initView();
+
 	}
 
 	public void signIn(final String username, final String password)
@@ -196,9 +205,6 @@ public class SignInActivity extends Activity implements OnClickListener
 
 				initAVChatManager();
 
-				Intent intent = new Intent(SignInActivity.this, StudentActivity.class);
-				intent.putExtra("accid", info.getAccount());
-				startActivity(intent);
 				finish();
 			}
 		});
@@ -242,54 +248,39 @@ public class SignInActivity extends Activity implements OnClickListener
 		config.res_ring = R.raw.avchat_ring;
 		AVChatManager.getInstance().setRingerConfig(config); // 铃声配置
 
-		// 监听网络通话被叫方的响应（接听、拒绝、忙）
-		AVChatManager.getInstance().observeCalleeAckNotification(new Observer<AVChatCalleeAckEvent>()
+		// 消息监听注册
+		NIMClient.getService(MsgServiceObserve.class).observeReceiveMessage(new Observer<List<IMMessage>>()
 		{
-			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void onEvent(AVChatCalleeAckEvent ackEvent)
+			public void onEvent(List<IMMessage> list)
 			{
-				AVChatEventType event = ackEvent.getEvent();
-
-				switch (event)
+				for (IMMessage imMessage : list)
 				{
-				case CALLEE_ACK_AGREE:// 被叫方同意接听
-					if (ackEvent.isDeviceReady())
-					{
-						CommonUtil.toast("设备正常,开始通话");
-					}
-					else
-					{
-						CommonUtil.toast("设备异常,无法通话");
-					}
-					break;
-
-				case CALLEE_ACK_REJECT:
-
-					break;
-
-				case CALLEE_ACK_BUSY:
-					break;
-
-				default:
-					break;
+					Log.i("logi", "教师消息类型为:" + imMessage.getMsgType());
 				}
-
 			}
 		}, true);
 
-		// 监听网络通话对方挂断的通知
-		AVChatManager.getInstance().observeHangUpNotification(new Observer<AVChatCommonEvent>()
+		// 监听网络来电
+		AVChatManager.getInstance().observeIncomingCall(new Observer<AVChatData>()
 		{
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void onEvent(AVChatCommonEvent event)
+			public void onEvent(AVChatData avChatData)
 			{
-				Log.i("logi", "对方已挂断");
+				Intent intent = new Intent(getApplication(), LiveChatActivity.class);
+				intent.putExtra("accid", avChatData.getAccount());
+				intent.putExtra("chatData", avChatData);
+				intent.putExtra(LiveChatActivity.CHATSTATE_KEY, LiveChatActivity.CHATSTATE_TAKE);
+				startActivity(intent);
 			}
 		}, true);
+
+	
+
+
 
 	}
 }

@@ -263,11 +263,6 @@ public class FolderActivity extends FragmentActivity
 
 		// ActionBar
 		getActionBar().setDisplayShowHomeEnabled(true);
-
-		// 自动升级服务
-		Intent service = new Intent(this, AutoUpdateService.class);
-		startService(service);
-
 	}
 
 	@Override

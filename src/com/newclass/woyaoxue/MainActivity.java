@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import com.newclass.woyaoxue.activity.FolderActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
+import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.service.DownloadService;
 import com.newclass.woyaoxue.student.StudentActivity;
 import com.voc.woyaoxue.R;
@@ -25,9 +26,12 @@ public class MainActivity extends Activity implements OnClickListener
 
 		initView();
 
+		// 下载任务服务
 		Intent sIntent = new Intent(this, DownloadService.class);
 		startService(sIntent);
-
+		// 自动升级服务
+		Intent service = new Intent(this, AutoUpdateService.class);
+		startService(service);
 	}
 
 	private Button bt_chat, bt_listen;
@@ -50,7 +54,7 @@ public class MainActivity extends Activity implements OnClickListener
 		{
 			Intent intent = new Intent(this, StudentActivity.class);
 			startActivity(intent);
-			//this.finish();
+			// this.finish();
 		}
 			break;
 		case R.id.bt_listen:
@@ -58,7 +62,7 @@ public class MainActivity extends Activity implements OnClickListener
 			Intent intent = new Intent(this, FolderActivity.class);
 			// Intent intent = new Intent(this, TestActivity.class);
 			startActivity(intent);
-			//this.finish();
+			// this.finish();
 		}
 			break;
 		default:
