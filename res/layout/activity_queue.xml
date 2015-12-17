@@ -4,9 +4,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <Button android:id="@+id/bt_queue"
+    <Button
+        android:id="@+id/bt_queue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="排队" />
+
+    <Button
+        android:id="@+id/bt_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="群聊" />
 
 </LinearLayout>

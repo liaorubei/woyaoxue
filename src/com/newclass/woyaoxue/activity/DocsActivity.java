@@ -65,12 +65,10 @@ public class DocsActivity extends Activity {
 	private TextView tv_folder, tv_down;
 	protected int pageSize = 15;
 	private int levelId;
-	private Typeface font;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		font = Typeface.createFromAsset(getAssets(), "fonts/xiyuan.ttf");
 		contentView = new ContentView(this) {
 
 			@Override
@@ -78,8 +76,6 @@ public class DocsActivity extends Activity {
 				View view = View.inflate(DocsActivity.this, R.layout.activity_docs, null);
 				tv_folder = (TextView) view.findViewById(R.id.tv_folder);
 				tv_down = (TextView) view.findViewById(R.id.tv_down);
-				tv_folder.setTypeface(font);
-				tv_down.setTypeface(font);
 				cpb_download = view.findViewById(R.id.cpb_download);
 				listview = (XListView) view.findViewById(R.id.listview);
 				return view;
@@ -267,13 +263,7 @@ public class DocsActivity extends Activity {
 				holder.tv_date = (TextView) convertView.findViewById(R.id.tv_date);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
-				// 设置字体
-				holder.tv_title_one.setTypeface(font);
-				holder.tv_title_two.setTypeface(font);
-				holder.tv_date.setTypeface(font);
-				holder.tv_size.setTypeface(font);
-				holder.tv_time.setTypeface(font);
-
+				
 				holder.cpb = (CircularProgressBar) convertView.findViewById(R.id.cpb);
 				convertView.setTag(holder);
 			}

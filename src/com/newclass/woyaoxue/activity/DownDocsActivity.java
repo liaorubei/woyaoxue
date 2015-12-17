@@ -3,18 +3,20 @@ package com.newclass.woyaoxue.activity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+
+import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.bean.Document;
+import com.newclass.woyaoxue.database.Database;
+import com.newclass.woyaoxue.util.FolderUtil;
+import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.view.ContentView;
+import com.newclass.woyaoxue.view.ContentView.ViewState;
+import com.voc.woyaoxue.R;
 
 import android.app.Activity;
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.text.format.Formatter;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,20 +29,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.newclass.woyaoxue.base.BaseAdapter;
-import com.newclass.woyaoxue.bean.Document;
-import com.newclass.woyaoxue.database.Database;
-import com.newclass.woyaoxue.database.MySQLiteOpenHelper;
-import com.newclass.woyaoxue.service.DownloadService;
-import com.newclass.woyaoxue.service.DownloadService.MyBinder;
-import com.newclass.woyaoxue.util.FolderUtil;
-import com.newclass.woyaoxue.util.Log;
-import com.newclass.woyaoxue.util.TypeFaceUtil;
-import com.newclass.woyaoxue.view.ContentView;
-import com.newclass.woyaoxue.view.ContentView.ViewState;
-import com.voc.woyaoxue.R;
 
 /**
  * 我的下载--文档列表显示界面
@@ -65,19 +53,16 @@ public class DownDocsActivity extends Activity implements OnClickListener {
 	private TextView tv_delete;
 	private TextView tv_cancel;
 	protected TextView tv_folder;
-	private Typeface font;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		font = TypeFaceUtil.get(this);
 		contentView = new ContentView(this) {
 
 			@Override
 			public View onCreateSuccessView() {
 				View view = View.inflate(DownDocsActivity.this, R.layout.activity_downdocs, null);
 				tv_folder = (TextView) view.findViewById(R.id.tv_folder);
-				tv_folder.setTypeface(font);
 				listview = (ListView) view.findViewById(R.id.listview);
 
 				ll_ctrl = view.findViewById(R.id.ll_ctrl);
@@ -194,12 +179,6 @@ public class DownDocsActivity extends Activity implements OnClickListener {
 				holder.tv_date = (TextView) convertView.findViewById(R.id.tv_date);
 				holder.tv_size = (TextView) convertView.findViewById(R.id.tv_size);
 				holder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
-
-				holder.tv_title_one.setTypeface(font);
-				holder.tv_title_two.setTypeface(font);
-				holder.tv_date.setTypeface(font);
-				holder.tv_size.setTypeface(font);
-				holder.tv_time.setTypeface(font);
 
 				holder.cb_delete = (CheckBox) convertView.findViewById(R.id.cb_delete);
 				convertView.setTag(holder);

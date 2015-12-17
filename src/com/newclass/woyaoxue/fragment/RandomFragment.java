@@ -22,6 +22,11 @@ import com.netease.nimlib.sdk.msg.MessageBuilder;
 import com.netease.nimlib.sdk.msg.MsgService;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
+import com.netease.nimlib.sdk.rts.RTSCallback;
+import com.netease.nimlib.sdk.rts.RTSManager;
+import com.netease.nimlib.sdk.rts.constant.RTSTunType;
+import com.netease.nimlib.sdk.rts.model.RTSData;
+import com.netease.nimlib.sdk.rts.model.RTSOptions;
 import com.newclass.woyaoxue.activity.LiveChatActivity;
 import com.newclass.woyaoxue.bean.Answer;
 import com.newclass.woyaoxue.util.CommonUtil;
@@ -43,7 +48,7 @@ import android.widget.Button;
 
 public class RandomFragment extends Fragment implements OnClickListener
 {
-	private Button bt_call, bt_text;
+	private Button bt_call, bt_text, bt_board;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -64,14 +69,17 @@ public class RandomFragment extends Fragment implements OnClickListener
 	{
 		bt_call = (Button) view.findViewById(R.id.bt_call);
 		bt_text = (Button) view.findViewById(R.id.bt_text);
+		bt_board = (Button) view.findViewById(R.id.bt_broad);
 
 		bt_call.setOnClickListener(this);
 		bt_text.setOnClickListener(this);
+		bt_board.setOnClickListener(this);
 	}
 
 	@Override
 	public void onClick(View v)
 	{
+
 		switch (v.getId())
 		{
 		case R.id.bt_call:
@@ -128,7 +136,43 @@ public class RandomFragment extends Fragment implements OnClickListener
 			IMMessage message = MessageBuilder.createTextMessage("bf09f7dd02e549f4a16af0cf8e9a5701", SessionTypeEnum.P2P, "来自学生的消息");
 			NIMClient.getService(MsgService.class).sendMessage(message, false);
 			break;
+		case R.id.bt_broad:
+			List<RTSTunType> types = new ArrayList<RTSTunType>(1);
+			types.add(RTSTunType.AUDIO);
+			types.add(RTSTunType.TCP);
+			String account = "";
+			String pushContent = account + "发起一个会话";
+			String extra = "extra_data";
+			RTSOptions options = new RTSOptions().setPushContent(pushContent).setExtra(extra).setRecordAudioTun(true).setRecordTCPTun(true);
+			
 
+			String sessionId = RTSManager.getInstance().start(account, types, options, new RTSCallback<RTSData>()
+			{
+
+				@Override
+				public void onException(Throwable arg0)
+				{
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void onFailed(int arg0)
+				{
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void onSuccess(RTSData arg0)
+				{
+					// TODO Auto-generated method stub
+
+				}
+			});
+			
+
+			break;
 		default:
 			break;
 		}

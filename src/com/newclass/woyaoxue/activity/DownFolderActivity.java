@@ -4,6 +4,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.bean.Document;
+import com.newclass.woyaoxue.bean.Folder;
+import com.newclass.woyaoxue.database.Database;
+import com.newclass.woyaoxue.util.FolderUtil;
+import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.view.ContentView;
+import com.newclass.woyaoxue.view.ContentView.ViewState;
+import com.voc.woyaoxue.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,17 +27,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.newclass.woyaoxue.base.BaseAdapter;
-import com.newclass.woyaoxue.bean.Document;
-import com.newclass.woyaoxue.bean.Folder;
-import com.newclass.woyaoxue.database.Database;
-import com.newclass.woyaoxue.util.FolderUtil;
-import com.newclass.woyaoxue.util.Log;
-import com.newclass.woyaoxue.util.TypeFaceUtil;
-import com.newclass.woyaoxue.view.ContentView;
-import com.newclass.woyaoxue.view.ContentView.ViewState;
-import com.voc.woyaoxue.R;
 
 /**
  * 我的下载界面,显示所有已经下载的文件,方面再次打开和管理
@@ -226,8 +225,6 @@ public class DownFolderActivity extends Activity implements OnClickListener {
 				holder.cb_delete = (CheckBox) convertView.findViewById(R.id.cb_delete);
 				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
 				holder.tv_counts = (TextView) convertView.findViewById(R.id.tv_counts);
-				holder.tv_folder.setTypeface(TypeFaceUtil.get(DownFolderActivity.this));
-				holder.tv_counts.setTypeface(TypeFaceUtil.get(DownFolderActivity.this)); 
 				convertView.setTag(holder);
 			}
 			ViewHolder holder = (ViewHolder) convertView.getTag();

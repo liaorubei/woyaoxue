@@ -17,7 +17,6 @@ import com.newclass.woyaoxue.bean.UrlCache;
 import com.newclass.woyaoxue.database.Database;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
-import com.newclass.woyaoxue.util.TypeFaceUtil;
 import com.newclass.woyaoxue.view.ContentView;
 import com.newclass.woyaoxue.view.ContentView.ViewState;
 import com.voc.woyaoxue.R;
@@ -39,7 +38,6 @@ public class FolderFragment extends Fragment
 	private MyAdapter adapter;
 	private ContentView contentView;
 	private Database database;
-	private Typeface font;
 	private List<Folder> list;
 	private ListView listview;
 	private int mLevelId = -1;
@@ -57,7 +55,7 @@ public class FolderFragment extends Fragment
 	{
 		String url = NetworkUtil.getFolders(mLevelId);
 		final UrlCache cache = database.cacheSelectByUrl(url);
-		long expire=10L;// 600000L;
+		long expire=1000000L;// 600000L;
 		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > expire))
 		{
 			Log.i("请求网络:" + url);
@@ -126,9 +124,6 @@ public class FolderFragment extends Fragment
 		{
 			database = new Database(getActivity());
 		}
-
-		font = TypeFaceUtil.get(getActivity());
-
 		if (contentView == null)
 		{
 			contentView = new ContentView(getActivity())
@@ -230,8 +225,6 @@ public class FolderFragment extends Fragment
 				ViewHolder holder = new ViewHolder();
 				holder.tv_folder = (TextView) convertView.findViewById(R.id.tv_folder);
 				holder.tv_counts = (TextView) convertView.findViewById(R.id.tv_counts);
-				holder.tv_folder.setTypeface(font);
-				holder.tv_counts.setTypeface(font);
 				convertView.setTag(holder);
 			}
 			ViewHolder holder = (ViewHolder) convertView.getTag();

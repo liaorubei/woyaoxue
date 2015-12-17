@@ -2,16 +2,19 @@ package com.newclass.woyaoxue;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.newclass.woyaoxue.activity.FolderActivity;
+import com.newclass.woyaoxue.activity.SignInActivity;
+import com.newclass.woyaoxue.activity.StudentActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.service.DownloadService;
-import com.newclass.woyaoxue.student.StudentActivity;
 import com.voc.woyaoxue.R;
 
 public class MainActivity extends Activity implements OnClickListener
@@ -32,6 +35,17 @@ public class MainActivity extends Activity implements OnClickListener
 		// 自动升级服务
 		Intent service = new Intent(this, AutoUpdateService.class);
 		startService(service);
+
+		// 自动登录
+		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+		String username = sp.getString("username", "");
+		String password = sp.getString("password", "");
+
+		if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password))
+		{
+		}
+		//startActivity(new Intent(this, SignInActivity.class));
+
 	}
 
 	private Button bt_chat, bt_listen;

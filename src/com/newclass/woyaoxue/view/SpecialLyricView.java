@@ -1,14 +1,13 @@
 package com.newclass.woyaoxue.view;
 
+import com.newclass.woyaoxue.bean.Lyric;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.newclass.woyaoxue.bean.Lyric;
-import com.newclass.woyaoxue.util.TypeFaceUtil;
 
 public class SpecialLyricView extends LinearLayout implements Comparable<SpecialLyricView>
 {
@@ -28,19 +27,17 @@ public class SpecialLyricView extends LinearLayout implements Comparable<Special
 
 		// 因为是放在线性布局中的，所以要使用LinearLayout.LayoutParams
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(0, 5, 0, 5);
+		params.setMargins(5,25,5,0);
 		this.setLayoutParams(params);
 		this.setOrientation(LinearLayout.VERTICAL);
 
 		originalTextView = new TextView(context);
-		originalTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-		originalTextView.setTypeface(TypeFaceUtil.get(context));
+		originalTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
 		originalTextView.setText(lyric.Original);
 		this.addView(originalTextView);
 
 		translateTextView = new TextView(context);
-		translateTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-		translateTextView.setTypeface(TypeFaceUtil.get(context));
+		translateTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
 		translateTextView.setText(lyric.Translate);
 		this.addView(translateTextView);
 	}

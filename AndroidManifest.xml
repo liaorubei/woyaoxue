@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="20151212" >
+    android:versionName="20151217" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -101,6 +101,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- 申明白板会话的广播接收器，第三方APP集成时，action中的com.netease.nim.demo请替换为自己的包名 -->
+        <receiver
+            android:name="com.netease.nimlib.receiver.RTSBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.voc.woyaoxue.ACTION.RECEIVE_RTS_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+
         <meta-data
             android:name="com.netease.cosine.target.receiver"
             android:value="com.netease.nimlib.service.NimReceiver" />
@@ -115,23 +125,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.newclass.woyaoxue.teacher.TeacherActivity"
+            android:name="com.newclass.woyaoxue.activity.TeacherActivity"
             android:label="教师端" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="sdfasdf" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <!-- 文件夹界面 -->
-        <activity
-            android:name="com.newclass.woyaoxue.activity.DownDocsActivity"
-            android:theme="@style/CustomHomeAsUpIndicator" />
+        <activity android:name="com.newclass.woyaoxue.activity.DownDocsActivity" />
         <!-- 文件夹界面 -->
-        <activity
-            android:name="com.newclass.woyaoxue.activity.DocsActivity"
-            android:theme="@style/CustomHomeAsUpIndicator" />
+        <activity android:name="com.newclass.woyaoxue.activity.DocsActivity" />
+
         <!-- 文件夹界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.FolderActivity" />
 
@@ -143,12 +151,15 @@
         <activity android:name="com.newclass.woyaoxue.activity.MoreActivity" />
         <!-- 测试界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.TestActivity" />
-        <activity android:name="com.newclass.woyaoxue.student.SignInActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.SignInActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.SignUpActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.MessageActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.LiveChatActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.ContactActivity" />
-        <activity android:name="com.newclass.woyaoxue.student.StudentActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.StudentActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.GroupActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.AgoraChatActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.GroupCreate" />
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />

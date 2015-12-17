@@ -1,6 +1,14 @@
 package com.newclass.woyaoxue.activity;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,8 +27,9 @@ import com.newclass.woyaoxue.bean.Level;
 import com.newclass.woyaoxue.bean.UrlCache;
 import com.newclass.woyaoxue.database.Database;
 import com.newclass.woyaoxue.fragment.FolderFragment;
-import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.util.ConstantsUtil;
+import com.newclass.woyaoxue.util.HttpUtil;
+import com.newclass.woyaoxue.util.HttpUtil.Parameters;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.view.ContentView;
@@ -30,8 +39,9 @@ import com.newclass.woyaoxue.view.LazyViewPager.OnPageChangeListener;
 import com.voc.woyaoxue.R;
 
 import android.content.Intent;
-import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -57,7 +67,7 @@ public class FolderActivity extends FragmentActivity
 	private MyFragmentPagerAdapter pagerAdapter;
 	private LazyViewPager vp_folder;
 	private List<Level> levels;
-	private Typeface font;
+	private long begins;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -131,7 +141,6 @@ public class FolderActivity extends FragmentActivity
 		{
 			final int item = i;
 			TextView child = new TextView(FolderActivity.this);
-			child.setTypeface(font);
 			child.setGravity(Gravity.CENTER);
 			child.setText(json.get(i).Name);
 			child.setBackgroundResource(R.drawable.selector_levels);
@@ -156,8 +165,39 @@ public class FolderActivity extends FragmentActivity
 	{
 		String url = NetworkUtil.getLevels();
 		final UrlCache cache = database.cacheSelectByUrl(url);
+		begins = System.currentTimeMillis();
+		//usenew();
+		 useUtils(url, cache);
+	}
 
-		if (cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
+	private void usenew()
+	{
+		Parameters parameters = new Parameters();
+		parameters.add("folder", "true");
+		HttpUtil.post("http://voc2015.azurewebsites.net/newclass", parameters, new RequestCallBack<String>()
+		{
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				Log.i("logi", "time:" + (System.currentTimeMillis() - begins));
+				Log.i("logi", "" + responseInfo.result);
+
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				// TODO Auto-generated method stub
+
+			}
+		});
+
+	}
+
+	private void useUtils(String url, final UrlCache cache)
+	{
+		if (true)//cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 		{
 			Log.i("使用网络:" + url);
 			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
@@ -178,10 +218,10 @@ public class FolderActivity extends FragmentActivity
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
+					Log.i("logi", "time:" + (System.currentTimeMillis() - begins));
 					List<Level> fromJson = new Gson().fromJson(responseInfo.result, new TypeToken<List<Level>>()
 					{
 					}.getType());
-
 					if (fromJson.size() > 0)
 					{
 						// 显示数据
@@ -217,7 +257,6 @@ public class FolderActivity extends FragmentActivity
 				showData(json);
 			}
 		}
-
 	}
 
 	@Override
@@ -225,7 +264,16 @@ public class FolderActivity extends FragmentActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
-		font = Typeface.createFromAsset(getAssets(), "fonts/xiyuan.ttf");
+
+		database = new Database(FolderActivity.this);
+		initView();
+		loadData();
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	private void initView()
+	{
 		ll_levels = (LinearLayout) findViewById(R.id.ll_levels);
 		vp_folder = (LazyViewPager) findViewById(R.id.vp_folder);
 
@@ -249,20 +297,15 @@ public class FolderActivity extends FragmentActivity
 			}
 
 			@Override
-			public void onPageSelected(int arg0)
+			public void onPageSelected(int position)
 			{
 				for (int i = 0; i < ll_levels.getChildCount(); i++)
 				{
 					TextView childAt = (TextView) ll_levels.getChildAt(i);
-					childAt.setTextColor(i == arg0 ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
+					childAt.setTextColor(i == position ? ConstantsUtil.ColorOne : ConstantsUtil.ColorTwo);
 				}
 			}
 		});
-		database = new Database(FolderActivity.this);
-		loadData();
-
-		// ActionBar
-		getActionBar().setDisplayShowHomeEnabled(true);
 	}
 
 	@Override
@@ -382,7 +425,7 @@ public class FolderActivity extends FragmentActivity
 						List<Folder> folders = new Gson().fromJson(responseInfo.result, new TypeToken<List<Folder>>()
 						{
 						}.getType());
-						
+
 						for (Folder folder : folders)
 						{
 							if (!database.folderExists(folder.Id))

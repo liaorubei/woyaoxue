@@ -174,7 +174,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="我就是那标准无比的大标题" />
+                    android:text="我就是那标准无比的大标题"
+                    android:textSize="18sp" />
 
                 <View
                     android:layout_width="match_parent"

@@ -7,6 +7,11 @@ import java.util.Observer;
 
 import android.app.Service;
 import android.app.LauncherActivity.ListItem;
+import android.app.Notification;
+import android.app.Notification.Action;
+import android.app.Notification.Builder;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -20,6 +25,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewDebug.FlagToString;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
@@ -39,6 +45,7 @@ import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Document;
 import com.newclass.woyaoxue.service.DownloadService;
@@ -57,6 +64,11 @@ public class TestActivity extends FragmentActivity
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
-	{}
+	{
+
+
+		
+
+	}
 
 }

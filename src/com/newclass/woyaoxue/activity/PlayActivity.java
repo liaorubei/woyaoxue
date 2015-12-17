@@ -108,7 +108,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	private TextView tv_bSide, tv_aSide, tv_title;
 	private TextView tv_play_record_time;
 	private MediaState currentState = MediaState.播放原音;
-	private Typeface font;
 
 	private void fillData(Document document)
 	{
@@ -325,10 +324,7 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 		tv_aSide = (TextView) findViewById(R.id.tv_aSide);
 		tv_bSide = (TextView) findViewById(R.id.tv_bSide);
 		tv_title = (TextView) findViewById(R.id.tv_title);
-		tv_aSide.setTypeface(font);
-		tv_bSide.setTypeface(font);
-		tv_title.setTypeface(font);
-
+		
 		iv_cover = (ImageView) findViewById(R.id.iv_cover);
 		ll_play = (LinearLayout) findViewById(R.id.ll_play);
 		ll_record = (LinearLayout) findViewById(R.id.ll_record);
@@ -496,8 +492,6 @@ public class PlayActivity extends Activity implements OnClickListener, OnPrepare
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_play);
-
-		font = Typeface.createFromAsset(getAssets(), "fonts/xiyuan.ttf");
 
 		initView();
 
