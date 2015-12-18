@@ -94,8 +94,9 @@ public class TeacherActivity extends Activity implements OnClickListener
 			break;
 
 		case R.id.bt_group:
-
-			startActivity(new Intent(this, GroupActivity.class));
+			Intent intent = new Intent(this, GroupActivity.class);
+			intent.putExtra(GroupActivity.ENTER_TYPE, GroupActivity.ENTER_TEACHER);
+			startActivity(intent);
 
 			break;
 

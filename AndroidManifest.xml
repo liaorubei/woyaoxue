@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="20151217" >
+    android:versionName="20151218" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -129,7 +129,6 @@
             android:label="教师端" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="sdfasdf" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -152,7 +151,7 @@
         <!-- 测试界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.TestActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.SignInActivity" />
-        <activity android:name="com.newclass.woyaoxue.activity.SignUpActivity" />
+        <activity android:name="com.newclass.woyaoxue.activity.SignUpActivity" android:label="注册帐号"/>
         <activity android:name="com.newclass.woyaoxue.activity.MessageActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.LiveChatActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.ContactActivity" />

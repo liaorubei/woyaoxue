@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements OnClickListener
 		if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password))
 		{
 		}
-		//startActivity(new Intent(this, SignInActivity.class));
+		startActivity(new Intent(this, SignInActivity.class));
 
 	}
 

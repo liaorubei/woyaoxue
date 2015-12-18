@@ -39,15 +39,15 @@ public class GroupCreate extends Activity implements OnClickListener
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_group_create);
 
-		initView();
+		//initView();
 		getActionBar().setDisplayShowHomeEnabled(true);
 	}
 
 	private void initView()
 	{
-		et_name = (EditText) findViewById(R.id.et_name);
+		//et_name = (EditText) findViewById(R.id.et_name);
 		et_theme = (EditText) findViewById(R.id.et_theme);
-		et_notice = (EditText) findViewById(R.id.et_notice);
+		//et_notice = (EditText) findViewById(R.id.et_notice);
 
 		bt_create = (Button) findViewById(R.id.bt_create);
 		bt_create.setOnClickListener(this);

@@ -32,16 +32,23 @@ import android.widget.TextView;
 
 public class GroupActivity extends Activity implements OnClickListener
 {
+	public static final int ENTER_STUDENT = 0;
+	public static final String ENTER_TYPE = "ENTER_TYPE";
+	public static final int ENTER_TEACHER = 1;
 	private Button bt_create;
 	private ListView listview;
 	private List<Group> list;
 	private MyAdapter adapter;
+	private int enter;
+	private TextView tv_title;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_group);
+
+		enter = getIntent().getIntExtra(ENTER_TYPE, ENTER_STUDENT);
 
 		initView();
 		initData();
@@ -50,9 +57,12 @@ public class GroupActivity extends Activity implements OnClickListener
 	private void initData()
 	{
 		Parameters parameters = new Parameters();
-		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-		String accid = sp.getString("accid", "");
-		parameters.add("accid", accid);
+		if (enter == ENTER_TEACHER)
+		{
+			SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+			String accid = sp.getString("accid", "");
+			parameters.add("accid", accid);
+		}
 		HttpUtil.post(NetworkUtil.groupSelect, parameters, new RequestCallBack<String>()
 		{
 
@@ -87,6 +97,9 @@ public class GroupActivity extends Activity implements OnClickListener
 	{
 		bt_create = (Button) findViewById(R.id.bt_create);
 		bt_create.setOnClickListener(this);
+		bt_create.setVisibility(enter == ENTER_TEACHER ? View.VISIBLE : View.GONE);
+		tv_title = (TextView) findViewById(R.id.tv_title);
+		tv_title.setVisibility(enter == ENTER_TEACHER ? View.VISIBLE : View.GONE);
 
 		listview = (ListView) findViewById(R.id.listview);
 		list = new ArrayList<Group>();

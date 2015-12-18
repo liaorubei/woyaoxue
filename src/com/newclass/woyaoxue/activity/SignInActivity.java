@@ -3,8 +3,6 @@ package com.newclass.woyaoxue.activity;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import org.apache.http.NameValuePair;
-
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -20,9 +18,6 @@ import com.netease.nimlib.sdk.auth.AuthService;
 import com.netease.nimlib.sdk.auth.AuthServiceObserver;
 import com.netease.nimlib.sdk.auth.LoginInfo;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
-import com.netease.nimlib.sdk.avchat.constant.AVChatEventType;
-import com.netease.nimlib.sdk.avchat.model.AVChatCalleeAckEvent;
-import com.netease.nimlib.sdk.avchat.model.AVChatCommonEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
 import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
 import com.netease.nimlib.sdk.msg.MsgServiceObserve;
@@ -48,10 +43,8 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.app.Notification.Builder;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -123,26 +116,7 @@ public class SignInActivity extends Activity implements OnClickListener
 			break;
 
 		case R.id.tv_signup:
-			// Instantiate a Builder object.
-			NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-			// Creates an Intent for the Activity
-			Intent notifyIntent = new Intent(this, MainActivity.class);
-			// Sets the Activity to start in a new, empty task
-			notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-			// Creates the PendingIntent
-			PendingIntent notifyPendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-			// Puts the PendingIntent into the notification builder
-			builder.setContentIntent(notifyPendingIntent);
-			builder.setContentText("text------------------------------------------------------------");
-			builder.setContentTitle("title");
-			builder.setSmallIcon(R.drawable.ic_launcher);
-			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-			notificationManager.notify(1, builder.build());
-			Log.i("logi", "NOTIFICATION_SERVICE:" + getSystemService(NOTIFICATION_SERVICE));
-
-			// startActivityForResult(new Intent(SignInActivity.this, SignUpActivity.class), SignUp);
+			startActivityForResult(new Intent(SignInActivity.this, SignUpActivity.class), SignUp);
 			break;
 		default:
 			break;

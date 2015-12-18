@@ -21,6 +21,8 @@ public class NetworkUtil
 	public static final String userSearch = domain + "/api/user/search";
 	public static final String userSignIn = domain + "/api/user/login";
 
+	public static final String userCaptcha = domain + "/api/user/Captcha";
+
 	public static String format(String text, Object... para)
 	{
 		for (int i = 0; i < para.length; i++)

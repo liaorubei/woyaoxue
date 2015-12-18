@@ -10,4 +10,5 @@ public class Group
 	public String Notice;
 	public String Theme;
 	public String Time;
+	public Level Level;
 }

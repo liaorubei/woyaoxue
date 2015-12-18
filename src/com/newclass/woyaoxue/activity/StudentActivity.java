@@ -5,10 +5,9 @@ import com.newclass.woyaoxue.fragment.FriendFragment;
 import com.newclass.woyaoxue.fragment.GroupsFragment;
 import com.newclass.woyaoxue.fragment.RandomFragment;
 import com.newclass.woyaoxue.view.LazyViewPager;
-import com.newclass.woyaoxue.view.LazyViewPager.OnPageChangeListener;
 import com.voc.woyaoxue.R;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -24,6 +23,7 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 {
 	private LazyViewPager viewpager;
 	private LinearLayout ll_ctrl;
+	private TextView tv_random, tv_choose, tv_groups, tv_friend;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -40,52 +40,14 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 	private void initView()
 	{
 		viewpager = (LazyViewPager) findViewById(R.id.viewpager);
-		viewpager.setOnPageChangeListener(new OnPageChangeListener()
-		{
+		tv_random = (TextView) findViewById(R.id.tv_random);
+		tv_choose = (TextView) findViewById(R.id.tv_choose);
+		tv_groups = (TextView) findViewById(R.id.tv_groups);
+		tv_friend = (TextView) findViewById(R.id.tv_friend);
 
-			@Override
-			public void onPageSelected(int position)
-			{
-				int childCount = ll_ctrl.getChildCount();
-				for (int i = 0; i < childCount; i++)
-				{
-					TextView childAt = (TextView) ll_ctrl.getChildAt(i);
-					childAt.setTextColor(i == position ? Color.BLUE : Color.BLACK);
-				}
-			}
-
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-			{
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int state)
-			{
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-		ll_ctrl = (LinearLayout) findViewById(R.id.ll_ctrl);
-		int childCount = ll_ctrl.getChildCount();
-		for (int i = 0; i < childCount; i++)
-		{
-			final int position = i;
-			TextView childAt = (TextView) ll_ctrl.getChildAt(i);
-			childAt.setTextColor(i == 0 ? Color.BLUE : Color.BLACK);
-			childAt.setOnClickListener(new OnClickListener()
-			{
-
-				@Override
-				public void onClick(View v)
-				{
-					viewpager.setCurrentItem(position);
-				}
-			});
-		}
+		tv_choose.setOnClickListener(this);
+		tv_groups.setOnClickListener(this);
+		tv_friend.setOnClickListener(this);
 	}
 
 	@Override
@@ -94,6 +56,19 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.viewpager:
+
+			break;
+		case R.id.tv_choose:
+
+			break;
+
+		case R.id.tv_groups:
+			Intent intent = new Intent(StudentActivity.this, GroupActivity.class);
+			intent.putExtra(GroupActivity.ENTER_TYPE, GroupActivity.ENTER_STUDENT);
+			startActivity(intent);
+
+			break;
+		case R.id.tv_friend:
 
 			break;
 
@@ -139,7 +114,7 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 		public int getCount()
 		{
 
-			return 4;
+			return 1;
 		}
 	}
 
