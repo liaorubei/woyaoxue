@@ -24,13 +24,13 @@ import android.widget.TextView;
 
 public class LiveChatActivity extends Activity implements OnClickListener
 {
-
-	public static final String CHATSTATE_KEY = "ChatState";
+	public static final String CHATSTATE_KEY = "CHATSTATE_KEY";
 	public static final int CHATSTATE_NONE = 0;
 	public static final int CHATSTATE_CALL = 1;
 	public static final int CHATSTATE_TAKE = 2;
 	public static final int CHATSTATE_BUSY = 3;
 	public static int CHAT_STATE = CHATSTATE_NONE;
+
 	private Button bt_accept, bt_hangup;
 	private SurfaceView sv_video;
 	private TextView tv_call, tv_take, tv_busy;
@@ -42,6 +42,7 @@ public class LiveChatActivity extends Activity implements OnClickListener
 		Intent intent = getIntent();
 		String target = intent.getStringExtra("target");
 		CHAT_STATE = intent.getIntExtra(CHATSTATE_KEY, CHATSTATE_NONE);
+
 		Log.i("logi", "chatState:" + CHAT_STATE + " target:" + target);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_livechat);
@@ -99,14 +100,16 @@ public class LiveChatActivity extends Activity implements OnClickListener
 					else
 					{
 						CommonUtil.toast("设备异常,无法通话");
+						finish();
 					}
 					break;
-
 				case CALLEE_ACK_REJECT:
+					CommonUtil.toast("对方拒绝接听");
 					finish();
 					break;
 
 				case CALLEE_ACK_BUSY:
+					CommonUtil.toast("对方忙");
 					finish();
 					break;
 				default:

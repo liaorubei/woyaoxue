@@ -59,17 +59,25 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 
 			break;
 		case R.id.tv_choose:
+		{
+			Intent intent = new Intent(StudentActivity.this, ChooseActivity.class);
+			startActivity(intent);
+		}
 
 			break;
 
 		case R.id.tv_groups:
+		{
 			Intent intent = new Intent(StudentActivity.this, GroupActivity.class);
 			intent.putExtra(GroupActivity.ENTER_TYPE, GroupActivity.ENTER_STUDENT);
 			startActivity(intent);
-
+		}
 			break;
 		case R.id.tv_friend:
-
+		{
+			Intent intent = new Intent(StudentActivity.this, FriendActivity.class);
+			startActivity(intent);
+		}
 			break;
 
 		default:

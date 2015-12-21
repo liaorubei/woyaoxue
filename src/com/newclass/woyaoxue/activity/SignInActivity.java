@@ -259,7 +259,7 @@ public class SignInActivity extends Activity implements OnClickListener
 		// 消息监听注册
 		NIMClient.getService(MsgServiceObserve.class).observeReceiveMessage(new Observer<List<IMMessage>>()
 		{
-
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void onEvent(List<IMMessage> list)
 			{

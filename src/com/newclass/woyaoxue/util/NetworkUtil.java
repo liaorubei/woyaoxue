@@ -6,22 +6,22 @@ public class NetworkUtil
 
 	public static String domain = "http://voc2015.azurewebsites.net";
 
-	public static final String groupCreate = domain + "/api/Group/Create";
-	public static final String groupRemove = domain + "/api/Group/Remove";
 	public static final String groupAccede = domain + "/api/Group/Create";
+	public static final String groupCreate = domain + "/api/Group/Create";
 	public static final String groupModify = domain + "/api/Group/Create";
+	public static final String groupRemove = domain + "/api/Group/Remove";
 	public static final String groupSelect = domain + "/api/Group/Select";
 
 	public static final String studentCall = domain + "/api/student/call";
 	public static final String teacherEnqueue = domain + "/api/teacher/enqueue";
 	public static final String teacherGroup = domain + "/api/teacher/group";
+	public static final String teacherInQueue = domain + "/api/teacher/InQueue";
+	public static final String userCaptcha = domain + "/api/user/Captcha";
 	public static final String userCreate = domain + "/api/user/create";
 	public static final String userLogout = domain + "/api/user/logout";
 	public static final String userRefresh = domain + "/api/user/refresh";
 	public static final String userSearch = domain + "/api/user/search";
 	public static final String userSignIn = domain + "/api/user/login";
-
-	public static final String userCaptcha = domain + "/api/user/Captcha";
 
 	public static String format(String text, Object... para)
 	{
