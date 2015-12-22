@@ -1,14 +1,6 @@
 package com.newclass.woyaoxue.activity;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,9 +31,7 @@ import com.newclass.woyaoxue.view.LazyViewPager.OnPageChangeListener;
 import com.voc.woyaoxue.R;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -161,13 +151,13 @@ public class FolderActivity extends FragmentActivity
 
 	}
 
-	private void loadData()
+	private void initData()
 	{
 		String url = NetworkUtil.getLevels();
 		final UrlCache cache = database.cacheSelectByUrl(url);
 		begins = System.currentTimeMillis();
-		//usenew();
-		 useUtils(url, cache);
+		// usenew();
+		useUtils(url, cache);
 	}
 
 	private void usenew()
@@ -188,7 +178,6 @@ public class FolderActivity extends FragmentActivity
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -197,7 +186,7 @@ public class FolderActivity extends FragmentActivity
 
 	private void useUtils(String url, final UrlCache cache)
 	{
-		if (true)//cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
+		if (true)// cache == null || (System.currentTimeMillis() - cache.UpdateAt > 600000))
 		{
 			Log.i("使用网络:" + url);
 			new HttpUtils().send(HttpMethod.GET, NetworkUtil.getLevels(), new RequestCallBack<String>()
@@ -266,8 +255,9 @@ public class FolderActivity extends FragmentActivity
 		setContentView(R.layout.activity_home);
 
 		database = new Database(FolderActivity.this);
+		
 		initView();
-		loadData();
+		initData();
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}

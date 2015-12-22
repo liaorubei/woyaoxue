@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -37,6 +38,8 @@ import com.netease.nimlib.sdk.rts.model.RTSTunData;
 import com.newclass.woyaoxue.MainActivity;
 import com.newclass.woyaoxue.MyApplication;
 import com.newclass.woyaoxue.bean.Answer;
+import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
@@ -147,7 +150,7 @@ public class SignInActivity extends Activity implements OnClickListener
 		RequestParams params = new RequestParams();
 		params.addBodyParameter("username", username);
 		params.addBodyParameter("password", password);
-
+		
 		new HttpUtils().send(HttpMethod.POST, NetworkUtil.userSignIn, params, new RequestCallBack<String>()
 		{
 			@Override
@@ -161,12 +164,11 @@ public class SignInActivity extends Activity implements OnClickListener
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
 				bt_login.setEnabled(true);
-				Answer answer = new Gson().fromJson(responseInfo.result, Answer.class);
-				Log.i("logi", "应用登录成功:" + answer.toString());
-				if (answer.code == 200)
+				Response<User> response = new Gson().fromJson(responseInfo.result,new TypeToken<Response<User>>(){}.getType());
+				if (response.code == 200)
 				{
 					// 登录云信
-					signInNim(answer.info.accid, answer.info.token);
+					signInNim(response.info.Accid, response.info.Token);
 					// 保护登录信息
 					Editor editor = SignInActivity.this.getSharedPreferences("user", MODE_PRIVATE).edit();
 					editor.putString("username", username);
@@ -177,7 +179,6 @@ public class SignInActivity extends Activity implements OnClickListener
 				{
 					Toast.makeText(MyApplication.getContext(), "登录失败,帐号密码不匹配", Toast.LENGTH_SHORT).show();
 				}
-
 			}
 		});
 	}

@@ -8,12 +8,14 @@ import com.newclass.woyaoxue.view.LazyViewPager;
 import com.voc.woyaoxue.R;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
@@ -35,6 +37,16 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 
 		PagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		viewpager.setAdapter(myPagerAdapter);
+		
+		// 自动登录
+		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
+		String username = sp.getString("username", "");
+		String password = sp.getString("password", "");
+
+		if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password))
+		{
+		}
+		startActivity(new Intent(this, SignInActivity.class));
 	}
 
 	private void initView()

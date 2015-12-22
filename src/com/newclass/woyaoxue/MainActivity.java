@@ -35,17 +35,6 @@ public class MainActivity extends Activity implements OnClickListener
 		// 自动升级服务
 		Intent service = new Intent(this, AutoUpdateService.class);
 		startService(service);
-
-		// 自动登录
-		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-		String username = sp.getString("username", "");
-		String password = sp.getString("password", "");
-
-		if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password))
-		{
-		}
-		startActivity(new Intent(this, SignInActivity.class));
-
 	}
 
 	private Button bt_chat, bt_listen;

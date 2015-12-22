@@ -16,12 +16,13 @@ public class NetworkUtil
 	public static final String teacherEnqueue = domain + "/api/teacher/enqueue";
 	public static final String teacherGroup = domain + "/api/teacher/group";
 	public static final String teacherInQueue = domain + "/api/teacher/InQueue";
-	public static final String userCaptcha = domain + "/api/user/Captcha";
-	public static final String userCreate = domain + "/api/user/create";
-	public static final String userLogout = domain + "/api/user/logout";
-	public static final String userRefresh = domain + "/api/user/refresh";
-	public static final String userSearch = domain + "/api/user/search";
-	public static final String userSignIn = domain + "/api/user/login";
+	public static final String userCaptcha = domain+ "/api/NimUser/Captcha";
+	public static final String userCreate = domain + "/api/NimUser/create";
+	public static final String userLogout = domain + "/api/NimUser/logout";
+	public static final String userSearch = domain + "/api/NimUser/search";
+	public static final String userSignIn = domain + "/api/NimUser/Signin";
+
+	public static final String userVerify = domain+"/api/NimUser/Verify";
 
 	public static String format(String text, Object... para)
 	{

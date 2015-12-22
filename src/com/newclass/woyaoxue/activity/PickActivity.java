@@ -17,7 +17,13 @@ import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class CallTeacherActivity extends Activity implements OnClickListener
+
+/**
+ * 电话接听界面
+ * @author liaorubei
+ *
+ */
+public class PickActivity extends Activity implements OnClickListener
 {
 	public static final String TARGET = "TARGET";
 	protected static final String CALL_TYPE_KEY = "CALL_TYPE_KEY";

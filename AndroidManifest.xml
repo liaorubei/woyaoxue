@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="20151218" >
+    android:versionName="20151222" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -151,7 +151,9 @@
         <!-- 测试界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.TestActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.SignInActivity" />
-        <activity android:name="com.newclass.woyaoxue.activity.SignUpActivity" android:label="注册帐号" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.SignUpActivity"
+            android:label="注册帐号" />
         <activity android:name="com.newclass.woyaoxue.activity.MessageActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.LiveChatActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.ContactActivity" />
@@ -159,8 +161,12 @@
         <activity android:name="com.newclass.woyaoxue.activity.GroupActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.AgoraChatActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.GroupCreate" />
-        <activity android:name="com.newclass.woyaoxue.activity.ChooseActivity" android:label="自选教师" />
-        <activity android:name="com.newclass.woyaoxue.activity.FriendActivity" android:label="我的学友" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.ChooseActivity"
+            android:label="自选教师" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.FriendActivity"
+            android:label="我的学友" />
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />

@@ -24,6 +24,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.bean.UpgradePatch;
+import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
@@ -77,10 +78,12 @@ public class AutoUpdateService extends Service
 						{
 							if (installPack.exists())
 							{
-								installPack.delete();// 如果更新抱下载失败则删除下载不完全的包
+								installPack.delete();// 如果更新包下载失败则删除下载不完全的包
 							}
 							builder.setContentText("下载失败");
-							notificationManager.notify(0, builder.build());
+							notificationManager.cancel(0);
+							
+							CommonUtil.toast("下载失败");
 						}
 
 						@Override
@@ -92,8 +95,7 @@ public class AutoUpdateService extends Service
 								builderNowSetupDialog();
 							}
 							isNowSetupDialog.show();
-							builder.setContentText("下载成功");
-							notificationManager.notify(0, builder.build());
+							notificationManager.cancel(0);;
 						}
 
 						public void onLoading(long total, long current, boolean isUploading)
@@ -111,6 +113,8 @@ public class AutoUpdateService extends Service
 							builder.setContentText("应用更新");
 							builder.setProgress(100, 0, false);
 							notificationManager.notify(0, builder.build());
+							
+							CommonUtil.toast("开始下载");
 						}
 					});
 				}

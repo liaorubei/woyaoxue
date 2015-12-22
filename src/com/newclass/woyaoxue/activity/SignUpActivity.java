@@ -4,6 +4,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.protocol.HTTP;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -11,6 +12,8 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.newclass.woyaoxue.bean.Answer;
+import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.HttpUtil;
 import com.newclass.woyaoxue.util.HttpUtil.Parameters;
@@ -167,15 +170,21 @@ public class SignUpActivity extends Activity implements OnClickListener
 			Parameters parameters = new Parameters();
 			parameters.add("phone", phone);
 			parameters.add("captcha", captcha);
-			HttpUtil.post(NetworkUtil.userCaptcha, parameters, new RequestCallBack<String>()
+			HttpUtil.post(NetworkUtil.userVerify, parameters, new RequestCallBack<String>()
 			{
 
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
+					Response<String> response=	 new Gson().fromJson(responseInfo.result, new TypeToken<Response<String>>(){}.getType());
+					if (response.code==200)
+					{
+						ll_first.setVisibility(View.INVISIBLE);
+						ll_second.setVisibility(View.VISIBLE);
+					}else{
+						CommonUtil.toast(response.desc);	
+					}
 					tv_next.setEnabled(true);
-					ll_first.setVisibility(View.INVISIBLE);
-					ll_second.setVisibility(View.VISIBLE);
 				}
 
 				@Override
@@ -209,9 +218,8 @@ public class SignUpActivity extends Activity implements OnClickListener
 			}
 
 			Parameters parameters = new Parameters();
-			parameters.add("account", phone);
+			parameters.add("username", phone);
 			parameters.add("password", password);
-			parameters.add("phone", phone);
 			parameters.add("nickname", nickname);
 			parameters.add("isteacher", cb_is_teacher.isChecked() + "");
 			HttpUtil.post(NetworkUtil.userCreate, parameters, new RequestCallBack<String>()
@@ -225,7 +233,7 @@ public class SignUpActivity extends Activity implements OnClickListener
 					ll_first.setVisibility(View.INVISIBLE);
 					ll_second.setVisibility(View.INVISIBLE);
 					
-					Answer json = new Gson().fromJson(responseInfo.result, Answer.class);
+					Response<User> json = new Gson().fromJson(responseInfo.result, new TypeToken<Response<User>>(){}.getType());
 
 					Log.i("logi", "创建成功:" + json.toString());
 					if (200 == json.code)

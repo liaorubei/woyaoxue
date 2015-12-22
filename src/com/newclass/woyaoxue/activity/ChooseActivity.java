@@ -114,9 +114,9 @@ public class ChooseActivity extends Activity
 				@Override
 				public void onClick(View v)
 				{
-					Intent intent = new Intent(ChooseActivity.this, CallTeacherActivity.class);
-					intent.putExtra(CallTeacherActivity.TARGET, user.Accid);
-					intent.putExtra(CallTeacherActivity.CALL_TYPE_KEY, CallTeacherActivity.CALL_TYPE_AUDIO);
+					Intent intent = new Intent(ChooseActivity.this, CallActivity.class);
+					intent.putExtra(CallActivity.TARGET, user.Accid);
+					intent.putExtra(CallActivity.CALL_TYPE_KEY, CallActivity.CALL_TYPE_AUDIO);
 					startActivity(intent);
 
 				}
