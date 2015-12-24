@@ -75,7 +75,7 @@ public class ContactActivity extends Activity implements OnClickListener
 			}
 		});
 
-		new HttpUtils().send(HttpMethod.POST, NetworkUtil.userSearch, new RequestCallBack<String>()
+		new HttpUtils().send(HttpMethod.POST, NetworkUtil.userSelect, new RequestCallBack<String>()
 		{
 
 			@Override

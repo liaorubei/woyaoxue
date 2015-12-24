@@ -3,6 +3,8 @@ package com.newclass.woyaoxue.activity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -11,6 +13,9 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.auth.AuthService;
+import com.newclass.woyaoxue.bean.Rank;
+import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.HttpUtil;
 import com.newclass.woyaoxue.util.HttpUtil.Parameters;
 import com.newclass.woyaoxue.util.Log;
@@ -62,26 +67,20 @@ public class TeacherActivity extends Activity implements OnClickListener
 			bt_queue.setEnabled(false);
 
 			Parameters parameters = new Parameters();
-			parameters.add("accid", accid);
-			parameters.add("jsonData", "{'code':200,  'msg':'',  'obj':1234}");
+			parameters.add("id", getSharedPreferences("user", MODE_PRIVATE).getInt("id", 0) + "");
 			HttpUtil.post(NetworkUtil.teacherEnqueue, parameters, new RequestCallBack<String>()
 			{
 
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
+					Response<Rank> resp = new Gson().fromJson(responseInfo.result, new TypeToken<Response<Rank>>()
+					{}.getType());
+					if (resp.code == 200)
+					{
+						Toast.makeText(TeacherActivity.this, "排队成功,当前名次为:" + resp.info.Rank, Toast.LENGTH_SHORT).show();
+					}
 					bt_queue.setEnabled(true);
-					int rank = -1;
-					try
-					{
-						JSONObject object = new JSONObject(responseInfo.result);
-						rank = object.getInt("rank");
-					}
-					catch (JSONException e)
-					{
-						e.printStackTrace();
-					}
-					Toast.makeText(TeacherActivity.this, "排队成功,当前名次为:" + rank, Toast.LENGTH_SHORT).show();
 				}
 
 				@Override

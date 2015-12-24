@@ -29,6 +29,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="昵称" />
+
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="用户名" />
+
+        <TextView
+            android:id="@+id/tv_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="类型" />
     </LinearLayout>
 
 </RelativeLayout>

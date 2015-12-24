@@ -9,7 +9,7 @@ public class Log
 	{
 		if (logOn)
 		{
-			android.util.Log.i(tag, msg);
+			android.util.Log.i("logi:" + tag, msg);
 		}
 	}
 

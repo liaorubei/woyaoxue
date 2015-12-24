@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
@@ -56,7 +57,7 @@ public class AutoUpdateService extends Service
 			public void onClick(DialogInterface dialog, int which)
 			{
 				// 2.检查是否已经下载了安装包
-				if (installPack != null && installPack.exists())
+				if (false)// installPack != null && installPack.exists())
 				{
 					// 如果已经下载了最新安装包.询问是否现在安装
 					if (isNowSetupDialog == null)
@@ -68,7 +69,10 @@ public class AutoUpdateService extends Service
 				else
 				{
 					// 如果还没有下载最新安装包,则开始下载最新安装包
-					new HttpUtils().download(NetworkUtil.getFullPath(upgradePatch.PackagePath), installPack.getAbsolutePath(), true, true, new RequestCallBack<File>()
+
+					boolean autoResume = true; // 如果目标文件存在，接着未完成的部分继续下载。服务器不支持RANGE时将从新下载。
+					boolean autoRename = false; // 如果从请求返回信息中获取到文件名，下载完成后自动重命名。
+					new HttpUtils().download(NetworkUtil.getFullPath(upgradePatch.PackagePath), installPack.getAbsolutePath(), autoResume, autoRename, new RequestCallBack<File>()
 					{
 						private NotificationManager notificationManager;
 						private NotificationCompat.Builder builder;
@@ -82,8 +86,8 @@ public class AutoUpdateService extends Service
 							}
 							builder.setContentText("下载失败");
 							notificationManager.cancel(0);
-							
-							CommonUtil.toast("下载失败");
+
+							CommonUtil.toast("下载失败"+msg);
 						}
 
 						@Override
@@ -113,7 +117,7 @@ public class AutoUpdateService extends Service
 							builder.setContentText("应用更新");
 							builder.setProgress(100, 0, false);
 							notificationManager.notify(0, builder.build());
-							
+
 							CommonUtil.toast("开始下载");
 						}
 					});

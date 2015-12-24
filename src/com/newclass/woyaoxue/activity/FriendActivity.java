@@ -8,11 +8,17 @@ import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.netease.nimlib.sdk.NIMClient;
+import com.netease.nimlib.sdk.friend.FriendService;
+import com.netease.nimlib.sdk.uinfo.UserService;
+import com.netease.nimlib.sdk.uinfo.model.NimUserInfo;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Response;
 import com.newclass.woyaoxue.bean.User;
+import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.HttpUtil;
 import com.newclass.woyaoxue.util.HttpUtil.Parameters;
+import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
@@ -20,6 +26,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -41,51 +48,30 @@ public class FriendActivity extends Activity
 		setContentView(R.layout.activity_friend);
 
 		initView();
-		// initData();
+		initData();
 	}
 
 	private void initData()
 	{
-		Parameters parameters = new Parameters();
-		HttpUtil.post(NetworkUtil.teacherInQueue, parameters, new RequestCallBack<String>()
+		// 构建通讯录
+		// 如果使用网易云信用户关系、用户资料托管，构建通讯录，先获取我所有好友帐号，再根据帐号去获取对应的用户资料，代码示例如下:
+		List<String> accounts = NIMClient.getService(FriendService.class).getFriendAccounts(); // 获取所有好友帐号
+		List<NimUserInfo> users = NIMClient.getService(UserService.class).getUserInfo(accounts); // 获取所有好友用户资料
+
+		for (NimUserInfo nim : users)
 		{
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo)
-			{
-				Response<List<User>> response = new Gson().fromJson(responseInfo.result, new TypeToken<Response<List<User>>>()
-				{
-				}.getType());
-				if (response.code == 200 && response.info != null)
-				{
-					List<User> users = response.info;
-					for (User user : users)
-					{
-						list.add(user);
-					}
-					adapter.notifyDataSetChanged();
-				}
-
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{
-				// TODO Auto-generated method stub
-
-			}
-		});
+			User user = new User();
+			user.Accid = nim.getAccount();
+			user.NickName = nim.getName();
+			list.add(user);
+		}
+		adapter.notifyDataSetInvalidated();
 	}
 
 	private void initView()
 	{
 		listview = (ListView) findViewById(R.id.listview);
 		list = new ArrayList<User>();
-		list.add(new User());
-		list.add(new User());
-		list.add(new User());
-		list.add(new User());
-		list.add(new User());
 		adapter = new MyAdapter(list);
 		listview.setAdapter(adapter);
 
@@ -105,7 +91,9 @@ public class FriendActivity extends Activity
 		{
 			final User user = list.get(position);
 			View inflate = View.inflate(FriendActivity.this, R.layout.listitem_friend, null);
+			TextView tv_username = (TextView) inflate.findViewById(R.id.tv_username);
 			TextView tv_nickname = (TextView) inflate.findViewById(R.id.tv_nickname);
+			tv_username.setText(user.Username);
 			tv_nickname.setText(user.NickName);
 
 			Button bt_call = (Button) inflate.findViewById(R.id.bt_call);
@@ -132,5 +120,21 @@ public class FriendActivity extends Activity
 	{
 		getMenuInflater().inflate(R.menu.friend_activity, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		case R.id.menu_add_friend:
+			startActivity(new Intent(FriendActivity.this, FriendSearchActivity.class));
+			break;
+
+		default:
+			break;
+		}
+
+		return super.onMenuItemSelected(featureId, item);
 	}
 }

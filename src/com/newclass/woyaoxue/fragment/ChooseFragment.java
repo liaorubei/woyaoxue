@@ -1,19 +1,27 @@
 package com.newclass.woyaoxue.fragment;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.netease.nimlib.sdk.NIMClient;
-import com.netease.nimlib.sdk.avchat.AVChatCallback;
-import com.netease.nimlib.sdk.avchat.AVChatManager;
-import com.netease.nimlib.sdk.avchat.constant.AVChatType;
-import com.netease.nimlib.sdk.avchat.model.AVChatData;
-import com.netease.nimlib.sdk.avchat.model.VideoChatParam;
 import com.netease.nimlib.sdk.msg.MessageBuilder;
 import com.netease.nimlib.sdk.msg.MsgService;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
+import com.newclass.woyaoxue.activity.CallActivity;
+import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.CommonUtil;
+import com.newclass.woyaoxue.util.HttpUtil;
+import com.newclass.woyaoxue.util.HttpUtil.Parameters;
 import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -63,32 +71,8 @@ public class ChooseFragment extends Fragment implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.bt_call:
-			// 请求服务器
 
-			String teacherAccid = "bf09f7dd02e549f4a16af0cf8e9a5701";
-			// 发起网络通话,并监听是否拨通的通知
 
-			VideoChatParam param = new VideoChatParam(sv_video, 0);
-			AVChatManager.getInstance().call(teacherAccid, AVChatType.AUDIO, param, new AVChatCallback<AVChatData>()
-			{
-				@Override
-				public void onSuccess(AVChatData avChatData)
-				{
-					CommonUtil.toast("拨打成功");
-				}
-
-				@Override
-				public void onFailed(int arg0)
-				{
-					CommonUtil.toast("网络失败,请重试");
-				}
-
-				@Override
-				public void onException(Throwable arg0)
-				{
-					CommonUtil.toast("网络异常,请重试");
-				}
-			});
 
 			break;
 

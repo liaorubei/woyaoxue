@@ -13,16 +13,19 @@ public class NetworkUtil
 	public static final String groupSelect = domain + "/api/Group/Select";
 
 	public static final String studentCall = domain + "/api/student/call";
-	public static final String teacherEnqueue = domain + "/api/teacher/enqueue";
+	public static final String teacherEnqueue = domain + "/api/NimUser/enqueue";
 	public static final String teacherGroup = domain + "/api/teacher/group";
-	public static final String teacherInQueue = domain + "/api/teacher/InQueue";
-	public static final String userCaptcha = domain+ "/api/NimUser/Captcha";
+	public static final String teacherInQueue = domain + "/api/NimUser/TeacherInqueue";
+	public static final String userCaptcha = domain + "/api/NimUser/Captcha";
 	public static final String userCreate = domain + "/api/NimUser/create";
 	public static final String userLogout = domain + "/api/NimUser/logout";
-	public static final String userSearch = domain + "/api/NimUser/search";
+	public static final String userSelect = domain + "/api/NimUser/Select";
 	public static final String userSignIn = domain + "/api/NimUser/Signin";
 
-	public static final String userVerify = domain+"/api/NimUser/Verify";
+	public static final String userVerify = domain + "/api/NimUser/Verify";
+
+	public static final String chooseTeacher = domain + "/api/nimUser/ChooseTeacher";
+	public static final String ObtainTeacher = domain + "/api/nimUser/ObtainTeacher";
 
 	public static String format(String text, Object... para)
 	{

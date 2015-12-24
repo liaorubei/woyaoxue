@@ -8,7 +8,9 @@ import com.netease.nimlib.sdk.auth.LoginInfo;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
 import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
+import com.netease.nimlib.sdk.msg.MsgServiceObserve;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
+import com.netease.nimlib.sdk.msg.model.CustomNotification;
 import com.netease.nimlib.sdk.uinfo.UserInfoProvider;
 import com.newclass.woyaoxue.activity.MessageActivity;
 import com.newclass.woyaoxue.util.ConstantsUtil;
@@ -38,6 +40,29 @@ public class MyApplication extends Application
 		NIMClient.init(this, loginInfo, options);
 		// 监听音频视频实时交流来电
 		// enableAVChat();
+
+		// 注册NIMClinet关的观察者
+		//registerNimClientObserver();
+	}
+
+	private void registerNimClientObserver()
+	{
+		// 如果有自定义通知是作用于全局的，不依赖某个特定的 Activity，那么这段代码应该在 Application 的 onCreate 中就调用
+		// 自定义通知。
+		// 区别于IMMessage，SDK仅透传该类型消息，不负责解析和存储。消息内容由第三方APP自由扩展。
+		// 发送给个人的自定义通知消息可选择要不要发送给当前不在线的用户。
+		// 发送给群的自定义通知消息则只有当前在线的群成员才能收到。
+		NIMClient.getService(MsgServiceObserve.class).observeCustomNotification(new Observer<CustomNotification>()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onEvent(CustomNotification message)
+			{
+				// 在这里处理自定义通知。
+
+			}
+		}, true);
 	}
 
 	private void enableAVChat()

@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="手机/邮箱"
-        android:text="13522222222" />
+        android:inputType="phone" />
 
     <EditText
         android:id="@+id/et_password"

@@ -21,8 +21,13 @@ import com.netease.nimlib.sdk.auth.LoginInfo;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
 import com.netease.nimlib.sdk.avchat.model.AVChatRingerConfig;
+import com.netease.nimlib.sdk.friend.FriendService;
+import com.netease.nimlib.sdk.friend.model.AddFriendNotify;
 import com.netease.nimlib.sdk.msg.MsgServiceObserve;
+import com.netease.nimlib.sdk.msg.SystemMessageObserver;
+import com.netease.nimlib.sdk.msg.constant.SystemMessageType;
 import com.netease.nimlib.sdk.msg.model.IMMessage;
+import com.netease.nimlib.sdk.msg.model.SystemMessage;
 import com.netease.nimlib.sdk.rts.RTSCallback;
 import com.netease.nimlib.sdk.rts.RTSChannelStateObserver;
 import com.netease.nimlib.sdk.rts.RTSManager;
@@ -46,8 +51,11 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -143,6 +151,8 @@ public class SignInActivity extends Activity implements OnClickListener
 
 		initView();
 
+		NIMClient.getService(AuthService.class).logout();
+
 	}
 
 	public void signIn(final String username, final String password)
@@ -150,7 +160,7 @@ public class SignInActivity extends Activity implements OnClickListener
 		RequestParams params = new RequestParams();
 		params.addBodyParameter("username", username);
 		params.addBodyParameter("password", password);
-		
+
 		new HttpUtils().send(HttpMethod.POST, NetworkUtil.userSignIn, params, new RequestCallBack<String>()
 		{
 			@Override
@@ -164,13 +174,17 @@ public class SignInActivity extends Activity implements OnClickListener
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
 				bt_login.setEnabled(true);
-				Response<User> response = new Gson().fromJson(responseInfo.result,new TypeToken<Response<User>>(){}.getType());
+				Response<User> response = new Gson().fromJson(responseInfo.result, new TypeToken<Response<User>>()
+				{}.getType());
 				if (response.code == 200)
 				{
 					// 登录云信
 					signInNim(response.info.Accid, response.info.Token);
 					// 保护登录信息
 					Editor editor = SignInActivity.this.getSharedPreferences("user", MODE_PRIVATE).edit();
+					editor.putInt("id", response.info.Id);
+					editor.putString("accid", response.info.Accid);
+					editor.putString("token", response.info.Token);
 					editor.putString("username", username);
 					editor.putString("password", password);
 					editor.commit();
@@ -261,6 +275,7 @@ public class SignInActivity extends Activity implements OnClickListener
 		NIMClient.getService(MsgServiceObserve.class).observeReceiveMessage(new Observer<List<IMMessage>>()
 		{
 			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void onEvent(List<IMMessage> list)
 			{
@@ -313,21 +328,21 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onException(Throwable arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onFailed(int arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onSuccess(Boolean arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 		});
@@ -390,7 +405,7 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(RTSCommonEvent arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 		}, true);
@@ -404,21 +419,21 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onException(Throwable arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onFailed(int arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onSuccess(Void arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 		});
@@ -431,7 +446,7 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(RTSControlEvent arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 		}, true);
@@ -444,7 +459,7 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(RTSTimeOutEvent arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 		}, true);
@@ -457,42 +472,42 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onRecordInfo(RTSTunType arg0, String arg1, String arg2)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onNetworkStatusChange(RTSTunType arg0, int arg1)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onError(RTSTunType arg0, int arg1)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onDisconnectServer(RTSTunType arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onConnectResult(RTSTunType arg0, int arg1)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 
 			@Override
 			public void onChannelEstablished(RTSTunType arg0)
 			{
-				// TODO Auto-generated method stub
+				
 
 			}
 		}, true);
@@ -517,5 +532,70 @@ public class SignInActivity extends Activity implements OnClickListener
 
 			}
 		}, true);
+
+		// ===================================好友======================================================
+		NIMClient.getService(SystemMessageObserver.class).observeReceiveSystemMsg(new Observer<SystemMessage>()
+		{
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void onEvent(SystemMessage sysMsg)
+			{
+				switch (sysMsg.getType())
+				{
+				case AddFriend:// 添加好友
+					AddFriendNotify attachData = (AddFriendNotify) sysMsg.getAttachObject();
+					if (attachData != null)
+					{
+						// 针对不同的事件做处理
+						if (attachData.getEvent() == AddFriendNotify.Event.RECV_ADD_FRIEND_DIRECT)
+						{
+							CommonUtil.toast("有人添加你为他/她/它的好友");
+							// 对方直接添加你为好友
+						}
+						else if (attachData.getEvent() == AddFriendNotify.Event.RECV_AGREE_ADD_FRIEND)
+						{
+							CommonUtil.toast("对方通过了你的好友请求");
+							// 对方通过了你的好友验证请求
+						}
+						else if (attachData.getEvent() == AddFriendNotify.Event.RECV_REJECT_ADD_FRIEND)
+						{
+							CommonUtil.toast("对方拒绝了你的好友请求");
+							// 对方拒绝了你的好友验证请求
+						}
+						else if (attachData.getEvent() == AddFriendNotify.Event.RECV_ADD_FRIEND_VERIFY_REQUEST)
+						{
+							// 对方请求添加好友，一般场景会让用户选择同意或拒绝对方的好友请求。
+							// 通过message.getContent()获取好友验证请求的附言
+							Intent intent = new Intent(getApplication(), FriendAddActivity.class);
+							intent.putExtra("account", sysMsg.getFromAccount());
+							intent.putExtra("content", sysMsg.getContent());
+							startActivity(intent);
+
+						}
+					}
+					break;
+				case ApplyJoinTeam:
+
+					break;
+				case DeclineTeamInvite:
+
+					break;
+				case RejectTeamApply:
+
+					break;
+				case TeamInvite:
+
+					break;
+				case undefined:
+
+					break;
+				default:
+					break;
+				}
+
+			}
+		}, true);
+
 	}
 }

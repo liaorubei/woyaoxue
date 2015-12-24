@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.db.table.KeyValue;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -27,8 +28,11 @@ import com.netease.nimlib.sdk.rts.RTSManager;
 import com.netease.nimlib.sdk.rts.constant.RTSTunType;
 import com.netease.nimlib.sdk.rts.model.RTSData;
 import com.netease.nimlib.sdk.rts.model.RTSOptions;
+import com.newclass.woyaoxue.activity.CallActivity;
 import com.newclass.woyaoxue.activity.LiveChatActivity;
 import com.newclass.woyaoxue.bean.Answer;
+import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.HttpUtil;
 import com.newclass.woyaoxue.util.HttpUtil.Parameters;
@@ -36,6 +40,7 @@ import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -83,39 +88,26 @@ public class RandomFragment extends Fragment implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.bt_call:
+		{
+			// 请求服务器
 			Parameters parameters = new Parameters();
-			parameters.add("", "");
-
-			HttpUtil.post(NetworkUtil.studentCall, parameters, new RequestCallBack<String>()
+			parameters.add("id", getActivity().getSharedPreferences("user", Context.MODE_PRIVATE).getInt("id", 0) + "");
+			HttpUtil.post(NetworkUtil.ObtainTeacher, parameters, new RequestCallBack<String>()
 			{
 
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo)
 				{
-					Log.i("logi", "result" + responseInfo.result);
-
-					JSONObject object;
-					try
+					Response<User> resp = new Gson().fromJson(responseInfo.result, new TypeToken<Response<User>>()
+					{}.getType());
+					if (resp.code == 200)
 					{
-						object = new JSONObject(responseInfo.result);
-						int code = object.getInt("code");
-						String accid = object.getString("accid");
 
-						if (code == 200)
-						{
-							Intent intent = new Intent(getActivity(), LiveChatActivity.class);
-							intent.putExtra("target", accid);
-							intent.putExtra(LiveChatActivity.CHATSTATE_KEY, LiveChatActivity.CHATSTATE_CALL);
-							startActivity(intent);
-						}
-						else
-						{
-							CommonUtil.toast(object.getString("desc"));
-						}
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
+						Intent intent = new Intent(getActivity().getApplication(), CallActivity.class);
+						intent.putExtra(CallActivity.KEY_TARGET, resp.info.Accid);
+						intent.putExtra(CallActivity.KEY_NICKNAME, resp.info.NickName);
+						intent.putExtra(CallActivity.CALL_TYPE_KEY, CallActivity.CALL_TYPE_AUDIO);
+						startActivity(intent);
 					}
 					bt_call.setEnabled(true);
 				}
@@ -127,8 +119,8 @@ public class RandomFragment extends Fragment implements OnClickListener
 					bt_call.setEnabled(true);
 				}
 			});
-
 			bt_call.setEnabled(false);
+		}
 			break;
 
 		case R.id.bt_text:
@@ -144,7 +136,6 @@ public class RandomFragment extends Fragment implements OnClickListener
 			String pushContent = account + "发起一个会话";
 			String extra = "extra_data";
 			RTSOptions options = new RTSOptions().setPushContent(pushContent).setExtra(extra).setRecordAudioTun(true).setRecordTCPTun(true);
-			
 
 			String sessionId = RTSManager.getInstance().start(account, types, options, new RTSCallback<RTSData>()
 			{
@@ -152,25 +143,24 @@ public class RandomFragment extends Fragment implements OnClickListener
 				@Override
 				public void onException(Throwable arg0)
 				{
-					// TODO Auto-generated method stub
+					
 
 				}
 
 				@Override
 				public void onFailed(int arg0)
 				{
-					// TODO Auto-generated method stub
+					
 
 				}
 
 				@Override
 				public void onSuccess(RTSData arg0)
 				{
-					// TODO Auto-generated method stub
+					
 
 				}
 			});
-			
 
 			break;
 		default:
