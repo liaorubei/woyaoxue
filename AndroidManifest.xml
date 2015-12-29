@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="20151224" >
+    android:versionName="20151225" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -161,11 +161,30 @@
         <activity android:name="com.newclass.woyaoxue.activity.GroupActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.AgoraChatActivity" />
         <activity android:name="com.newclass.woyaoxue.activity.GroupCreate" />
-        <activity android:name="com.newclass.woyaoxue.activity.CallActivity" android:label="拨打电话" />
-        <activity android:name="com.newclass.woyaoxue.activity.ChooseActivity" android:label="自选教师" />
-        <activity android:name="com.newclass.woyaoxue.activity.FriendActivity" android:label="我的学友" />
-        <activity android:name="com.newclass.woyaoxue.activity.FriendAddActivity" android:label="添加学友" />
-        <activity android:name="com.newclass.woyaoxue.activity.FriendSearchActivity" android:label="查找学友" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.CallActivity"
+            android:label="拨打电话" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.TakeActivity"
+            android:label="接听电话" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.ChooseActivity"
+            android:label="自选教师" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.FriendActivity"
+            android:label="我的学友" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.FriendAddActivity"
+            android:label="添加学友" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.FriendSearchActivity"
+            android:label="查找学友" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.TeacherQueueActivity"
+            android:label="教师排队" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.RandomActivity"
+            android:label="随机拨打" />
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />

@@ -37,15 +37,14 @@ public class StudentActivity extends FragmentActivity implements OnClickListener
 
 		PagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		viewpager.setAdapter(myPagerAdapter);
-		
+
 		// 自动登录
 		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
 		String username = sp.getString("username", "");
 		String password = sp.getString("password", "");
 
 		if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password))
-		{
-		}
+		{}
 		startActivity(new Intent(this, SignInActivity.class));
 	}
 

@@ -1,35 +1,15 @@
 package com.newclass.woyaoxue.activity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.auth.AuthService;
-import com.newclass.woyaoxue.bean.Rank;
-import com.newclass.woyaoxue.bean.Response;
-import com.newclass.woyaoxue.bean.User;
-import com.newclass.woyaoxue.util.HttpUtil;
-import com.newclass.woyaoxue.util.HttpUtil.Parameters;
-import com.newclass.woyaoxue.util.Log;
-import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class TeacherActivity extends Activity implements OnClickListener
 {
@@ -61,6 +41,11 @@ public class TeacherActivity extends Activity implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.bt_queue:
+			startActivity(new Intent(getApplication(),TeacherQueueActivity.class));
+			
+			
+			
+			/*
 			SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
 			accid = sp.getString("accid", "");
 
@@ -90,6 +75,7 @@ public class TeacherActivity extends Activity implements OnClickListener
 					Toast.makeText(TeacherActivity.this, "排除失败", Toast.LENGTH_SHORT).show();
 				}
 			});
+			*/
 			break;
 
 		case R.id.bt_group:

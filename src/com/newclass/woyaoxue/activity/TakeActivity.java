@@ -3,26 +3,19 @@ package com.newclass.woyaoxue.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
-
 import com.google.gson.Gson;
-import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.avchat.AVChatCallback;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.constant.AVChatTimeOutEvent;
-import com.netease.nimlib.sdk.avchat.constant.AVChatType;
 import com.netease.nimlib.sdk.avchat.model.AVChatCalleeAckEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatCommonEvent;
-import com.netease.nimlib.sdk.avchat.model.AVChatData;
-import com.netease.nimlib.sdk.msg.MsgService;
 import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.CustomNotification;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.NimSysNotice;
 import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.Log;
-import com.newclass.woyaoxue.util.Rotate3dAnimation;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
@@ -36,20 +29,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager.LayoutParams;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * 电话拨打界面
+ * 电话接听界面
  * @author liaorubei
  *
  */
-public class CallActivity extends Activity implements OnClickListener
+public class TakeActivity extends Activity implements OnClickListener
 {
 	public static final String KEY_TARGET = "TARGET";
 	public static final String CALL_TYPE_KEY = "CALL_TYPE_KEY";
@@ -57,7 +48,7 @@ public class CallActivity extends Activity implements OnClickListener
 	public static final int CALL_TYPE_VIDEO = 2;
 	public static final String KEY_NICKNAME = "KEY_NICKNAME";
 
-	private Button bt_hangup, bt_mute, bt_free, bt_face, bt_text, bt_card, bt_more;
+	private Button bt_hangup, bt_accept, bt_mute, bt_free, bt_face, bt_text, bt_card, bt_more;
 	private ImageView iv_icon;
 	private TextView tv_nickname;
 	private Chronometer cm_time;
@@ -69,7 +60,7 @@ public class CallActivity extends Activity implements OnClickListener
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_call_teacher);
+		setContentView(R.layout.activity_take);
 
 		initView();
 		initData();
@@ -82,25 +73,6 @@ public class CallActivity extends Activity implements OnClickListener
 		String nickname = intent.getStringExtra(KEY_NICKNAME);
 
 		tv_nickname.setText(nickname);
-
-		// 呼叫拨出
-		AVChatManager.getInstance().call(target, AVChatType.AUDIO, null, new AVChatCallback<AVChatData>()
-		{
-
-			@Override
-			public void onSuccess(AVChatData avChatData)
-			{
-				cm_time.start();
-			}
-
-			@Override
-			public void onFailed(int arg0)
-			{}
-
-			@Override
-			public void onException(Throwable arg0)
-			{}
-		});
 
 		registerObserver();
 	}
@@ -177,6 +149,7 @@ public class CallActivity extends Activity implements OnClickListener
 	private void initView()
 	{
 		bt_hangup = (Button) findViewById(R.id.bt_hangup);
+		bt_accept = (Button) findViewById(R.id.bt_accept);
 		bt_mute = (Button) findViewById(R.id.bt_mute);
 		bt_free = (Button) findViewById(R.id.bt_free);
 		bt_face = (Button) findViewById(R.id.bt_face);
@@ -189,6 +162,7 @@ public class CallActivity extends Activity implements OnClickListener
 		cm_time.stop();
 
 		bt_hangup.setOnClickListener(this);
+		bt_accept.setOnClickListener(this);
 		bt_mute.setOnClickListener(this);
 		bt_free.setOnClickListener(this);
 		bt_face.setOnClickListener(this);
@@ -205,6 +179,10 @@ public class CallActivity extends Activity implements OnClickListener
 		{
 		case R.id.bt_hangup:
 			hangup();
+			break;
+
+		case R.id.bt_accept:
+			accept();
 			break;
 
 		case R.id.bt_mute:
@@ -249,8 +227,8 @@ public class CallActivity extends Activity implements OnClickListener
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 
-		
-		Builder builder = new AlertDialog.Builder(CallActivity.this);
+		// TODO Auto-generated method stub
+		Builder builder = new AlertDialog.Builder(TakeActivity.this);
 		View dialogView = View.inflate(getApplication(), R.layout.dialog_card, null);
 		GridView gv_card = (GridView) dialogView.findViewById(R.id.gv_card);
 		List<String> list = new ArrayList<String>();
@@ -267,6 +245,13 @@ public class CallActivity extends Activity implements OnClickListener
 		LayoutParams attributes2 = getWindow().getAttributes();
 		attributes2.height = outMetrics.heightPixels / 2;
 		// cardDialog.getWindow().setAttributes(attributes2);
+
+	}
+
+	private void accept()
+	{
+
+		AVChatManager.getInstance().accept(null, avChatCallback);
 
 	}
 

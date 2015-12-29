@@ -77,6 +77,7 @@ import android.widget.Toast;
 public class SignInActivity extends Activity implements OnClickListener
 {
 	public static final int SignUp = 0;
+	protected static final String TAG = "SignInActivity";
 	private Button bt_login;
 	private EditText et_username, et_password;
 	private TextView tv_signup;
@@ -294,10 +295,9 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(AVChatData avChatData)
 			{
-				Intent intent = new Intent(getApplication(), LiveChatActivity.class);
-				intent.putExtra("accid", avChatData.getAccount());
-				intent.putExtra("chatData", avChatData);
-				intent.putExtra(LiveChatActivity.CHATSTATE_KEY, LiveChatActivity.CHATSTATE_TAKE);
+				Log.i(TAG, "observeIncomingCall");
+				Intent intent = new Intent(getApplication(), TakeActivity.class);
+				intent.putExtra(TakeActivity.KEY_TARGET, avChatData.getAccount());
 				startActivity(intent);
 			}
 		}, true);
@@ -328,21 +328,18 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onException(Throwable arg0)
 			{
-				
 
 			}
 
 			@Override
 			public void onFailed(int arg0)
 			{
-				
 
 			}
 
 			@Override
 			public void onSuccess(Boolean arg0)
 			{
-				
 
 			}
 		});
@@ -405,35 +402,30 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(RTSCommonEvent arg0)
 			{
-				
 
 			}
 		}, true);
 
 		// 发送控制信息
 		// 双方会话建立之后，就可以相互发送控制信息了。
-
 		RTSManager.getInstance().sendControlCommand(sessionId, "content", new RTSCallback<Void>()
 		{
 
 			@Override
 			public void onException(Throwable arg0)
 			{
-				
 
 			}
 
 			@Override
 			public void onFailed(int arg0)
 			{
-				
 
 			}
 
 			@Override
 			public void onSuccess(Void arg0)
 			{
-				
 
 			}
 		});
@@ -446,7 +438,6 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(RTSControlEvent arg0)
 			{
-				
 
 			}
 		}, true);
@@ -459,7 +450,6 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(RTSTimeOutEvent arg0)
 			{
-				
 
 			}
 		}, true);
@@ -472,49 +462,42 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onRecordInfo(RTSTunType arg0, String arg1, String arg2)
 			{
-				
 
 			}
 
 			@Override
 			public void onNetworkStatusChange(RTSTunType arg0, int arg1)
 			{
-				
 
 			}
 
 			@Override
 			public void onError(RTSTunType arg0, int arg1)
 			{
-				
 
 			}
 
 			@Override
 			public void onDisconnectServer(RTSTunType arg0)
 			{
-				
 
 			}
 
 			@Override
 			public void onConnectResult(RTSTunType arg0, int arg1)
 			{
-				
 
 			}
 
 			@Override
 			public void onChannelEstablished(RTSTunType arg0)
 			{
-				
 
 			}
 		}, true);
 
 		// 接收数据
 		// 数据通道建立完之后，就可以监听对方发送来的数据。
-
 		RTSManager.getInstance().observeReceiveData(sessionId, new Observer<RTSTunData>()
 		{
 			@Override

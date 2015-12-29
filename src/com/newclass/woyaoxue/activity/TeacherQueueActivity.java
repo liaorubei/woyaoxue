@@ -9,6 +9,7 @@ import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.bean.Rank;
 import com.newclass.woyaoxue.bean.Response;
 import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.HttpUtil;
@@ -20,6 +21,7 @@ import com.voc.woyaoxue.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -31,30 +33,38 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class ChooseActivity extends Activity
+/**
+ * 教师排队界面
+ * @author liaorubei
+ *
+ */
+public class TeacherQueueActivity extends Activity
 {
 	private List<User> list;
 	private MyAdapter adapter;
 	private ListView listview;
+	private String accid;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_choose);
+		setContentView(R.layout.activity_teacherqueue);
 
 		initView();
 		// initData();
 
 		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-		int int1 = sp.getInt("id", 0);
+		accid = sp.getString("accid", "");
+
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		getMenuInflater().inflate(R.menu.choose_activity, menu);
+		getMenuInflater().inflate(R.menu.activity_teacherqueue, menu);
 		return true;
 	}
 
@@ -73,11 +83,39 @@ public class ChooseActivity extends Activity
 		case R.id.menu_refresh_teacher:
 			initData();
 			break;
-
+		case R.id.menu_teacher_queue:
+			queue();
+			break;
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void queue()
+	{
+		Parameters parameters = new Parameters();
+		parameters.add("id", getSharedPreferences("user", MODE_PRIVATE).getInt("id", 0) + "");
+		HttpUtil.post(NetworkUtil.teacherEnqueue, parameters, new RequestCallBack<String>()
+		{
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				Response<Rank> resp = new Gson().fromJson(responseInfo.result, new TypeToken<Response<Rank>>()
+				{}.getType());
+				if (resp.code == 200)
+				{
+					Toast.makeText(getApplication(), "排队成功,当前名次为:" + resp.info.Rank, Toast.LENGTH_SHORT).show();
+				}
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				Toast.makeText(getApplication(), "排除失败", Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 
 	private void initData()
@@ -133,47 +171,16 @@ public class ChooseActivity extends Activity
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
 			final User user = list.get(position);
-			View inflate = View.inflate(ChooseActivity.this, R.layout.listitem_choose, null);
+			View inflate = View.inflate(TeacherQueueActivity.this, R.layout.listitem_teacherqueue, null);
 			TextView tv_nickname = (TextView) inflate.findViewById(R.id.tv_nickname);
 			TextView tv_username = (TextView) inflate.findViewById(R.id.tv_username);
 			TextView tv_category = (TextView) inflate.findViewById(R.id.tv_category);
-			tv_nickname.setText(user.Name);
+
+			tv_nickname.setText(user.Name + (accid.equals(user.Accid) ? "(本人)" : ""));
 			tv_username.setText(user.Username);
 			tv_category.setText(user.Category == 1 ? "教师" : "学生");
 
-			Button bt_call = (Button) inflate.findViewById(R.id.bt_call);
-			bt_call.setOnClickListener(new OnClickListener()
-			{
-
-				@Override
-				public void onClick(View v)
-				{
-					Parameters parameters = new Parameters();
-					parameters.add("id", 1 + "");
-					parameters.add("target", user.Id + "");
-					HttpUtil.post(NetworkUtil.chooseTeacher, parameters, new RequestCallBack<String>()
-					{
-
-						@Override
-						public void onSuccess(ResponseInfo<String> responseInfo)
-						{
-							Intent intent = new Intent(getApplication(), CallActivity.class);
-							intent.putExtra(CallActivity.KEY_TARGET, user.Accid);
-							intent.putExtra(CallActivity.KEY_NICKNAME, user.NickName);
-							intent.putExtra(CallActivity.CALL_TYPE_KEY, CallActivity.CALL_TYPE_AUDIO);
-							startActivity(intent);
-						}
-
-						@Override
-						public void onFailure(HttpException error, String msg)
-						{
-							// TODO Auto-generated method stub
-
-						}
-					});
-
-				}
-			});
+			tv_username.setTextColor(accid.equals(user.Accid) ? Color.RED : Color.BLACK);
 
 			return inflate;
 		}

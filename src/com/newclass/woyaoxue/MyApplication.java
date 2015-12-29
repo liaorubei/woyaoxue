@@ -1,5 +1,6 @@
 package com.newclass.woyaoxue;
 
+import com.google.gson.Gson;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.SDKOptions;
@@ -13,12 +14,14 @@ import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.CustomNotification;
 import com.netease.nimlib.sdk.uinfo.UserInfoProvider;
 import com.newclass.woyaoxue.activity.MessageActivity;
+import com.newclass.woyaoxue.bean.NimSysNotice;
 import com.newclass.woyaoxue.util.ConstantsUtil;
 import com.newclass.woyaoxue.util.Log;
 import com.voc.woyaoxue.R;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Environment;
@@ -38,11 +41,13 @@ public class MyApplication extends Application
 		SDKOptions options = getOptions();
 		LoginInfo loginInfo = getLoginInfo();
 		NIMClient.init(this, loginInfo, options);
+		
+		
 		// 监听音频视频实时交流来电
-		// enableAVChat();
+		//enableAVChat();
 
 		// 注册NIMClinet关的观察者
-		//registerNimClientObserver();
+		// registerNimClientObserver();
 	}
 
 	private void registerNimClientObserver()
@@ -60,6 +65,24 @@ public class MyApplication extends Application
 			public void onEvent(CustomNotification message)
 			{
 				// 在这里处理自定义通知。
+				String content = message.getContent();
+				NimSysNotice notice = new Gson().fromJson(content, NimSysNotice.class);
+				switch (notice.NoticeType)
+				{
+				case NimSysNotice.NoticeType_Card:
+
+				{
+					Intent intent = new Intent();// 翻牌广播
+					intent.setAction("");
+					intent.addCategory("");
+					sendBroadcast(intent);
+				}
+
+					break;
+
+				default:
+					break;
+				}
 
 			}
 		}, true);
@@ -84,6 +107,7 @@ public class MyApplication extends Application
 
 	private void registerAVChatIncomingCallObserver(boolean register)
 	{
+		//注册来电监听
 		AVChatManager.getInstance().observeIncomingCall(new Observer<AVChatData>()
 		{
 			@Override

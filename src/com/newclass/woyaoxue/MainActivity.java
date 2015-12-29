@@ -9,12 +9,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.newclass.woyaoxue.activity.CallActivity;
 import com.newclass.woyaoxue.activity.FolderActivity;
+import com.newclass.woyaoxue.activity.RandomActivity;
 import com.newclass.woyaoxue.activity.SignInActivity;
 import com.newclass.woyaoxue.activity.StudentActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.service.DownloadService;
+import com.newclass.woyaoxue.util.CommonUtil;
 import com.voc.woyaoxue.R;
 
 public class MainActivity extends Activity implements OnClickListener
@@ -38,6 +41,7 @@ public class MainActivity extends Activity implements OnClickListener
 	}
 
 	private Button bt_chat, bt_listen;
+	private int back = 0;
 
 	private void initView()
 	{
@@ -49,15 +53,28 @@ public class MainActivity extends Activity implements OnClickListener
 	}
 
 	@Override
+	public void onBackPressed()
+	{
+		// TODO Auto-generated method stub
+		 super.onBackPressed();
+		// back = 1;
+		// CommonUtil.toast("再次点击退出");
+
+	}
+
+	@Override
 	public void onClick(View v)
 	{
 		switch (v.getId())
 		{
 		case R.id.bt_chat:
 		{
-			Intent intent = new Intent(this, StudentActivity.class);
+			 //Intent intent = new Intent(this, StudentActivity.class);
+			//Intent intent = new Intent(this, CallActivity.class);
+			 Intent intent = new Intent(this, RandomActivity.class);
 			startActivity(intent);
 			// this.finish();
+
 		}
 			break;
 		case R.id.bt_listen:
