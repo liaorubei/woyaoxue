@@ -150,7 +150,10 @@
         <activity android:name="com.newclass.woyaoxue.activity.MoreActivity" />
         <!-- 测试界面 -->
         <activity android:name="com.newclass.woyaoxue.activity.TestActivity" />
-        <activity android:name="com.newclass.woyaoxue.activity.SignInActivity" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.SignInActivity"
+            android:label="用户登录"
+            android:launchMode="singleTask" />
         <activity
             android:name="com.newclass.woyaoxue.activity.SignUpActivity"
             android:label="注册帐号" />
@@ -166,7 +169,8 @@
             android:label="拨打电话" />
         <activity
             android:name="com.newclass.woyaoxue.activity.TakeActivity"
-            android:label="接听电话" />
+            android:label="接听电话"
+            android:launchMode="singleTask" />
         <activity
             android:name="com.newclass.woyaoxue.activity.ChooseActivity"
             android:label="自选教师" />

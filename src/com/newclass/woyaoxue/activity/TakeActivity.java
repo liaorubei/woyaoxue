@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.netease.nimlib.sdk.NimIntent;
 import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.avchat.AVChatCallback;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
@@ -21,7 +23,10 @@ import com.voc.woyaoxue.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
@@ -47,6 +52,7 @@ public class TakeActivity extends Activity implements OnClickListener
 	public static final int CALL_TYPE_AUDIO = 1;
 	public static final int CALL_TYPE_VIDEO = 2;
 	public static final String KEY_NICKNAME = "KEY_NICKNAME";
+	protected static final String TAG = "TakeActivity";
 
 	private Button bt_hangup, bt_accept, bt_mute, bt_free, bt_face, bt_text, bt_card, bt_more;
 	private ImageView iv_icon;
@@ -56,6 +62,26 @@ public class TakeActivity extends Activity implements OnClickListener
 	private AlertDialog cardDialog;
 	private String target;
 
+	// 自定义系统通知的广播接收者
+	private BroadcastReceiver receiver = new BroadcastReceiver()
+	{
+
+		@Override
+		public void onReceive(Context context, Intent intent)
+		{
+			// 从 intent 中取出自定义通知， intent 中只包含了一个 CustomNotification 对象
+			CustomNotification notification = (CustomNotification) intent.getSerializableExtra(NimIntent.EXTRA_BROADCAST_MSG);
+
+			NimSysNotice<String> notice = new Gson().fromJson(notification.getContent(), new TypeToken<NimSysNotice<String>>()
+			{}.getType());
+			if (notice.NoticeType == NimSysNotice.NoticeType_Card)
+			{
+				CommonUtil.toast("对方点击了:" + notice.info);
+			}
+
+		}
+	};
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -64,6 +90,10 @@ public class TakeActivity extends Activity implements OnClickListener
 
 		initView();
 		initData();
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(this.getPackageName() + NimIntent.ACTION_RECEIVE_CUSTOM_NOTIFICATION);
+		registerReceiver(receiver, filter);
 	}
 
 	private void initData()
@@ -331,4 +361,11 @@ public class TakeActivity extends Activity implements OnClickListener
 		}
 	}
 
+	@Override
+	protected void onDestroy()
+	{
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		unregisterReceiver(receiver);
+	}
 }

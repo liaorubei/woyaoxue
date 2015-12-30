@@ -5,13 +5,13 @@ public class NetworkUtil
 	// public static String domain = "http://192.168.3.121:801";
 
 	public static String domain = "http://voc2015.azurewebsites.net";
-
+	public static final String chooseTeacher = domain + "/api/nimUser/ChooseTeacher";
 	public static final String groupAccede = domain + "/api/Group/Create";
 	public static final String groupCreate = domain + "/api/Group/Create";
 	public static final String groupModify = domain + "/api/Group/Create";
 	public static final String groupRemove = domain + "/api/Group/Remove";
 	public static final String groupSelect = domain + "/api/Group/Select";
-
+	public static final String ObtainTeacher = domain + "/api/nimUser/ObtainTeacher";
 	public static final String studentCall = domain + "/api/student/call";
 	public static final String teacherEnqueue = domain + "/api/NimUser/enqueue";
 	public static final String teacherGroup = domain + "/api/teacher/group";
@@ -21,11 +21,7 @@ public class NetworkUtil
 	public static final String userLogout = domain + "/api/NimUser/logout";
 	public static final String userSelect = domain + "/api/NimUser/Select";
 	public static final String userSignIn = domain + "/api/NimUser/Signin";
-
 	public static final String userVerify = domain + "/api/NimUser/Verify";
-
-	public static final String chooseTeacher = domain + "/api/nimUser/ChooseTeacher";
-	public static final String ObtainTeacher = domain + "/api/nimUser/ObtainTeacher";
 
 	public static String format(String text, Object... para)
 	{

@@ -58,7 +58,6 @@ public class TeacherQueueActivity extends Activity
 
 		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
 		accid = sp.getString("accid", "");
-
 	}
 
 	@Override

@@ -6,8 +6,10 @@ import java.util.List;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.netease.media.a;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
+import com.netease.nimlib.sdk.RequestCallback;
 import com.netease.nimlib.sdk.avchat.AVChatCallback;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.constant.AVChatTimeOutEvent;
@@ -56,7 +58,8 @@ public class CallActivity extends Activity implements OnClickListener
 	public static final int CALL_TYPE_AUDIO = 1;
 	public static final int CALL_TYPE_VIDEO = 2;
 	public static final String KEY_NICKNAME = "KEY_NICKNAME";
-
+	protected static final String TAG = "CallActivity";
+	private String accid;
 	private Button bt_hangup, bt_mute, bt_free, bt_face, bt_text, bt_card, bt_more;
 	private ImageView iv_icon;
 	private TextView tv_nickname;
@@ -71,6 +74,7 @@ public class CallActivity extends Activity implements OnClickListener
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_call_teacher);
 
+		accid = getSharedPreferences("user", MODE_PRIVATE).getString("accid", "");
 		initView();
 		initData();
 	}
@@ -249,14 +253,13 @@ public class CallActivity extends Activity implements OnClickListener
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
 
-		
 		Builder builder = new AlertDialog.Builder(CallActivity.this);
 		View dialogView = View.inflate(getApplication(), R.layout.dialog_card, null);
 		GridView gv_card = (GridView) dialogView.findViewById(R.id.gv_card);
 		List<String> list = new ArrayList<String>();
 		for (int i = 0; i < 5; i++)
 		{
-			list.add(i + "");
+			list.add(i + "号主题");
 		}
 		MyAdapter adapter = new MyAdapter(list);
 		gv_card.setAdapter(adapter);
@@ -302,6 +305,28 @@ public class CallActivity extends Activity implements OnClickListener
 		AVChatManager.getInstance().hangUp(avChatCallback);
 	}
 
+	protected RequestCallback<Void> sendcallBack = new RequestCallback<Void>()
+	{
+
+		@Override
+		public void onSuccess(Void arg0)
+		{
+			Log.i(TAG, "sendcallBack" + "onSuccess");
+		}
+
+		@Override
+		public void onFailed(int arg0)
+		{
+			Log.i(TAG, "sendcallBack" + "onFailed" + arg0);
+		}
+
+		@Override
+		public void onException(Throwable arg0)
+		{
+			Log.i(TAG, "sendcallBack" + "onException:" + arg0.getMessage());
+		}
+	};
+
 	private class MyAdapter extends BaseAdapter<String>
 	{
 
@@ -317,7 +342,7 @@ public class CallActivity extends Activity implements OnClickListener
 			View inflate = View.inflate(getApplication(), R.layout.griditem_card, null);
 			inflate.findViewById(R.id.iv_card).setVisibility(View.VISIBLE);
 			TextView tv_theme = (TextView) inflate.findViewById(R.id.tv_theme);
-			tv_theme.setText("主题:" + item);
+			tv_theme.setText(item);
 			inflate.setOnClickListener(new OnClickListener()
 			{
 
@@ -327,18 +352,19 @@ public class CallActivity extends Activity implements OnClickListener
 					v.findViewById(R.id.iv_card).setVisibility(View.INVISIBLE);
 
 					// 构造自定义通知，指定接收者
-					CustomNotification notification = new CustomNotification();
-					notification.setSessionId(target);
-					notification.setSessionType(SessionTypeEnum.System);
-					notification.setSendToOnlineUserOnly(true);
-
 					NimSysNotice<String> notice = new NimSysNotice<String>();
 					notice.NoticeType = NimSysNotice.NoticeType_Card;
 					notice.info = item;
+
+					CustomNotification notification = new CustomNotification();
+					notification.setFromAccount(accid);
+					notification.setSessionId(target);
+					notification.setSessionType(SessionTypeEnum.P2P);
+					notification.setSendToOnlineUserOnly(true);
 					notification.setContent(new Gson().toJson(notice));
 
 					// 发送自定义通知
-					// NIMClient.getService(MsgService.class).sendCustomNotification(notification);
+					NIMClient.getService(MsgService.class).sendCustomNotification(notification).setCallback(sendcallBack);;
 				}
 			});
 
