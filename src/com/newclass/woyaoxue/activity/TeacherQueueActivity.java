@@ -14,23 +14,17 @@ import com.newclass.woyaoxue.bean.Response;
 import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.HttpUtil;
 import com.newclass.woyaoxue.util.HttpUtil.Parameters;
-import com.newclass.woyaoxue.util.Log;
 import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,10 +36,12 @@ import android.widget.Toast;
  */
 public class TeacherQueueActivity extends Activity
 {
+	protected static final String TAG = "TeacherQueueActivity";
 	private List<User> list;
 	private MyAdapter adapter;
 	private ListView listview;
 	private String accid;
+	private Gson gson = new Gson();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -54,7 +50,6 @@ public class TeacherQueueActivity extends Activity
 		setContentView(R.layout.activity_teacherqueue);
 
 		initView();
-		// initData();
 
 		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
 		accid = sp.getString("accid", "");
@@ -101,12 +96,7 @@ public class TeacherQueueActivity extends Activity
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
-				Response<Rank> resp = new Gson().fromJson(responseInfo.result, new TypeToken<Response<Rank>>()
-				{}.getType());
-				if (resp.code == 200)
-				{
-					Toast.makeText(getApplication(), "排队成功,当前名次为:" + resp.info.Rank, Toast.LENGTH_SHORT).show();
-				}
+				refreshView(responseInfo.result);
 			}
 
 			@Override
@@ -120,34 +110,36 @@ public class TeacherQueueActivity extends Activity
 	private void initData()
 	{
 		Parameters parameters = new Parameters();
-		parameters.add("skip", 0 + "");
-		parameters.add("take", 5 + "");
-		HttpUtil.post(NetworkUtil.teacherInQueue, parameters, new RequestCallBack<String>()
+		parameters.add("id", getSharedPreferences("user", MODE_PRIVATE).getInt("id", 0) + "");
+		HttpUtil.post(NetworkUtil.teacherRefresh, parameters, new RequestCallBack<String>()
 		{
-
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
-				Response<List<User>> response = new Gson().fromJson(responseInfo.result, new TypeToken<Response<List<User>>>()
-				{}.getType());
-
-				if (response.code == 200 && response.info != null)
-				{
-					List<User> users = response.info;
-					list.clear();
-					for (User user : users)
-					{
-						list.add(user);
-					}
-					adapter.notifyDataSetChanged();
-				}
-				Log.i("logi", "数据更新");
+				refreshView(responseInfo.result);
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{}
 		});
+	}
+
+	private void refreshView(String json)
+	{
+		Response<Rank> resp = gson.fromJson(json, new TypeToken<Response<Rank>>()
+		{}.getType());
+
+		if (resp.code == 200 && resp.info != null)
+		{
+			List<User> users = resp.info.Data;
+			list.clear();
+			for (User user : users)
+			{
+				list.add(user);
+			}
+			adapter.notifyDataSetChanged();
+		}
 	}
 
 	private void initView()

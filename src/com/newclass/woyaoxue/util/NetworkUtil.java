@@ -11,9 +11,11 @@ public class NetworkUtil
 	public static final String groupModify = domain + "/api/Group/Create";
 	public static final String groupRemove = domain + "/api/Group/Remove";
 	public static final String groupSelect = domain + "/api/Group/Select";
+
 	public static final String ObtainTeacher = domain + "/api/nimUser/ObtainTeacher";
 	public static final String studentCall = domain + "/api/student/call";
-	public static final String teacherEnqueue = domain + "/api/NimUser/enqueue";
+	public static final String teacherEnqueue = domain + "/api/NimUser/Enqueue";
+	public static final String teacherRefresh = domain + "/api/NimUser/Refresh";
 	public static final String teacherGroup = domain + "/api/teacher/group";
 	public static final String teacherInQueue = domain + "/api/NimUser/TeacherInqueue";
 	public static final String userCaptcha = domain + "/api/NimUser/Captcha";
@@ -22,6 +24,7 @@ public class NetworkUtil
 	public static final String userSelect = domain + "/api/NimUser/Select";
 	public static final String userSignIn = domain + "/api/NimUser/Signin";
 	public static final String userVerify = domain + "/api/NimUser/Verify";
+	public static final String ThemeSelect = domain + "/api/Theme/Select";
 
 	public static String format(String text, Object... para)
 	{

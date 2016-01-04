@@ -6,6 +6,10 @@ import java.util.List;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.netease.media.a;
 import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
@@ -22,8 +26,13 @@ import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
 import com.netease.nimlib.sdk.msg.model.CustomNotification;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.NimSysNotice;
+import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.Theme;
 import com.newclass.woyaoxue.util.CommonUtil;
+import com.newclass.woyaoxue.util.HttpUtil;
+import com.newclass.woyaoxue.util.HttpUtil.Parameters;
 import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.NetworkUtil;
 import com.newclass.woyaoxue.util.Rotate3dAnimation;
 import com.voc.woyaoxue.R;
 
@@ -67,6 +76,7 @@ public class CallActivity extends Activity implements OnClickListener
 	private AVChatCallback<Void> avChatCallback;
 	private AlertDialog cardDialog;
 	private String target;
+	private Gson gson = new Gson();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -240,7 +250,39 @@ public class CallActivity extends Activity implements OnClickListener
 			{
 				createCardDialog();
 			}
-			cardDialog.show();
+
+			Parameters parameters = new Parameters();
+			parameters.add("skip", 0 + "");
+			parameters.add("take", 15 + "");
+			HttpUtil.post(NetworkUtil.ThemeSelect, parameters, new RequestCallBack<String>()
+			{
+
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo)
+				{
+					Response<List<Theme>> resp = gson.fromJson(responseInfo.result, new TypeToken<Response<List<Theme>>>()
+					{}.getType());
+
+					if (resp.code == 200)
+					{
+						cardList.clear();
+						List<Theme> themes = resp.info;
+						for (Theme theme : themes)
+						{
+							cardList.add(theme);
+						}
+						cardAdapter.notifyDataSetChanged();
+					}
+
+					cardDialog.show();
+				}
+
+				@Override
+				public void onFailure(HttpException error, String msg)
+				{
+					CommonUtil.toast("网络异常");
+				}
+			});
 
 			break;
 		default:
@@ -256,13 +298,9 @@ public class CallActivity extends Activity implements OnClickListener
 		Builder builder = new AlertDialog.Builder(CallActivity.this);
 		View dialogView = View.inflate(getApplication(), R.layout.dialog_card, null);
 		GridView gv_card = (GridView) dialogView.findViewById(R.id.gv_card);
-		List<String> list = new ArrayList<String>();
-		for (int i = 0; i < 5; i++)
-		{
-			list.add(i + "号主题");
-		}
-		MyAdapter adapter = new MyAdapter(list);
-		gv_card.setAdapter(adapter);
+		cardList = new ArrayList<Theme>();
+		cardAdapter = new MyAdapter(cardList);
+		gv_card.setAdapter(cardAdapter);
 		builder.setView(dialogView);
 		cardDialog = builder.create();
 
@@ -326,11 +364,13 @@ public class CallActivity extends Activity implements OnClickListener
 			Log.i(TAG, "sendcallBack" + "onException:" + arg0.getMessage());
 		}
 	};
+	private List<Theme> cardList;
+	private MyAdapter cardAdapter;
 
-	private class MyAdapter extends BaseAdapter<String>
+	private class MyAdapter extends BaseAdapter<Theme>
 	{
 
-		public MyAdapter(List<String> list)
+		public MyAdapter(List<Theme> list)
 		{
 			super(list);
 		}
@@ -338,11 +378,13 @@ public class CallActivity extends Activity implements OnClickListener
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			final String item = getItem(position);
+			final Theme item = getItem(position);
 			View inflate = View.inflate(getApplication(), R.layout.griditem_card, null);
 			inflate.findViewById(R.id.iv_card).setVisibility(View.VISIBLE);
 			TextView tv_theme = (TextView) inflate.findViewById(R.id.tv_theme);
-			tv_theme.setText(item);
+			TextView tv_name = (TextView) inflate.findViewById(R.id.tv_name);
+			tv_theme.setText(item.Name);
+			tv_name.setText(item.Name);
 			inflate.setOnClickListener(new OnClickListener()
 			{
 
@@ -354,7 +396,7 @@ public class CallActivity extends Activity implements OnClickListener
 					// 构造自定义通知，指定接收者
 					NimSysNotice<String> notice = new NimSysNotice<String>();
 					notice.NoticeType = NimSysNotice.NoticeType_Card;
-					notice.info = item;
+					notice.info = item.Name;
 
 					CustomNotification notification = new CustomNotification();
 					notification.setFromAccount(accid);
@@ -364,7 +406,7 @@ public class CallActivity extends Activity implements OnClickListener
 					notification.setContent(new Gson().toJson(notice));
 
 					// 发送自定义通知
-					NIMClient.getService(MsgService.class).sendCustomNotification(notification).setCallback(sendcallBack);;
+					NIMClient.getService(MsgService.class).sendCustomNotification(notification).setCallback(sendcallBack);
 				}
 			});
 
