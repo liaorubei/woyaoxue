@@ -30,7 +30,7 @@ public class RandomActivity extends Activity implements OnClickListener
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_random);
 		initView();
-		
+
 		startActivity(new Intent(this, SignInActivity.class));
 	}
 
@@ -63,8 +63,9 @@ public class RandomActivity extends Activity implements OnClickListener
 					if (response.code == 200)
 					{
 						Intent intent = new Intent(getApplication(), CallActivity.class);
-						intent.putExtra(CallActivity.KEY_TARGET, response.info.Accid);
-						intent.putExtra(CallActivity.KEY_NICKNAME, response.info.Name);
+						intent.putExtra(CallActivity.KEY_TARGET_ID, response.info.Id);
+						intent.putExtra(CallActivity.KEY_TARGET_ACCID, response.info.Accid);
+						intent.putExtra(CallActivity.KEY_TARGET_NICKNAME, response.info.Name);
 						startActivity(intent);
 					}
 					else

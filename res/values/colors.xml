@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Multi-sim sim colors -->
     <color name="color_one">#3498db</color>
     <color name="color_two">#95a5a6</color>
     <color name="download_green">#5AB400</color>
-    <color name="main_dark">#bb000000</color>
-
     
-       <color name="transparent">#00000000</color>
+    <!-- Multi-sim sim colors -->
+    <color name="main_dark">#bb000000</color>
+    <color name="transparent">#00000000</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="grey">#333333</color>
@@ -78,11 +77,10 @@
     <color name="color_black_ff666666">#ff666666</color>
     <color name="color_black_ff999999">#ff999999</color>
     <color name="color_gray_bfc2c5">#bfc2c5</color>
-    
-    
-        <color name="color_f2f7fc">#F2F7FC</color>
+    <color name="color_f2f7fc">#F2F7FC</color>
     <color name="color_c2364b">#C2364B</color>
     <color name="color_f5455e">#F5455E</color>
     <color name="video_call_peer_close_cameral_text_shadow">#484848</color>
     <color name="video_call_peer_close_cameral_text_color">#f1f1f1</color>
+
 </resources>

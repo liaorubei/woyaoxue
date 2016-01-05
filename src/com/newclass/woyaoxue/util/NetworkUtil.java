@@ -25,6 +25,10 @@ public class NetworkUtil
 	public static final String userSignIn = domain + "/api/NimUser/Signin";
 	public static final String userVerify = domain + "/api/NimUser/Verify";
 	public static final String ThemeSelect = domain + "/api/Theme/Select";
+	public static final String callstart = domain + "/api/CallLog/Start";
+	public static final String callFinish = domain + "/api/Calllog/finish";
+	public static final String userGetByAccId = domain + "/api/NimUser/GetByAccId";
+	public static final String GetStudentCalllogByAccId = domain + "/api/CallLog/GetStudentCalllogByAccId";
 
 	public static String format(String text, Object... para)
 	{

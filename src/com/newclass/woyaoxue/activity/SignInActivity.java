@@ -297,9 +297,10 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onEvent(AVChatData avChatData)
 			{
-				Log.i(TAG, "observeIncomingCall");
+				Log.i(TAG, "observeIncomingCall avChatData.getChatId:" + avChatData.getChatId());
+
 				Intent intent = new Intent(getApplication(), TakeActivity.class);
-				intent.putExtra(TakeActivity.KEY_TARGET, avChatData.getAccount());
+				intent.putExtra(TakeActivity.KEY_CHATDATA, avChatData);
 				startActivity(intent);
 			}
 		}, true);

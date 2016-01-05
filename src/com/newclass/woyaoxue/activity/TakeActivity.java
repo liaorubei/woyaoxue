@@ -1,10 +1,12 @@
 package com.newclass.woyaoxue.activity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.netease.nimlib.sdk.NimIntent;
 import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.avchat.AVChatCallback;
@@ -12,31 +14,32 @@ import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.constant.AVChatTimeOutEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatCalleeAckEvent;
 import com.netease.nimlib.sdk.avchat.model.AVChatCommonEvent;
-import com.netease.nimlib.sdk.msg.constant.SessionTypeEnum;
+import com.netease.nimlib.sdk.avchat.model.AVChatData;
 import com.netease.nimlib.sdk.msg.model.CustomNotification;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.NimSysNotice;
+import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.CommonUtil;
+import com.newclass.woyaoxue.util.HttpUtil;
+import com.newclass.woyaoxue.util.HttpUtil.Parameters;
 import com.newclass.woyaoxue.util.Log;
+import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -47,20 +50,83 @@ import android.widget.TextView;
  */
 public class TakeActivity extends Activity implements OnClickListener
 {
-	public static final String KEY_TARGET = "TARGET";
-	public static final String CALL_TYPE_KEY = "CALL_TYPE_KEY";
 	public static final int CALL_TYPE_AUDIO = 1;
+	public static final String CALL_TYPE_KEY = "CALL_TYPE_KEY";
 	public static final int CALL_TYPE_VIDEO = 2;
 	public static final String KEY_NICKNAME = "KEY_NICKNAME";
+	public static final String KEY_TARGET = "TARGET";
 	protected static final String TAG = "TakeActivity";
+	protected static String KEY_CHATDATA = "KEY_CHATDATA";
 
-	private Button bt_hangup, bt_accept, bt_mute, bt_free, bt_face, bt_text, bt_card, bt_more;
-	private ImageView iv_icon;
-	private TextView tv_nickname;
-	private Chronometer cm_time;
 	private AVChatCallback<Void> avChatCallback;
+	private Button bt_hangup, bt_accept, bt_mute, bt_free, bt_face, bt_text, bt_card, bt_more;
 	private AlertDialog cardDialog;
-	private String target;
+	private Chronometer cm_time;
+	private ImageView iv_icon;
+
+	private Observer<AVChatCalleeAckEvent> observer = new Observer<AVChatCalleeAckEvent>()
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void onEvent(AVChatCalleeAckEvent ackEvent)
+		{
+			switch (ackEvent.getEvent())
+			{
+			case CALLEE_ACK_AGREE:// 被叫方同意接听
+				if (ackEvent.isDeviceReady())
+				{
+					CommonUtil.toast("设备正常,开始通话");
+					cm_time.setBase(SystemClock.elapsedRealtime());
+				}
+				else
+				{
+					CommonUtil.toast("设备异常,无法通话");
+					finish();
+				}
+				break;
+			case CALLEE_ACK_REJECT:
+				CommonUtil.toast("对方拒绝接听");
+				finish();
+				break;
+
+			case CALLEE_ACK_BUSY:
+				CommonUtil.toast("对方忙");
+				finish();
+				break;
+			default:
+				break;
+			}
+		}
+	};
+
+	private Observer<AVChatCommonEvent> observerHangup = new Observer<AVChatCommonEvent>()
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void onEvent(AVChatCommonEvent event)
+		{
+			Log.i("logi", "对方已挂断 ChatId:" + event.getChatId());
+			Parameters parameters = new Parameters();
+			parameters.add("chatId", event.getChatId() + "");
+
+			HttpUtil.post(NetworkUtil.callFinish, parameters, null);
+			finish();
+		}
+	};
+
+	private Observer<AVChatTimeOutEvent> observer3 = new Observer<AVChatTimeOutEvent>()
+	{
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void onEvent(AVChatTimeOutEvent timeOutEvent)
+		{
+			CommonUtil.toast("超时");
+			finish();
+		}
+	};
 
 	// 自定义系统通知的广播接收者
 	private BroadcastReceiver receiver = new BroadcastReceiver()
@@ -82,98 +148,82 @@ public class TakeActivity extends Activity implements OnClickListener
 		}
 	};
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	private User target;
+
+	private TextView tv_nickname;
+
+	private void accept()
 	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_take);
-
-		initView();
-		initData();
-
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(this.getPackageName() + NimIntent.ACTION_RECEIVE_CUSTOM_NOTIFICATION);
-		registerReceiver(receiver, filter);
+		AVChatManager.getInstance().accept(null, avChatCallback);
 	}
+
+	private void hangup()
+	{
+		if (avChatCallback == null)
+		{
+			avChatCallback = new AVChatCallback<Void>()
+			{
+
+				@Override
+				public void onException(Throwable arg0)
+				{
+					Log.i("logi", "callactivity hangUp onException:" + arg0.getMessage());
+					finish();
+				}
+
+				@Override
+				public void onFailed(int arg0)
+				{
+					Log.i("logi", "callactivity hangUp onFailed:" + arg0);
+					finish();
+				}
+
+				@Override
+				public void onSuccess(Void arg0)
+				{
+
+					Log.i("logi", "callactivity hangUp onSuccess");
+					finish();
+				}
+			};
+		}
+		AVChatManager.getInstance().hangUp(avChatCallback);
+	}
+
+	private Gson gson = new Gson();
 
 	private void initData()
 	{
 		Intent intent = getIntent();
-		target = intent.getStringExtra(KEY_TARGET);
-		String nickname = intent.getStringExtra(KEY_NICKNAME);
+		AVChatData avChatData = (AVChatData) intent.getSerializableExtra(KEY_CHATDATA);
+		target = new User();
+		target.Accid = avChatData.getAccount();
 
-		tv_nickname.setText(nickname);
-
-		registerObserver();
-	}
-
-	private void registerObserver()
-	{
-		// 监听网络通话被叫方的响应（接听、拒绝、忙）
-		AVChatManager.getInstance().observeCalleeAckNotification(new Observer<AVChatCalleeAckEvent>()
+		Parameters parameters = new Parameters();
+		parameters.add("accid", target.Accid);
+		HttpUtil.post(NetworkUtil.userGetByAccId, parameters, new RequestCallBack<String>()
 		{
-			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void onEvent(AVChatCalleeAckEvent ackEvent)
+			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
-				switch (ackEvent.getEvent())
+				Response<User> resp = gson.fromJson(responseInfo.result, new TypeToken<Response<User>>()
+				{}.getType());
+				if (resp.code == 200)
 				{
-				case CALLEE_ACK_AGREE:// 被叫方同意接听
-					if (ackEvent.isDeviceReady())
-					{
-						CommonUtil.toast("设备正常,开始通话");
-						cm_time.setBase(SystemClock.elapsedRealtime());
-					}
-					else
-					{
-						CommonUtil.toast("设备异常,无法通话");
-						finish();
-					}
-					break;
-				case CALLEE_ACK_REJECT:
-					CommonUtil.toast("对方拒绝接听");
-					finish();
-					break;
-
-				case CALLEE_ACK_BUSY:
-					CommonUtil.toast("对方忙");
-					finish();
-					break;
-				default:
-					break;
+					target.Id = resp.info.Id;
+					target.NickName = resp.info.NickName;
+					tv_nickname.setText(target.NickName);
 				}
-			}
-		}, true);
 
-		// 监听网络通话对方挂断的通知,即在正常通话时,结束通话
-		AVChatManager.getInstance().observeHangUpNotification(new Observer<AVChatCommonEvent>()
-		{
-			private static final long serialVersionUID = 1L;
+			}
 
 			@Override
-			public void onEvent(AVChatCommonEvent event)
-			{
-				Log.i("logi", "对方已挂断");
-				finish();
-			}
-		}, true);
+			public void onFailure(HttpException error, String msg)
+			{}
+		});
 
-		// 监听呼叫或接听超时通知
-		// 主叫方在拨打网络通话时，超过 45 秒被叫方还未接听来电，则自动挂断。
-		// 被叫方超过 45 秒未接听来听，也会自动挂断
-		// 在通话过程中网络超时 30 秒自动挂断。
-		AVChatManager.getInstance().observeTimeoutNotification(new Observer<AVChatTimeOutEvent>()
-		{
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void onEvent(AVChatTimeOutEvent timeOutEvent)
-			{
-				CommonUtil.toast("超时");
-				finish();
-			}
-		}, true);
+		registerObserver(true);
 	}
 
 	private void initView()
@@ -191,6 +241,9 @@ public class TakeActivity extends Activity implements OnClickListener
 		cm_time = (Chronometer) findViewById(R.id.cm_time);
 		cm_time.stop();
 
+		iv_icon = (ImageView) findViewById(R.id.iv_icon);
+		iv_icon.setOnClickListener(this);
+
 		bt_hangup.setOnClickListener(this);
 		bt_accept.setOnClickListener(this);
 		bt_mute.setOnClickListener(this);
@@ -199,7 +252,6 @@ public class TakeActivity extends Activity implements OnClickListener
 		bt_text.setOnClickListener(this);
 		bt_card.setOnClickListener(this);
 		bt_more.setOnClickListener(this);
-
 	}
 
 	@Override
@@ -240,81 +292,66 @@ public class TakeActivity extends Activity implements OnClickListener
 			break;
 
 		case R.id.bt_card:
-			if (cardDialog == null)
-			{
-				createCardDialog();
-			}
-			cardDialog.show();
+			break;
 
+		case R.id.iv_icon:
+			break;
+
+		case R.id.bt_face:
+		{
+			Intent intent = new Intent(getApplication(), HistoryActivity.class);
+			intent.putExtra("target.Accid", target.Accid);
+			startActivity(intent);
+		}
+			break;
+
+		case R.id.bt_text:
+		{
+			Intent intent = new Intent(getApplication(), QuestionActivity.class);
+			startActivity(intent);
+		}
 			break;
 		default:
 			break;
 		}
 	}
 
-	private void createCardDialog()
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
 	{
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_take);
 
-		// TODO Auto-generated method stub
-		Builder builder = new AlertDialog.Builder(TakeActivity.this);
-		View dialogView = View.inflate(getApplication(), R.layout.dialog_card, null);
-		GridView gv_card = (GridView) dialogView.findViewById(R.id.gv_card);
-		List<String> list = new ArrayList<String>();
-		for (int i = 0; i < 5; i++)
-		{
-			list.add(i + "");
-		}
-		MyAdapter adapter = new MyAdapter(list);
-		gv_card.setAdapter(adapter);
-		builder.setView(dialogView);
-		cardDialog = builder.create();
+		initView();
+		initData();
 
-		cardDialog.setCanceledOnTouchOutside(false);
-		LayoutParams attributes2 = getWindow().getAttributes();
-		attributes2.height = outMetrics.heightPixels / 2;
-		// cardDialog.getWindow().setAttributes(attributes2);
-
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(this.getPackageName() + NimIntent.ACTION_RECEIVE_CUSTOM_NOTIFICATION);
+		registerReceiver(receiver, filter);
 	}
 
-	private void accept()
+	@Override
+	protected void onDestroy()
 	{
-
-		AVChatManager.getInstance().accept(null, avChatCallback);
-
+		super.onDestroy();
+		unregisterReceiver(receiver);
+		registerObserver(false);
 	}
 
-	private void hangup()
+	private void registerObserver(boolean register)
 	{
-		if (avChatCallback == null)
-		{
-			avChatCallback = new AVChatCallback<Void>()
-			{
 
-				@Override
-				public void onSuccess(Void arg0)
-				{
-					Log.i("logi", "callactivity hangUp onSuccess");
-					finish();
-				}
+		// 监听网络通话被叫方的响应（接听、拒绝、忙）
+		AVChatManager.getInstance().observeCalleeAckNotification(observer, register);
 
-				@Override
-				public void onFailed(int arg0)
-				{
-					Log.i("logi", "callactivity hangUp onFailed:" + arg0);
-					finish();
-				}
+		// 监听网络通话对方挂断的通知,即在正常通话时,结束通话
+		AVChatManager.getInstance().observeHangUpNotification(observerHangup, register);
 
-				@Override
-				public void onException(Throwable arg0)
-				{
-					Log.i("logi", "callactivity hangUp onException:" + arg0.getMessage());
-					finish();
-				}
-			};
-		}
-		AVChatManager.getInstance().hangUp(avChatCallback);
+		// 监听呼叫或接听超时通知
+		// 主叫方在拨打网络通话时，超过 45 秒被叫方还未接听来电，则自动挂断。
+		// 被叫方超过 45 秒未接听来听，也会自动挂断
+		// 在通话过程中网络超时 30 秒自动挂断。
+		AVChatManager.getInstance().observeTimeoutNotification(observer3, register);
 	}
 
 	private class MyAdapter extends BaseAdapter<String>
@@ -333,39 +370,8 @@ public class TakeActivity extends Activity implements OnClickListener
 			inflate.findViewById(R.id.iv_card).setVisibility(View.VISIBLE);
 			TextView tv_theme = (TextView) inflate.findViewById(R.id.tv_theme);
 			tv_theme.setText("主题:" + item);
-			inflate.setOnClickListener(new OnClickListener()
-			{
-
-				@Override
-				public void onClick(View v)
-				{
-					v.findViewById(R.id.iv_card).setVisibility(View.INVISIBLE);
-
-					// 构造自定义通知，指定接收者
-					CustomNotification notification = new CustomNotification();
-					notification.setSessionId(target);
-					notification.setSessionType(SessionTypeEnum.System);
-					notification.setSendToOnlineUserOnly(true);
-
-					NimSysNotice<String> notice = new NimSysNotice<String>();
-					notice.NoticeType = NimSysNotice.NoticeType_Card;
-					notice.info = item;
-					notification.setContent(new Gson().toJson(notice));
-
-					// 发送自定义通知
-					// NIMClient.getService(MsgService.class).sendCustomNotification(notification);
-				}
-			});
 
 			return inflate;
 		}
-	}
-
-	@Override
-	protected void onDestroy()
-	{
-		// TODO Auto-generated method stub
-		super.onDestroy();
-		unregisterReceiver(receiver);
 	}
 }

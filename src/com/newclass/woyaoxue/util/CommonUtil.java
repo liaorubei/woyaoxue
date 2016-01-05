@@ -18,4 +18,11 @@ public class CommonUtil
 		toast(MyApplication.getContext(), text);
 	}
 
+	public static String millisecondsFormat(long milliseconds)
+	{
+		long minutes = (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
+		long seconds = (milliseconds % (1000 * 60)) / 1000;
+		return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+	}
+
 }

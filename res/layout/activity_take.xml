@@ -84,35 +84,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:visibility="gone" >
+            android:visibility="visible" >
 
             <Button
                 android:id="@+id/bt_face"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="发表情" />
+                android:text="历史" />
 
             <Button
                 android:id="@+id/bt_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="发文字" />
+                android:text="问题" />
 
             <Button
                 android:id="@+id/bt_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="选主题" />
+                android:text="选主题"
+                android:visibility="invisible" />
 
             <Button
                 android:id="@+id/bt_more"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="..." />
+                android:text="..."
+                android:visibility="invisible" />
         </LinearLayout>
     </LinearLayout>
 

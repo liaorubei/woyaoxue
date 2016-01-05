@@ -166,7 +166,8 @@
         <activity android:name="com.newclass.woyaoxue.activity.GroupCreate" />
         <activity
             android:name="com.newclass.woyaoxue.activity.CallActivity"
-            android:label="拨打电话" />
+            android:label="拨打电话"
+            android:launchMode="singleTask" />
         <activity
             android:name="com.newclass.woyaoxue.activity.TakeActivity"
             android:label="接听电话"
@@ -189,6 +190,12 @@
         <activity
             android:name="com.newclass.woyaoxue.activity.RandomActivity"
             android:label="随机拨打" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.HistoryActivity"
+            android:label="学习记录" />
+        <activity
+            android:name="com.newclass.woyaoxue.activity.QuestionActivity"
+            android:label="问题列表" />
 
         <!-- 更新下载服务 -->
         <service android:name="com.newclass.woyaoxue.service.AutoUpdateService" />

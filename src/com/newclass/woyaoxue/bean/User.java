@@ -9,5 +9,4 @@ public class User
 	public String Name = "未定义昵称";
 	public String Username;
 	public int Category;
-
 }

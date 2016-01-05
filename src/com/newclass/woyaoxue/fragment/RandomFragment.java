@@ -104,8 +104,8 @@ public class RandomFragment extends Fragment implements OnClickListener
 					{
 
 						Intent intent = new Intent(getActivity().getApplication(), CallActivity.class);
-						intent.putExtra(CallActivity.KEY_TARGET, resp.info.Accid);
-						intent.putExtra(CallActivity.KEY_NICKNAME, resp.info.NickName);
+						intent.putExtra(CallActivity.KEY_TARGET_ACCID, resp.info.Accid);
+						intent.putExtra(CallActivity.KEY_TARGET_NICKNAME, resp.info.NickName);
 						intent.putExtra(CallActivity.CALL_TYPE_KEY, CallActivity.CALL_TYPE_AUDIO);
 						startActivity(intent);
 					}

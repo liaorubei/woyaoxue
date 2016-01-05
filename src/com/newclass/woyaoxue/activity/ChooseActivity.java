@@ -158,8 +158,8 @@ public class ChooseActivity extends Activity
 						public void onSuccess(ResponseInfo<String> responseInfo)
 						{
 							Intent intent = new Intent(getApplication(), CallActivity.class);
-							intent.putExtra(CallActivity.KEY_TARGET, user.Accid);
-							intent.putExtra(CallActivity.KEY_NICKNAME, user.NickName);
+							intent.putExtra(CallActivity.KEY_TARGET_ACCID, user.Accid);
+							intent.putExtra(CallActivity.KEY_TARGET_NICKNAME, user.NickName);
 							intent.putExtra(CallActivity.CALL_TYPE_KEY, CallActivity.CALL_TYPE_AUDIO);
 							startActivity(intent);
 						}
