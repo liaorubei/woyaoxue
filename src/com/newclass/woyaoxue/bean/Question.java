@@ -1,11 +1,7 @@
 package com.newclass.woyaoxue.bean;
 
-import java.util.List;
-
-public class Theme
+public class Question
 {
-	
 	public int Id;
 	public String Name;
-public List<Question> Questions;
 }

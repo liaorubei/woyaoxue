@@ -3,11 +3,23 @@ package com.newclass.woyaoxue.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.newclass.woyaoxue.base.BaseAdapter;
+import com.newclass.woyaoxue.bean.Question;
+import com.newclass.woyaoxue.bean.Response;
 import com.newclass.woyaoxue.bean.Theme;
+import com.newclass.woyaoxue.util.CommonUtil;
+import com.newclass.woyaoxue.util.HttpUtil;
+import com.newclass.woyaoxue.util.HttpUtil.Parameters;
+import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -54,33 +66,59 @@ public class QuestionActivity extends Activity
 		tv_theme = (TextView) findViewById(R.id.tv_theme);
 		listview = (ListView) findViewById(R.id.listview);
 
-		List<Theme> list = new ArrayList<Theme>();
-		list.add(new Theme());
-		list.add(new Theme());
-		list.add(new Theme());
-		list.add(new Theme());
-		list.add(new Theme());
-
-		for (Theme theme : list)
-		{
-			theme.Name = "问题1:" + "你早上是坐什么交通工具上班的啊";
-		}
-
-		BaseAdapter<Theme> adapter = new MyAdapter(list);
+		list = new ArrayList<Question>();
+		adapter = new MyAdapter(list);
 		listview.setAdapter(adapter);
-
 	}
+
+	Gson gson = new Gson();
+	private List<Question> list;
+	private BaseAdapter<Question> adapter;
 
 	private void initData()
 	{
-		// TODO Auto-generated method stub
+		Intent intent = getIntent();
+		int themeId = intent.getIntExtra("themeId", 0);
+		Parameters parameters = new Parameters();
+		parameters.add("id", themeId + "");
+		HttpUtil.post(NetworkUtil.themeGetById, parameters, new RequestCallBack<String>()
+		{
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				CommonUtil.toast("数据成功");
+				Response<Theme> resp = gson.fromJson(responseInfo.result, new TypeToken<Response<Theme>>()
+				{}.getType());
+				if (resp.code == 200)
+				{
+					//显示主题的名字
+					tv_theme.setText(resp.info.Name);
+					
+					//显示主题对应的问题
+					list.clear();
+					List<Question> questions = resp.info.Questions;
+					for (Question question : questions)
+					{
+						list.add(question);
+					}
+					adapter.notifyDataSetChanged();
+				}
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				
+
+			} 		});
 
 	}
 
-	private class MyAdapter extends BaseAdapter<Theme>
+	private class MyAdapter extends BaseAdapter<Question>
 	{
 
-		public MyAdapter(List<Theme> list)
+		public MyAdapter(List<Question> list)
 		{
 			super(list);
 		}
@@ -88,7 +126,7 @@ public class QuestionActivity extends Activity
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			Theme item = getItem(position);
+			Question item = getItem(position);
 
 			TextView textView = new TextView(getApplication());
 			textView.setText(item.Name);

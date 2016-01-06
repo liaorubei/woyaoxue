@@ -473,19 +473,23 @@ public class CallActivity extends Activity implements OnClickListener
 					v.findViewById(R.id.iv_card).setVisibility(View.INVISIBLE);
 
 					// 构造自定义通知，指定接收者
-					NimSysNotice<String> notice = new NimSysNotice<String>();
-					notice.NoticeType = NimSysNotice.NoticeType_Card;
-					notice.info = item.Name;
+					NimSysNotice<Theme> notice = new NimSysNotice<Theme>();
+					notice.NoticeType = NimSysNotice.NoticeType_Card;					
+					notice.info =item;
 
 					CustomNotification notification = new CustomNotification();
 					notification.setFromAccount(source.Accid);
 					notification.setSessionId(target.Accid);
 					notification.setSessionType(SessionTypeEnum.P2P);
 					notification.setSendToOnlineUserOnly(true);
-					notification.setContent(new Gson().toJson(notice));
+					notification.setContent(gson.toJson(notice));
 
 					// 发送自定义通知
 					NIMClient.getService(MsgService.class).sendCustomNotification(notification).setCallback(sendcallBack);
+					if (cardDialog != null)
+					{
+						cardDialog.dismiss();
+					}
 				}
 			});
 

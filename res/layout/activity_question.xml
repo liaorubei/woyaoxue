@@ -3,22 +3,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tv_theme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="主题:" />
-
-        <TextView
-            android:id="@+id/tv_theme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="论持久战" />
-    </LinearLayout>
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="论持久战"
+        android:textColor="@color/color_one" />
 
     <ListView
         android:id="@id/listview"

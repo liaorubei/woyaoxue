@@ -29,6 +29,7 @@ public class NetworkUtil
 	public static final String callFinish = domain + "/api/Calllog/finish";
 	public static final String userGetByAccId = domain + "/api/NimUser/GetByAccId";
 	public static final String GetStudentCalllogByAccId = domain + "/api/CallLog/GetStudentCalllogByAccId";
+	public static final String themeGetById = domain+"/api/Theme/GetById";
 
 	public static String format(String text, Object... para)
 	{

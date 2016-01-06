@@ -19,6 +19,7 @@ import com.netease.nimlib.sdk.msg.model.CustomNotification;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.NimSysNotice;
 import com.newclass.woyaoxue.bean.Response;
+import com.newclass.woyaoxue.bean.Theme;
 import com.newclass.woyaoxue.bean.User;
 import com.newclass.woyaoxue.util.CommonUtil;
 import com.newclass.woyaoxue.util.HttpUtil;
@@ -128,6 +129,7 @@ public class TakeActivity extends Activity implements OnClickListener
 		}
 	};
 
+	private Theme currentTheme = null;
 	// 自定义系统通知的广播接收者
 	private BroadcastReceiver receiver = new BroadcastReceiver()
 	{
@@ -138,13 +140,15 @@ public class TakeActivity extends Activity implements OnClickListener
 			// 从 intent 中取出自定义通知， intent 中只包含了一个 CustomNotification 对象
 			CustomNotification notification = (CustomNotification) intent.getSerializableExtra(NimIntent.EXTRA_BROADCAST_MSG);
 
-			NimSysNotice<String> notice = new Gson().fromJson(notification.getContent(), new TypeToken<NimSysNotice<String>>()
+			NimSysNotice<Theme> notice = gson.fromJson(notification.getContent(), new TypeToken<NimSysNotice<Theme>>()
 			{}.getType());
+
 			if (notice.NoticeType == NimSysNotice.NoticeType_Card)
 			{
-				CommonUtil.toast("对方点击了:" + notice.info);
+				CommonUtil.toast("对方点击了:" + notice.info.Name);
 			}
-
+			currentTheme = notice.info;
+			// showThemeQuestion();
 		}
 	};
 
@@ -155,6 +159,8 @@ public class TakeActivity extends Activity implements OnClickListener
 	private void accept()
 	{
 		AVChatManager.getInstance().accept(null, avChatCallback);
+		cm_time.setBase(SystemClock.elapsedRealtime());
+		cm_time.start();
 	}
 
 	private void hangup()
@@ -307,13 +313,24 @@ public class TakeActivity extends Activity implements OnClickListener
 
 		case R.id.bt_text:
 		{
-			Intent intent = new Intent(getApplication(), QuestionActivity.class);
-			startActivity(intent);
+			showThemeQuestion();
 		}
 			break;
 		default:
 			break;
 		}
+	}
+
+	private void showThemeQuestion()
+	{
+		if (currentTheme == null)
+		{
+			CommonUtil.toast("对方还没有选择学习主题");
+			return;
+		}
+		Intent intent = new Intent(getApplication(), QuestionActivity.class);
+		intent.putExtra("themeId", currentTheme.Id);
+		startActivity(intent);
 	}
 
 	@Override
@@ -327,6 +344,7 @@ public class TakeActivity extends Activity implements OnClickListener
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(this.getPackageName() + NimIntent.ACTION_RECEIVE_CUSTOM_NOTIFICATION);
+
 		registerReceiver(receiver, filter);
 	}
 
