@@ -3,7 +3,7 @@
     package="com.voc.woyaoxue"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="20160107" >
+    android:versionName="20160108" >
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -125,8 +125,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.newclass.woyaoxue.activity.TeacherActivity"
-            android:label="教师端" >
+            android:name="com.newclass.woyaoxue.activity.TeacherQueueActivity"
+            android:label="教师排队" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -184,9 +184,11 @@
         <activity
             android:name="com.newclass.woyaoxue.activity.FriendSearchActivity"
             android:label="查找学友" />
-        <activity
+        <!--
+             <activity
             android:name="com.newclass.woyaoxue.activity.TeacherQueueActivity"
             android:label="教师排队" />
+        -->
         <activity
             android:name="com.newclass.woyaoxue.activity.RandomActivity"
             android:label="随机拨打" />

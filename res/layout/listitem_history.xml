@@ -18,7 +18,7 @@
             android:id="@+id/tv_theme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="论经济发展"
+            android:text="论经济发展/r/n论经济发展论经济发展论经济发展论经济发展论经济发展论经济发展论经济发展论经济发展论经济发展论经济发展"
             android:textColor="@color/black" />
     </LinearLayout>
 
@@ -105,12 +105,16 @@
                 android:text="评分:"
                 android:textColor="@color/black" />
 
-            <TextView
-                android:id="@+id/tv_score"
+
+            <RatingBar
+                android:id="@+id/rb_score"
+                style="?android:attr/ratingBarStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="A"
-                android:textColor="@color/black" />
+                android:maxHeight="15dp"
+                android:minHeight="15dp"
+                android:numStars="5"
+                android:rating="4" />
         </LinearLayout>
     </LinearLayout>
 

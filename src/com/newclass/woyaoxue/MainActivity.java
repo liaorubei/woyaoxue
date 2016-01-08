@@ -14,6 +14,7 @@ import com.newclass.woyaoxue.activity.FolderActivity;
 import com.newclass.woyaoxue.activity.RandomActivity;
 import com.newclass.woyaoxue.activity.SignInActivity;
 import com.newclass.woyaoxue.activity.StudentActivity;
+import com.newclass.woyaoxue.activity.TakeActivity;
 import com.newclass.woyaoxue.activity.TestActivity;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.service.DownloadService;
@@ -56,10 +57,9 @@ public class MainActivity extends Activity implements OnClickListener
 	public void onBackPressed()
 	{
 		// TODO Auto-generated method stub
-		 super.onBackPressed();
+		super.onBackPressed();
 		// back = 1;
 		// CommonUtil.toast("再次点击退出");
-
 	}
 
 	@Override
@@ -69,9 +69,9 @@ public class MainActivity extends Activity implements OnClickListener
 		{
 		case R.id.bt_chat:
 		{
-			 //Intent intent = new Intent(this, StudentActivity.class);
-			//Intent intent = new Intent(this, CallActivity.class);
-			 Intent intent = new Intent(this, RandomActivity.class);
+			// Intent intent = new Intent(this, StudentActivity.class);
+			// Intent intent = new Intent(this, TakeActivity.class);
+			Intent intent = new Intent(this, RandomActivity.class);
 			startActivity(intent);
 			// this.finish();
 

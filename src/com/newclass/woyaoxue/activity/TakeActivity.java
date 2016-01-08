@@ -30,6 +30,7 @@ import com.voc.woyaoxue.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +43,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
 
 /**
@@ -52,20 +55,75 @@ import android.widget.TextView;
 public class TakeActivity extends Activity implements OnClickListener
 {
 	public static final int CALL_TYPE_AUDIO = 1;
-	public static final String CALL_TYPE_KEY = "CALL_TYPE_KEY";
 	public static final int CALL_TYPE_VIDEO = 2;
+	public static final String CALL_TYPE_KEY = "CALL_TYPE_KEY";
+	protected static String KEY_CHATDATA = "KEY_CHATDATA";
 	public static final String KEY_NICKNAME = "KEY_NICKNAME";
 	public static final String KEY_TARGET = "TARGET";
 	protected static final String TAG = "TakeActivity";
-	protected static String KEY_CHATDATA = "KEY_CHATDATA";
 
-	private AVChatCallback<Void> avChatCallback;
 	private Button bt_hangup, bt_accept, bt_mute, bt_free, bt_face, bt_text, bt_card, bt_more;
-	private AlertDialog cardDialog;
 	private Chronometer cm_time;
+	private Theme currentTheme = null;
+	private Gson gson = new Gson();
 	private ImageView iv_icon;
+	private AlertDialog ratingDialog;
+	protected boolean isAccept = false;
 
-	private Observer<AVChatCalleeAckEvent> observer = new Observer<AVChatCalleeAckEvent>()
+	private AVChatCallback<Void> avChatCallbackAccept = new AVChatCallback<Void>()
+	{
+
+		@Override
+		public void onException(Throwable arg0)
+		{
+
+		}
+
+		@Override
+		public void onFailed(int arg0)
+		{
+
+		}
+
+		@Override
+		public void onSuccess(Void arg0)
+		{
+			cm_time.setBase(SystemClock.elapsedRealtime());
+			cm_time.start();
+			isAccept = true;
+		}
+	};
+
+	private AVChatCallback<Void> avChatCallbackHangup = new AVChatCallback<Void>()
+	{
+
+		@Override
+		public void onException(Throwable arg0)
+		{
+
+		}
+
+		@Override
+		public void onFailed(int arg0)
+		{
+
+		}
+
+		@Override
+		public void onSuccess(Void arg0)
+		{
+			if (ratingDialog == null)
+			{
+				createRatingDialog();
+			}
+			if (isAccept)
+			{
+				ratingDialog.show();
+			}
+		}
+	};
+
+	private Observer<AVChatCalleeAckEvent> observerCallack = new Observer<AVChatCalleeAckEvent>()
 	{
 		private static final long serialVersionUID = 1L;
 
@@ -108,16 +166,22 @@ public class TakeActivity extends Activity implements OnClickListener
 		@Override
 		public void onEvent(AVChatCommonEvent event)
 		{
+			cm_time.stop();
 			Log.i("logi", "对方已挂断 ChatId:" + event.getChatId());
 			Parameters parameters = new Parameters();
 			parameters.add("chatId", event.getChatId() + "");
 
 			HttpUtil.post(NetworkUtil.callFinish, parameters, null);
-			finish();
+
+			if (ratingDialog == null)
+			{
+				createRatingDialog();
+			}
+			ratingDialog.show();
 		}
 	};
 
-	private Observer<AVChatTimeOutEvent> observer3 = new Observer<AVChatTimeOutEvent>()
+	private Observer<AVChatTimeOutEvent> observerTimeout = new Observer<AVChatTimeOutEvent>()
 	{
 		private static final long serialVersionUID = 1L;
 
@@ -129,7 +193,6 @@ public class TakeActivity extends Activity implements OnClickListener
 		}
 	};
 
-	private Theme currentTheme = null;
 	// 自定义系统通知的广播接收者
 	private BroadcastReceiver receiver = new BroadcastReceiver()
 	{
@@ -153,55 +216,13 @@ public class TakeActivity extends Activity implements OnClickListener
 	};
 
 	private User target;
-
 	private TextView tv_nickname;
-
-	private void accept()
-	{
-		AVChatManager.getInstance().accept(null, avChatCallback);
-		cm_time.setBase(SystemClock.elapsedRealtime());
-		cm_time.start();
-	}
-
-	private void hangup()
-	{
-		if (avChatCallback == null)
-		{
-			avChatCallback = new AVChatCallback<Void>()
-			{
-
-				@Override
-				public void onException(Throwable arg0)
-				{
-					Log.i("logi", "callactivity hangUp onException:" + arg0.getMessage());
-					finish();
-				}
-
-				@Override
-				public void onFailed(int arg0)
-				{
-					Log.i("logi", "callactivity hangUp onFailed:" + arg0);
-					finish();
-				}
-
-				@Override
-				public void onSuccess(Void arg0)
-				{
-
-					Log.i("logi", "callactivity hangUp onSuccess");
-					finish();
-				}
-			};
-		}
-		AVChatManager.getInstance().hangUp(avChatCallback);
-	}
-
-	private Gson gson = new Gson();
+	private AVChatData avChatData;
 
 	private void initData()
 	{
 		Intent intent = getIntent();
-		AVChatData avChatData = (AVChatData) intent.getSerializableExtra(KEY_CHATDATA);
+		avChatData = (AVChatData) intent.getSerializableExtra(KEY_CHATDATA);
 		target = new User();
 		target.Accid = avChatData.getAccount();
 
@@ -209,6 +230,10 @@ public class TakeActivity extends Activity implements OnClickListener
 		parameters.add("accid", target.Accid);
 		HttpUtil.post(NetworkUtil.userGetByAccId, parameters, new RequestCallBack<String>()
 		{
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{}
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
@@ -221,15 +246,54 @@ public class TakeActivity extends Activity implements OnClickListener
 					target.NickName = resp.info.NickName;
 					tv_nickname.setText(target.NickName);
 				}
-
 			}
-
-			@Override
-			public void onFailure(HttpException error, String msg)
-			{}
 		});
 
 		registerObserver(true);
+	}
+
+	protected void createRatingDialog()
+	{
+		Builder builder = new AlertDialog.Builder(TakeActivity.this);
+
+		View inflate = View.inflate(TakeActivity.this, R.layout.dialog_rating, null);
+		View bt_positive = inflate.findViewById(R.id.bt_positive);
+		final RatingBar rb_score = (RatingBar) inflate.findViewById(R.id.rb_score);
+
+		bt_positive.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View v)
+			{
+				Parameters parameters = new Parameters();
+				parameters.add("chatId", avChatData.getChatId() + "");
+				parameters.add("score", (int) rb_score.getRating() + "");
+				Log.i(TAG, "parameters:" + parameters.get());
+				HttpUtil.post(NetworkUtil.calllogRating, parameters, new RequestCallBack<String>()
+				{
+
+					@Override
+					public void onSuccess(ResponseInfo<String> responseInfo)
+					{
+						CommonUtil.toast("评分成功");
+						finish();
+					}
+
+					@Override
+					public void onFailure(HttpException error, String msg)
+					{
+						Log.i(TAG, "onFailure RequestUrl:" + getRequestUrl() + " msg:" + msg);
+						CommonUtil.toast("评分失败");
+					}
+				});
+				ratingDialog.dismiss();
+			}
+		});
+
+		builder.setView(inflate);
+		builder.setCancelable(false);
+		ratingDialog = builder.create();
 	}
 
 	private void initView()
@@ -266,11 +330,11 @@ public class TakeActivity extends Activity implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.bt_hangup:
-			hangup();
+			AVChatManager.getInstance().hangUp(avChatCallbackHangup);
 			break;
 
 		case R.id.bt_accept:
-			accept();
+			AVChatManager.getInstance().accept(null, avChatCallbackAccept);
 			break;
 
 		case R.id.bt_mute:
@@ -298,6 +362,11 @@ public class TakeActivity extends Activity implements OnClickListener
 			break;
 
 		case R.id.bt_card:
+			if (ratingDialog == null)
+			{
+				createRatingDialog();
+			}
+			ratingDialog.show();
 			break;
 
 		case R.id.iv_icon:
@@ -306,7 +375,10 @@ public class TakeActivity extends Activity implements OnClickListener
 		case R.id.bt_face:
 		{
 			Intent intent = new Intent(getApplication(), HistoryActivity.class);
-			intent.putExtra("target.Accid", target.Accid);
+			if (target != null)
+			{
+				intent.putExtra("target.Accid", target.Accid);
+			}
 			startActivity(intent);
 		}
 			break;
@@ -321,18 +393,6 @@ public class TakeActivity extends Activity implements OnClickListener
 		}
 	}
 
-	private void showThemeQuestion()
-	{
-		if (currentTheme == null)
-		{
-			CommonUtil.toast("对方还没有选择学习主题");
-			return;
-		}
-		Intent intent = new Intent(getApplication(), QuestionActivity.class);
-		intent.putExtra("themeId", currentTheme.Id);
-		startActivity(intent);
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -344,7 +404,6 @@ public class TakeActivity extends Activity implements OnClickListener
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(this.getPackageName() + NimIntent.ACTION_RECEIVE_CUSTOM_NOTIFICATION);
-
 		registerReceiver(receiver, filter);
 	}
 
@@ -360,7 +419,7 @@ public class TakeActivity extends Activity implements OnClickListener
 	{
 
 		// 监听网络通话被叫方的响应（接听、拒绝、忙）
-		AVChatManager.getInstance().observeCalleeAckNotification(observer, register);
+		AVChatManager.getInstance().observeCalleeAckNotification(observerCallack, register);
 
 		// 监听网络通话对方挂断的通知,即在正常通话时,结束通话
 		AVChatManager.getInstance().observeHangUpNotification(observerHangup, register);
@@ -369,7 +428,19 @@ public class TakeActivity extends Activity implements OnClickListener
 		// 主叫方在拨打网络通话时，超过 45 秒被叫方还未接听来电，则自动挂断。
 		// 被叫方超过 45 秒未接听来听，也会自动挂断
 		// 在通话过程中网络超时 30 秒自动挂断。
-		AVChatManager.getInstance().observeTimeoutNotification(observer3, register);
+		AVChatManager.getInstance().observeTimeoutNotification(observerTimeout, register);
+	}
+
+	private void showThemeQuestion()
+	{
+		if (currentTheme == null)
+		{
+			CommonUtil.toast("对方还没有选择学习主题");
+			return;
+		}
+		Intent intent = new Intent(getApplication(), QuestionActivity.class);
+		intent.putExtra("themeId", currentTheme.Id);
+		startActivity(intent);
 	}
 
 	private class MyAdapter extends BaseAdapter<String>

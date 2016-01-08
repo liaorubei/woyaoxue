@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class HistoryActivity extends Activity
@@ -37,7 +38,6 @@ public class HistoryActivity extends Activity
 	private ListView listview;
 	private List<CallLog> list;
 	private BaseAdapter<CallLog> adapter;
-	private int id;
 	private String targetAccid;
 	private SimpleDateFormat sdf;
 
@@ -81,7 +81,6 @@ public class HistoryActivity extends Activity
 	private void initData()
 	{
 		Intent intent = getIntent();
-		id = intent.getIntExtra("id", 1);
 		targetAccid = intent.getStringExtra("target.Accid");
 
 		Parameters parameters = new Parameters();
@@ -105,6 +104,7 @@ public class HistoryActivity extends Activity
 					for (CallLog callLog : logs)
 					{
 						list.add(callLog);
+						Log.i(TAG, "score:" + callLog.Score);
 					}
 					adapter.notifyDataSetChanged();
 				}
@@ -135,9 +135,19 @@ public class HistoryActivity extends Activity
 			TextView tv_tiem = (TextView) inflate.findViewById(R.id.tv_time);
 			TextView tv_date = (TextView) inflate.findViewById(R.id.tv_date);
 			TextView tv_teacher = (TextView) inflate.findViewById(R.id.tv_teacher);
-			TextView tv_score = (TextView) inflate.findViewById(R.id.tv_score);
+			RatingBar rb_score = (RatingBar) inflate.findViewById(R.id.rb_score);
 
-			tv_theme.setText("主题");
+			tv_theme.setText("");
+			if (item.Themes != null && item.Themes.size() > 0)
+			{
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < item.Themes.size(); i++)
+				{
+					sb.append(item.Themes.get(i).Name + "\r\n");
+				}
+				tv_theme.setText(sb.toString());
+			}
+
 			if (item.Finish != null)
 			{
 				tv_tiem.setText(CommonUtil.millisecondsFormat(item.Finish.getTime() - item.Start.getTime()));
@@ -145,7 +155,8 @@ public class HistoryActivity extends Activity
 
 			tv_date.setText(sdf.format(item.Start));
 			tv_teacher.setText(item.Teacher.Name);
-			tv_score.setText(item.Score);
+			rb_score.setNumStars(5);
+			rb_score.setRating(item.Score);
 
 			return inflate;
 		}

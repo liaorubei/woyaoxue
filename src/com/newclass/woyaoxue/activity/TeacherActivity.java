@@ -24,7 +24,6 @@ public class TeacherActivity extends Activity implements OnClickListener
 		initView();
 		NIMClient.getService(AuthService.class).logout();
 		startActivity(new Intent(this, SignInActivity.class));
-
 	}
 
 	private void initView()
@@ -41,41 +40,7 @@ public class TeacherActivity extends Activity implements OnClickListener
 		switch (v.getId())
 		{
 		case R.id.bt_queue:
-			startActivity(new Intent(getApplication(),TeacherQueueActivity.class));
-			
-			
-			
-			/*
-			SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-			accid = sp.getString("accid", "");
-
-			bt_queue.setEnabled(false);
-
-			Parameters parameters = new Parameters();
-			parameters.add("id", getSharedPreferences("user", MODE_PRIVATE).getInt("id", 0) + "");
-			HttpUtil.post(NetworkUtil.teacherEnqueue, parameters, new RequestCallBack<String>()
-			{
-
-				@Override
-				public void onSuccess(ResponseInfo<String> responseInfo)
-				{
-					Response<Rank> resp = new Gson().fromJson(responseInfo.result, new TypeToken<Response<Rank>>()
-					{}.getType());
-					if (resp.code == 200)
-					{
-						Toast.makeText(TeacherActivity.this, "排队成功,当前名次为:" + resp.info.Rank, Toast.LENGTH_SHORT).show();
-					}
-					bt_queue.setEnabled(true);
-				}
-
-				@Override
-				public void onFailure(HttpException error, String msg)
-				{
-					bt_queue.setEnabled(true);
-					Toast.makeText(TeacherActivity.this, "排除失败", Toast.LENGTH_SHORT).show();
-				}
-			});
-			*/
+			startActivity(new Intent(getApplication(), TeacherQueueActivity.class));
 			break;
 
 		case R.id.bt_group:

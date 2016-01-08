@@ -8,6 +8,9 @@ import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.netease.nimlib.sdk.NIMClient;
+import com.netease.nimlib.sdk.StatusCode;
+import com.netease.nimlib.sdk.auth.AuthService;
 import com.newclass.woyaoxue.base.BaseAdapter;
 import com.newclass.woyaoxue.bean.Rank;
 import com.newclass.woyaoxue.bean.Response;
@@ -18,7 +21,7 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
@@ -40,7 +43,6 @@ public class TeacherQueueActivity extends Activity
 	private List<User> list;
 	private MyAdapter adapter;
 	private ListView listview;
-	private String accid;
 	private Gson gson = new Gson();
 
 	@Override
@@ -49,10 +51,10 @@ public class TeacherQueueActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_teacherqueue);
 
-		initView();
+		// 为了便于测试,没有上次帐号的干扰,每次进入之前都登出上次的帐号
+		NIMClient.getService(AuthService.class).logout();
 
-		SharedPreferences sp = getSharedPreferences("user", MODE_PRIVATE);
-		accid = sp.getString("accid", "");
+		initView();
 	}
 
 	@Override
@@ -63,22 +65,15 @@ public class TeacherQueueActivity extends Activity
 	}
 
 	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		initData();
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
 		case R.id.menu_refresh_teacher:
-			initData();
+			refresh();
 			break;
 		case R.id.menu_teacher_queue:
-			queue();
+			enqueue();
 			break;
 		default:
 			break;
@@ -86,8 +81,15 @@ public class TeacherQueueActivity extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void queue()
+	private void enqueue()
 	{
+		StatusCode status = NIMClient.getStatus();
+		if (status != StatusCode.LOGINED)
+		{
+			startActivity(new Intent(this, SignInActivity.class));
+			return;
+		}
+
 		Parameters parameters = new Parameters();
 		parameters.add("id", getSharedPreferences("user", MODE_PRIVATE).getInt("id", 0) + "");
 		HttpUtil.post(NetworkUtil.teacherEnqueue, parameters, new RequestCallBack<String>()
@@ -107,8 +109,15 @@ public class TeacherQueueActivity extends Activity
 		});
 	}
 
-	private void initData()
+	private void refresh()
 	{
+		StatusCode status = NIMClient.getStatus();
+		if (status != StatusCode.LOGINED)
+		{
+			startActivity(new Intent(this, SignInActivity.class));
+			return;
+		}
+
 		Parameters parameters = new Parameters();
 		parameters.add("id", getSharedPreferences("user", MODE_PRIVATE).getInt("id", 0) + "");
 		HttpUtil.post(NetworkUtil.teacherRefresh, parameters, new RequestCallBack<String>()
@@ -148,6 +157,7 @@ public class TeacherQueueActivity extends Activity
 		list = new ArrayList<User>();
 		adapter = new MyAdapter(list);
 		listview.setAdapter(adapter);
+		//listview.smoothScrollToPosition(position);
 	}
 
 	private class MyAdapter extends BaseAdapter<User>
@@ -161,7 +171,8 @@ public class TeacherQueueActivity extends Activity
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			final User user = list.get(position);
+			User user = list.get(position);
+			String accid = getSharedPreferences("user", MODE_PRIVATE).getString("accid", "");
 			View inflate = View.inflate(TeacherQueueActivity.this, R.layout.listitem_teacherqueue, null);
 			TextView tv_nickname = (TextView) inflate.findViewById(R.id.tv_nickname);
 			TextView tv_username = (TextView) inflate.findViewById(R.id.tv_username);
@@ -172,7 +183,6 @@ public class TeacherQueueActivity extends Activity
 			tv_category.setText(user.Category == 1 ? "教师" : "学生");
 
 			tv_username.setTextColor(accid.equals(user.Accid) ? Color.RED : Color.BLACK);
-
 			return inflate;
 		}
 	}
