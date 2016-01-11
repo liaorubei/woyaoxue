@@ -1,21 +1,65 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@color/gray7" >
 
-    <Button
-        android:id="@+id/bt_chat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="chat" />
+    <RadioGroup
+        android:id="@+id/ll_ctrl"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="1dp"
+        android:background="#fff"
+        android:orientation="horizontal" >
 
-    <Button
-        android:id="@+id/bt_listen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/bt_chat"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:text="listen" />
+        <RadioButton
+            android:id="@+id/rb_random"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:text="chat"
+            android:textColor="@drawable/selector_tabtext"
+            android:textSize="20sp" />
+
+        <RadioButton
+            android:id="@+id/rb_listen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:text="listen"
+            android:textColor="@drawable/selector_tabtext"
+            android:textSize="20sp" />
+
+        <RadioButton
+            android:id="@+id/rb_my"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:text="my"
+            android:textColor="@drawable/selector_tabtext"
+            android:textSize="20sp" />
+    </RadioGroup>
+
+    <FrameLayout
+        android:id="@+id/fl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/ll_ctrl"
+        android:background="#fff" >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_launcher" />
+    </FrameLayout>
 
 </RelativeLayout>

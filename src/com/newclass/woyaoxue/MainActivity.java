@@ -1,30 +1,30 @@
 package com.newclass.woyaoxue;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-
-import com.newclass.woyaoxue.activity.CallActivity;
-import com.newclass.woyaoxue.activity.FolderActivity;
-import com.newclass.woyaoxue.activity.RandomActivity;
-import com.newclass.woyaoxue.activity.SignInActivity;
-import com.newclass.woyaoxue.activity.StudentActivity;
-import com.newclass.woyaoxue.activity.TakeActivity;
-import com.newclass.woyaoxue.activity.TestActivity;
+import com.netease.nimlib.sdk.NIMClient;
+import com.netease.nimlib.sdk.auth.AuthService;
+import com.newclass.woyaoxue.fragment.ListenFragment;
+import com.newclass.woyaoxue.fragment.MyFragment;
+import com.newclass.woyaoxue.fragment.RandomFragment;
 import com.newclass.woyaoxue.service.AutoUpdateService;
 import com.newclass.woyaoxue.service.DownloadService;
-import com.newclass.woyaoxue.util.CommonUtil;
 import com.voc.woyaoxue.R;
 
-public class MainActivity extends Activity implements OnClickListener
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+
+public class MainActivity extends FragmentActivity
 {
 	// Monkey测试代码
 	// adb shell monkey -p com.voc.woyaoxue -s 500 --ignore-crashes --ignore-timeouts --monitor-native-crashes -v -v 10000 > E:\log.txt
+
+	protected static final String TAG = "MainActivity";
+	private RadioGroup ll_ctrl;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -39,54 +39,51 @@ public class MainActivity extends Activity implements OnClickListener
 		// 自动升级服务
 		Intent service = new Intent(this, AutoUpdateService.class);
 		startService(service);
+
+		NIMClient.getService(AuthService.class).logout();// 登出帐号
 	}
 
-	private Button bt_chat, bt_listen;
-	private int back = 0;
+	private Fragment randomFragment, listenFragment, myFragment;
+	private FragmentPagerAdapter kk;
 
 	private void initView()
 	{
-		bt_chat = (Button) findViewById(R.id.bt_chat);
-		bt_listen = (Button) findViewById(R.id.bt_listen);
-
-		bt_chat.setOnClickListener(this);
-		bt_listen.setOnClickListener(this);
-	}
-
-	@Override
-	public void onBackPressed()
-	{
-		// TODO Auto-generated method stub
-		super.onBackPressed();
-		// back = 1;
-		// CommonUtil.toast("再次点击退出");
-	}
-
-	@Override
-	public void onClick(View v)
-	{
-		switch (v.getId())
+		ll_ctrl = (RadioGroup) findViewById(R.id.ll_ctrl);
+		ll_ctrl.setOnCheckedChangeListener(new OnCheckedChangeListener()
 		{
-		case R.id.bt_chat:
-		{
-			// Intent intent = new Intent(this, StudentActivity.class);
-			// Intent intent = new Intent(this, TakeActivity.class);
-			Intent intent = new Intent(this, RandomActivity.class);
-			startActivity(intent);
-			// this.finish();
 
-		}
-			break;
-		case R.id.bt_listen:
-		{
-			Intent intent = new Intent(this, FolderActivity.class);
-			// Intent intent = new Intent(this, TestActivity.class);
-			startActivity(intent);
-			// this.finish();
-		}
-			break;
-		default:
-			break;
-		}
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId)
+			{
+
+				switch (checkedId)
+				{
+				case R.id.rb_random:
+				{
+					if (randomFragment == null)
+					{
+						randomFragment = new RandomFragment();
+					}
+					getSupportFragmentManager().beginTransaction().replace(R.id.fl_content, randomFragment).commit();
+				}
+					break;
+				case R.id.rb_listen:
+				{
+					if (listenFragment == null)
+					{
+						listenFragment = new ListenFragment();
+					}
+					getSupportFragmentManager().beginTransaction().replace(R.id.fl_content, listenFragment).commit();
+				}
+					break;
+				case R.id.rb_my:
+					getSupportFragmentManager().beginTransaction().replace(R.id.fl_content, new MyFragment()).commit();
+					break;
+				default:
+					break;
+				}
+			}
+		});
+
 	}
 }

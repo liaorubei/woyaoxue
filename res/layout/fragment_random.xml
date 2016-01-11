@@ -10,7 +10,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="100dp"
-        android:text="点我" />
+        android:text="call" />
 
     <Button
         android:id="@+id/bt_text"

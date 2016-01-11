@@ -1,22 +1,20 @@
 package com.newclass.woyaoxue.fragment;
 
-import com.newclass.woyaoxue.view.ContentView;
-import com.newclass.woyaoxue.view.RandomView;
-import com.newclass.woyaoxue.view.ContentView.ViewState;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-public class RandomFragment extends Fragment
+public class MyFragment extends Fragment
 {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		ContentView randomView = new RandomView(getActivity());
-		randomView.showView(ViewState.SUCCESS);
-		return randomView;
+		TextView textView = new TextView(getActivity());
+		textView.setText("MyFragment");
+
+		return textView;
 	}
 }
