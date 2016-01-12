@@ -37,7 +37,7 @@
             android:textSize="20sp" />
 
         <RadioButton
-            android:id="@+id/rb_my"
+            android:id="@+id/rb_person"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

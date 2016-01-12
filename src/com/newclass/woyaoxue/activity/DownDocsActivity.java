@@ -72,6 +72,13 @@ public class DownDocsActivity extends Activity implements OnClickListener {
 				tv_cancel = (TextView) view.findViewById(R.id.tv_cancel);
 				return view;
 			}
+
+			@Override
+			public void initData()
+			{
+				// TODO Auto-generated method stub
+				
+			}
 		};
 		setContentView(contentView);
 

@@ -31,6 +31,7 @@ import com.newclass.woyaoxue.util.NetworkUtil;
 import com.voc.woyaoxue.R;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -194,8 +195,7 @@ public class SignInActivity extends Activity implements OnClickListener
 
 		initView();
 
-		NIMClient.getService(AuthService.class).logout();
-
+		NIMClient.getService(AuthService.class).logout();// 登出帐号
 	}
 
 	public void signIn(final String username, final String password)
@@ -216,6 +216,7 @@ public class SignInActivity extends Activity implements OnClickListener
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo)
 			{
+				Log.i(TAG, "汉问登录成功,下面开始登录云信");
 				bt_login.setEnabled(true);
 				Response<User> response = new Gson().fromJson(responseInfo.result, new TypeToken<Response<User>>()
 				{}.getType());
@@ -228,6 +229,9 @@ public class SignInActivity extends Activity implements OnClickListener
 					editor.putInt("id", response.info.Id);
 					editor.putString("accid", response.info.Accid);
 					editor.putString("token", response.info.Token);
+					editor.putString("nickname", response.info.NickName);
+					editor.putInt("gender", response.info.Gender);
+					editor.putString("avater", response.info.Avater);
 					editor.putString("username", username);
 					editor.putString("password", password);
 					editor.commit();
@@ -266,4 +270,5 @@ public class SignInActivity extends Activity implements OnClickListener
 		AVChatManager.getInstance().observeIncomingCall(observerIncomingCall, true);
 
 	}
+
 }

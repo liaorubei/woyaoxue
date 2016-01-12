@@ -8,5 +8,10 @@ public class User
 	public String Token;
 	public String Name = "未定义昵称";
 	public String Username;
+	public String UserName;
+	public String PassWord;
+	public String Icon;
+	public String Avater;
+	public int Gender;
 	public int Category;
 }

@@ -46,9 +46,9 @@ public class FolderFragment extends Fragment
 	{
 	}
 
-	public FolderFragment(int i)
+	public FolderFragment(int levelId)
 	{
-		this.mLevelId = i;
+		this.mLevelId = levelId;
 	}
 
 	private void loadData()
@@ -152,6 +152,13 @@ public class FolderFragment extends Fragment
 						}
 					});
 					return view;
+				}
+
+				@Override
+				public void initData()
+				{
+					// TODO Auto-generated method stub
+					
 				}
 			};
 		}

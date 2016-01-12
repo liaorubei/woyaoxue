@@ -5,6 +5,7 @@ import com.netease.nimlib.sdk.NIMClient;
 import com.netease.nimlib.sdk.Observer;
 import com.netease.nimlib.sdk.SDKOptions;
 import com.netease.nimlib.sdk.StatusBarNotificationConfig;
+import com.netease.nimlib.sdk.auth.AuthService;
 import com.netease.nimlib.sdk.auth.LoginInfo;
 import com.netease.nimlib.sdk.avchat.AVChatManager;
 import com.netease.nimlib.sdk.avchat.model.AVChatData;
@@ -37,6 +38,7 @@ public class MyApplication extends Application
 	@Override
 	public void onCreate()
 	{
+
 		super.onCreate();
 		mContext = this;
 		SDKOptions options = getOptions();

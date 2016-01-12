@@ -372,6 +372,13 @@ public class FolderActivity extends FragmentActivity
 					});
 					return view;
 				}
+
+				@Override
+				public void initData()
+				{
+					// TODO Auto-generated method stub
+					
+				}
 			};
 
 		}

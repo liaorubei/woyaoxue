@@ -80,6 +80,13 @@ public class DocsActivity extends Activity {
 				listview = (XListView) view.findViewById(R.id.listview);
 				return view;
 			}
+
+			@Override
+			public void initData()
+			{
+				// TODO Auto-generated method stub
+				
+			}
 		};
 		setContentView(contentView);
 

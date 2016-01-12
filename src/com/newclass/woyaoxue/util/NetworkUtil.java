@@ -10,7 +10,6 @@ public class NetworkUtil
 	public static final String groupModify = domain + "/api/Group/Create";
 	public static final String groupRemove = domain + "/api/Group/Remove";
 	public static final String groupSelect = domain + "/api/Group/Select";
-
 	public static final String ObtainTeacher = domain + "/api/nimUser/ObtainTeacher";
 	public static final String studentCall = domain + "/api/student/call";
 	public static final String teacherEnqueue = domain + "/api/NimUser/Enqueue";
@@ -31,6 +30,7 @@ public class NetworkUtil
 	public static final String themeGetById = domain + "/api/Theme/GetById";
 	public static final String calllogRating = domain + "/api/CallLog/Rating";
 	public static final String levelSelect = domain + "/api/Level/Select";
+	public static final String folderGetByLevelId = domain + "/api/Folder/GetByLevelId";
 
 	public static String format(String text, Object... para)
 	{

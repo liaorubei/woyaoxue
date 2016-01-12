@@ -51,6 +51,8 @@ public abstract class ContentView extends FrameLayout
 		return contentView.findViewById(R.id.rl_loading);
 	}
 
+	public abstract void initData();
+
 	public abstract View onCreateSuccessView();
 
 	public void showView(ViewState viewState)
